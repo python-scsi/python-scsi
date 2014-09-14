@@ -26,8 +26,9 @@ SCSI_CDB_INQUIRY = 0x12
 #
 # INQUIRY VPD pages
 #
-SUPPORTED_VPD_PAGES   = 0x00
-DEVICE_IDENTIFICATION = 0x83
+class VPD:
+    SUPPORTED_VPD_PAGES   = 0x00
+    DEVICE_IDENTIFICATION = 0x83
 
 class Inquiry(SCSICommand):
     '''
@@ -98,7 +99,7 @@ class Inquiry(SCSICommand):
             self.add_result('qas', self.datain[56] & 0x02)
             self.add_result('ius', self.datain[56] & 0x01)
             return
-        if self._page_code == SUPPORTED_VPD_PAGES:
+        if self._page_code == VPD.SUPPORTED_VPD_PAGES:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('page_code', self.datain[1])
