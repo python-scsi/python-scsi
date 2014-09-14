@@ -20,6 +20,9 @@ from scsi_device import SCSIDevice
 
 from scsi_cdb_inquiry import Inquiry
 
+class OPCODE:
+    INQUIRY = 0x12
+
 SCSI_STATUS_GOOD                 = 0x00
 SCSI_STATUS_CHECK_CONDITION      = 0x02
 SCSI_STATUS_CONDITIONS_MET       = 0x04

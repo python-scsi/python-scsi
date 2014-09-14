@@ -16,12 +16,12 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+import scsi as SCSI
 from scsi_command import SCSICommand
 
 #
 # SCSI Inquiry command and definitions
 #
-SCSI_CDB_INQUIRY = 0x12
 
 #
 # INQUIRY VPD pages
@@ -57,7 +57,7 @@ class Inquiry(SCSICommand):
         :param alloclen:
         :return:
         '''
-        cdb = bytearray([SCSI_CDB_INQUIRY, 0x00, 0x00, 0x00, 0x00, 0x00])
+        cdb = bytearray([SCSI.OPCODE.INQUIRY, 0x00, 0x00, 0x00, 0x00, 0x00])
         if (evpd):
             cdb[1] |= 0x01
             cdb[2] = page_code
