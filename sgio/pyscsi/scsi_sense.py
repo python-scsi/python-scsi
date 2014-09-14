@@ -1,3 +1,20 @@
+# coding: utf-8
+
+#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+#
+#	   This program is free software; you can redistribute it and/or modify
+#	   it under the terms of the GNU Lesser General Public License as published by
+#	   the Free Software Foundation; either version 2.1 of the License, or
+#	   (at your option) any later version.
+#
+#	   This program is distributed in the hope that it will be useful,
+#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	   GNU Lesser General Public License for more details.
+#
+#	   You should have received a copy of the GNU Lesser General Public License
+#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 #
 # SPC4 4.6 Sense Data
 #
@@ -6,14 +23,24 @@ SENSE_FORMAT_DEFERRED_FIXED      = 0x71
 SENSE_FORMAT_CURRENT_DESCRIPTOR  = 0x72
 SENSE_FORMAT_DEFERRED_DESCRIPTOR = 0x73
 
-sense_key_dict = { 0x00: 'No Sense',        0x01: 'Recovered Error',
-                   0x02: 'Not Ready',       0x03: 'Medium Error',
-                   0x04: 'Hardware Error',  0x05: 'Illegal Request',
-                   0x06: 'Unit Attention',  0x07: 'Data Protect',
-                   0x08: 'Blank Check',     0x09: 'Vendor Specific',
-                   0x0a: 'Copy Aborted',    0x0b: 'Aborted Command',
-                   0x0d: 'Volume Overflow', 0x0e: 'Miscompare',
+# dict with common key code qualifiers
+sense_key_dict = { 0x00: 'No Sense',
+                   0x01: 'Recovered Error',
+                   0x02: 'Not Ready',
+                   0x03: 'Medium Error',
+                   0x04: 'Hardware Error',
+                   0x05: 'Illegal Request',
+                   0x06: 'Unit Attention',
+                   0x07: 'Data Protect',
+                   0x08: 'Blank Check',
+                   0x09: 'Vendor Specific',
+                   0x0a: 'Copy Aborted',
+                   0x0b: 'Aborted Command',
+                   0x0d: 'Volume Overflow',
+                   0x0e: 'Miscompare',
                    0x0f: 'Completed'}
+
+# dict with additional sense data
 sense_ascq_dict = { 0x2400: 'Invalid Field In CDB',
                     0x2401: 'CDB Decryption Error',
                     0x2404: 'Security Audit Value Frozen',
@@ -23,7 +50,13 @@ sense_ascq_dict = { 0x2400: 'Invalid Field In CDB',
                     0x2408: 'Invalid XCDB'
                     }
 
+# Exception Class for a SCSI REQUEST SENSE command
 class SCSICheckCondition(Exception):
+    '''Exception raised for errors in the SCSIDevice execute method
+
+    Attributes:
+        sense -- bytearray with additional data
+    '''
     def __init__(self, sense):
         self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
