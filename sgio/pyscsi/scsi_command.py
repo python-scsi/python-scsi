@@ -34,6 +34,23 @@ class SCSICommand:
         self.datain = bytearray(datain_alloclen)
         self._result = {}
 
+    def init_cdb(self, opcode):
+        if opcode < 0x20:
+            cdb = bytearray(6)
+        elif opcode < 0x60:
+            cdb = bytearray(10)
+        elif opcode < 0x80:
+            raise OpcodeException
+        elif opcode < 0xa0:
+            cdb = bytearray(16)
+        elif opcode < 0xc0:
+            cdb = bytearray(12)
+        else:
+            raise OpcodeException
+
+        cdb[0] = opcode
+        return cdb
+
     def execute(self):
         '''
 

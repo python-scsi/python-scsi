@@ -57,7 +57,7 @@ class Inquiry(SCSICommand):
         :param alloclen:
         :return:
         '''
-        cdb = bytearray([SCSI.OPCODE.INQUIRY, 0x00, 0x00, 0x00, 0x00, 0x00])
+        cdb = self.init_cdb(SCSI.OPCODE.INQUIRY)
         if (evpd):
             cdb[1] |= 0x01
             cdb[2] = page_code
