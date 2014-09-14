@@ -1,3 +1,20 @@
+/*
+	   Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
+
+	   This program is free software; you can redistribute it and/or modify
+	   it under the terms of the GNU Lesser General Public License as published by
+	   the Free Software Foundation; either version 2.1 of the License, or
+	   (at your option) any later version.
+
+	   This program is distributed in the hope that it will be useful,
+	   but WITHOUT ANY WARRANTY; without even the implied warranty of
+	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	   GNU Lesser General Public License for more details.
+
+	   You should have received a copy of the GNU Lesser General Public License
+	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -84,9 +101,9 @@ sgio_execute(PyObject *self, PyObject *args)
 
     if ((io_hdr.info & SG_INFO_OK_MASK) != SG_INFO_OK) {
         if (io_hdr.sb_len_wr > 0)
-	  return Py_BuildValue("i", SCSI_STATUS_CHECK_CONDITION);
+	        return Py_BuildValue("i", SCSI_STATUS_CHECK_CONDITION);
 
-	return Py_BuildValue("i", SCSI_STATUS_SGIO_ERROR);
+	    return Py_BuildValue("i", SCSI_STATUS_SGIO_ERROR);
    }
 
     return Py_BuildValue("i", SCSI_STATUS_GOOD);
@@ -98,7 +115,7 @@ sgio_close(PyObject *self, PyObject *args)
   int s;
 
   if (!PyArg_ParseTuple(args, "i", &s)) {
-      PyErr_SetString(SGIOError, "Wrong number of rguments to sgio_close");
+      PyErr_SetString(SGIOError, "Wrong number of arguments to sgio_close");
       return NULL;
   }
 

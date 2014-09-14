@@ -1,4 +1,21 @@
-import sys
+# coding: utf-8
+
+
+#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+#
+#	   This program is free software; you can redistribute it and/or modify
+#	   it under the terms of the GNU Lesser General Public License as published by
+#	   the Free Software Foundation; either version 2.1 of the License, or
+#	   (at your option) any later version.
+#
+#	   This program is distributed in the hope that it will be useful,
+#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	   GNU Lesser General Public License for more details.
+#
+#	   You should have received a copy of the GNU Lesser General Public License
+#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 from scsi_command import SCSICommand
 
 #
@@ -13,7 +30,18 @@ SUPPORTED_VPD_PAGES   = 0x00
 DEVICE_IDENTIFICATION = 0x83
 
 class Inquiry(SCSICommand):
+    '''
+
+    '''
     def __init__(self, dev, evpd = 0, page_code = 0, alloclen = 96):
+        '''
+
+        :param dev:
+        :param evpd:
+        :param page_code:
+        :param alloclen:
+        :return:
+        '''
         self._evpd = evpd
         self._page_code = page_code
         SCSICommand.__init__(self, dev, 0, alloclen)
@@ -21,6 +49,13 @@ class Inquiry(SCSICommand):
         self.execute()
 
     def build_cdb(self, evpd, page_code, alloclen ):
+        '''
+
+        :param evpd:
+        :param page_code:
+        :param alloclen:
+        :return:
+        '''
         cdb = bytearray([SCSI_CDB_INQUIRY, 0x00, 0x00, 0x00, 0x00, 0x00])
         if (evpd):
             cdb[1] |= 0x01
@@ -30,6 +65,10 @@ class Inquiry(SCSICommand):
         return cdb
 
     def unmarshall(self):
+        '''
+
+        :return:
+        '''
         if self._evpd == 0:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
