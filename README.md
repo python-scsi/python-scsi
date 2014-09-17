@@ -23,7 +23,19 @@ This will clone the source code to the current directory. If you download the zi
 
 ### build
 
+You usally will use the setup.py script to build the package and therefore you can various options. The simplest way is just use the build option. If you are already in the source folder just use:
+
+    $ python setup.py build
+    
+This will create a build folder in the actual folder with all the nessesary files. At this point you could simply install the packages. To get all options available for the setup script just check out the distutils package.
+
 ### install
+
+After you have build the  package you can install it with pip:
+
+    $ pip install .
+    
+this would install the package in the dist-package folder of your python distribution. It's recommended to use virtual environments. Since we don't write a "how to create a virtual environment" just use a search engine you like and look it up. 
 
 ### run
 
