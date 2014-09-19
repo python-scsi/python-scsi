@@ -42,7 +42,7 @@ class Inquiry(SCSICommand):
         '''
         initialize a new instance
 
-        :param dev: the file descriptor for the device
+        :param dev: a SCSIDevice instance
         :param evpd: the byte to enable or disable vital product data
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
