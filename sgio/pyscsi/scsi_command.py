@@ -16,17 +16,19 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-class SCSICommand:
-    '''
 
+
+class SCSICommand(object):
+    '''
+    The base class for a derived scsi command class
     '''
     def __init__(self, dev, dataout_alloclen, datain_alloclen):
         '''
+        initialize a new instance
 
-        :param dev:
-        :param dataout_alloclen:
-        :param datain_alloclen:
-        :return:
+        :param dev: a SCSIDevice instance
+        :param dataout_alloclen: integer representing the size of the data_out buffer
+        :param datain_alloclen: integer representing the size of the data_in buffer
         '''
         self.dev = dev
         self.sense = bytearray(32)
@@ -35,6 +37,12 @@ class SCSICommand:
         self._result = {}
 
     def init_cdb(self, opcode):
+        '''
+        init a byte array representing a command descriptor block with fixed length depending on the Opcode
+
+        :param opcode: a byte
+        :return: a byte array
+        '''
         if opcode < 0x20:
             cdb = bytearray(6)
         elif opcode < 0x60:
@@ -53,8 +61,10 @@ class SCSICommand:
 
     def execute(self):
         '''
+        method to call the SCSIDevice.execute method
 
-        :return:
+        this method takes no arguments but it calls the execute method of the device instance
+        with the local attributes of the SCSICommand class.
         '''
         self.dev.execute(self.cdb, self.dataout,
                          self.datain, self.sense)
@@ -63,25 +73,26 @@ class SCSICommand:
     @property
     def result(self):
         '''
+        getter method of the result property
 
-        :return:
+        :return: a dictionary
         '''
         return self._result
 
     @result.setter
     def result(self, value):
         '''
+        setter method of the result property
 
-        :param value:
-        :return:
+        :param value: a dictionary
         '''
         self._result = value
 
     def add_result(self, key, value):
         '''
+        method to update the result dictionary
 
-        :param key:
-        :param value:
-        :return:
+        :param key: a string
+        :param value: a byte or byte array
         '''
         self.result.update({key:value})
