@@ -27,21 +27,25 @@ from scsi_command import SCSICommand
 # INQUIRY VPD pages
 #
 class VPD:
+    '''
+    A class to act as a fake enumerator for vital product data page codes
+    '''
     SUPPORTED_VPD_PAGES   = 0x00
     DEVICE_IDENTIFICATION = 0x83
 
 class Inquiry(SCSICommand):
     '''
-
+    A class to hold information from a inquiry command to a scsi device
     '''
+
     def __init__(self, dev, evpd = 0, page_code = 0, alloclen = 96):
         '''
+        initialize a new instance
 
-        :param dev:
-        :param evpd:
-        :param page_code:
-        :param alloclen:
-        :return:
+        :param dev: the file descriptor for the device
+        :param evpd: the byte to enable or disable vital product data
+        :param page_code: the page code for the vpd page
+        :param alloclen: the max number of bytes allocated for the data_in buffer
         '''
         self._evpd = evpd
         self._page_code = page_code
@@ -51,11 +55,15 @@ class Inquiry(SCSICommand):
 
     def build_cdb(self, evpd, page_code, alloclen ):
         '''
+        method to create a byte array for a Command Descriptor Block with a proper length
 
-        :param evpd:
-        :param page_code:
-        :param alloclen:
-        :return:
+        init_cdb returns a byte array of 6,10,12 or 16 bytes depending on the operation code and if
+        vital product data is enabled
+
+        :param evpd: the byte to enable or disable vital product data
+        :param page_code: the page code for the vpd page
+        :param alloclen: the max number of bytes allocated for the data_in buffer
+        :return: a byte array representing a code descriptor block
         '''
         cdb = self.init_cdb(SCSI.OPCODE.INQUIRY)
         if (evpd):
@@ -67,8 +75,10 @@ class Inquiry(SCSICommand):
 
     def unmarshall(self):
         '''
+        method to extract relevant data from the byte array that the inquiry command returns
 
-        :return:
+        the content of the result dict depends if vital product data is enabled or not. if vpd is
+        enabled we create a list with the received vpd.
         '''
         if self._evpd == 0:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
@@ -98,7 +108,7 @@ class Inquiry(SCSICommand):
             self.add_result('clocking', (self.datain[56] >> 2) & 0x03)
             self.add_result('qas', self.datain[56] & 0x02)
             self.add_result('ius', self.datain[56] & 0x01)
-            return
+
         if self._page_code == VPD.SUPPORTED_VPD_PAGES:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
@@ -110,4 +120,4 @@ class Inquiry(SCSICommand):
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
                 self.add_result('vpd_pages', vpd_pages )
-            return
+
