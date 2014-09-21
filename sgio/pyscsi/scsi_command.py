@@ -31,6 +31,56 @@ SCSI_STATUS_TASK_ABORTED = 0x40
 SCSI_STATUS_SGIO_ERROR = 0xff
 
 
+def scsi_16_to_ba(i):
+    """
+    This function converts a 16-bit integer to a bytearray(2) in
+    BigEndian byte order.
+
+    i: a 16-bit integer
+    return: a bytearray(2)
+    """
+    ba = bytearray(2)
+    ba[0] = (i >> 8) & 0xff
+    ba[1] = i & 0xff
+    return ba
+
+
+def scsi_32_to_ba(i):
+    """
+    This function converts a 32-bit integer to a bytearray(4) in
+    BigEndian byte order.
+
+    i: a 32-bit integer
+    return: a bytearray(4)
+    """
+    ba = bytearray(4)
+    ba[0] = (i >> 24) & 0xff
+    ba[1] = (i >> 16) & 0xff
+    ba[2] = (i >> 8) & 0xff
+    ba[3] = i & 0xff
+    return ba
+
+
+def scsi_64_to_ba(i):
+    """
+    This function converts a 64-bit integer to a bytearray(8) in
+    BigEndian byte order.
+
+    i: a 64-bit integer
+    return: a bytearray(8)
+    """
+    ba = bytearray(8)
+    ba[0] = (i >> 56) & 0xff
+    ba[1] = (i >> 48) & 0xff
+    ba[2] = (i >> 40) & 0xff
+    ba[3] = (i >> 32) & 0xff
+    ba[4] = (i >> 24) & 0xff
+    ba[5] = (i >> 16) & 0xff
+    ba[6] = (i >> 8) & 0xff
+    ba[7] = i & 0xff
+    return ba
+
+
 class SCSICommand(object):
     """
     The base class for a derived scsi command class
