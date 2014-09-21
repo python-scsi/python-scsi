@@ -16,7 +16,7 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand, OPCODE
+from scsi_command import SCSICommand, OPCODE, scsi_16_to_ba
 
 #
 # SCSI Inquiry command and definitions
@@ -72,8 +72,7 @@ class Inquiry(SCSICommand):
         if evpd:
             cdb[1] |= 0x01
             cdb[2] = page_code
-        cdb[3] = alloclen >> 8
-        cdb[4] = alloclen & 0xff
+        cdb[3:5] = scsi_16_to_ba(alloclen)
         return cdb
 
     def unmarshall(self):
