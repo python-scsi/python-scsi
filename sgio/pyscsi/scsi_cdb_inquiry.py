@@ -18,15 +18,70 @@
 
 from scsi_command import SCSICommand, OPCODE
 from sgio.utils.converter import scsi_16_to_ba
+from sgio.utils.enum import Enum
 #
 # SCSI Inquiry command and definitions
 #
 
 #
+# Device qualifier
+#
+qualifiers = {'CONNECTED': 0x00,
+              'NOT_CONNECTED': 0x01,
+              'NOT_CAPABLE': 0x03, }
+
+QUALIFIER = Enum(qualifiers)
+
+#
+# Device type
+#
+device_types = {'BLOCK_DEVICE': 0x00,
+                'TAPE_DEVICE': 0x01,
+                'PRINTER_DEVICE': 0x02,
+                'PROCESSOR_DEVICE': 0x03,
+                'WRITE_ONCE_DEVICE': 0x04,
+                'MULTIMEDIA_DEVICE': 0x05,
+                'SCANNER_DEVICE': 0x06,
+                'OPTICAL_MEMORY_DEVICE': 0x07,
+                'MEDIA_CHANGER_DEVICE': 0x08,
+                'COMMUNICATIONS_DEVICE': 0x09,
+                'STORAGE_ARRAY_CONTROLLER': 0x0c,
+                'ENCLOSURE_SERVICE_DEVICE': 0x0d,
+                'SIMPLIFIED_DIRECT_ACCESS_DEVICE': 0x0e,
+                'OPTICAL_CARD_READER': 0x0f,
+                'BRIDGE_CONTROLLER': 0x10,
+                'OBJECT_STORAGE_DEVICE': 0x11,
+                'AUTOMATION_DRIVE_DEVICE': 0x12,
+                'SECURITY_MANAGER_DEVICE': 0x13,
+                'WELL_KNOWN_LOGICAL_UNIT': 0x1e,
+                'UNKNOWN_DEVICE': 0x1f, }
+
+DEVICE_TYPE = Enum(device_types)
+
+#
+# Version
+#
+versions = {'NO_STANDARD_CLAIMED': 0x00,
+            'ANSI_INCITS_301_1997': 0x03,
+            'SPC_2': 0x04,
+            'SPC_3': 0x05,
+            'SPC_4': 0x06, }
+
+VERSION = Enum(versions)
+
+#
+# TargetPortalGroupSupport
+#
+tpgss = {'NO_ASSYMETRIC_LUN_ACCESS': 0x00,
+         'ONLY_IMPLICIT_ASSYMETRIC_LUN_ACCESS': 0x01,
+         'ONLY_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x02,
+         'BOTH_IMPLICIT_AND_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x03, }
+
+TPGS = Enum(tpgss);
+
+#
 # INQUIRY VPD pages
 #
-
-
 class VPD(object):
     """
     A class to act as a fake enumerator for vital product data page codes
@@ -83,7 +138,6 @@ class Inquiry(SCSICommand):
         enabled we create a list with the received vpd.
         """
         if self._evpd == 0:
-            self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('version', self.datain[2])
