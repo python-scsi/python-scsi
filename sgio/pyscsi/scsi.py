@@ -18,33 +18,19 @@
 
 from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
-from scsi_command import Scan
 
-class OPCODE:
-    INQUIRY = 0x12
-
-SCSI_STATUS_GOOD                 = 0x00
-SCSI_STATUS_CHECK_CONDITION      = 0x02
-SCSI_STATUS_CONDITIONS_MET       = 0x04
-SCSI_STATUS_BUSY                 = 0x08
-SCSI_STATUS_RESERVATION_CONFLICT = 0x18
-SCSI_STATUS_TASK_SET_FULL        = 0x28
-SCSI_STATUS_ACA_ACTIVE           = 0x30
-SCSI_STATUS_TASK_ABORTED         = 0x40
-SCSI_STATUS_SGIO_ERROR           = 0xff
 
 class SCSI(SCSIDevice):
-    '''
+    """
     The interface to  the specialized scsi classes
-    '''
-    def inquiry(self, evpd = 0, page_code = 0, alloc_len = 96):
-        '''
+    """
+    def inquiry(self, evpd=0, page_code=0, alloc_len=96):
+        """
         Returns a Inquiry Instance
 
         :param evpd: a byte indicating if vital product data is supported
         :param page_code: a byte representing a page code for vpd
         :param alloc_len: a integer , the size of the data_in buffer
         :return: a Inquiry instance
-        '''
+        """
         return Inquiry(self, evpd, page_code, alloc_len)
-
