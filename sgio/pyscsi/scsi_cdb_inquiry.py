@@ -16,8 +16,7 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import scsi as SCSI
-from scsi_command import SCSICommand
+from scsi_command import SCSICommand, OPCODE
 
 #
 # SCSI Inquiry command and definitions
@@ -26,35 +25,46 @@ from scsi_command import SCSICommand
 #
 # INQUIRY VPD pages
 #
-class VPD:
-    '''
+
+
+class VPD(object):
+    """
     A class to act as a fake enumerator for vital product data page codes
-    '''
-    SUPPORTED_VPD_PAGES   = 0x00
+    """
+    SUPPORTED_VPD_PAGES = 0x00
     DEVICE_IDENTIFICATION = 0x83
 
-class Inquiry(SCSICommand):
-    '''
-    A class to hold information from a inquiry command to a scsi device
-    '''
 
-    def __init__(self, dev, evpd = 0, page_code = 0, alloclen = 96):
-        '''
+class Inquiry(SCSICommand):
+    """
+    A class to hold information from a inquiry command to a scsi device
+    """
+
+    def __init__(self, dev, evpd=0, page_code=0, alloclen=96):
+        """
         initialize a new instance
 
         :param dev: a SCSIDevice instance
         :param evpd: the byte to enable or disable vital product data
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
-        '''
+        """
         self._evpd = evpd
         self._page_code = page_code
         SCSICommand.__init__(self, dev, 0, alloclen)
-        self.cdb = self.build_cdb(evpd, page_code, alloclen)
+        self._cdb = self.build_cdb(evpd, page_code, alloclen)
         self.execute()
 
-    def build_cdb(self, evpd, page_code, alloclen ):
-        '''
+    @property
+    def pagecode(self):
+        return self._page_code
+
+    @pagecode.setter
+    def pagecode(self, value):
+        self._page_code = value
+
+    def build_cdb(self, evpd, page_code, alloclen):
+        """
         method to create a byte array for a Command Descriptor Block with a proper length
 
         init_cdb returns a byte array of 6,10,12 or 16 bytes depending on the operation code and if
@@ -64,9 +74,9 @@ class Inquiry(SCSICommand):
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
-        '''
-        cdb = self.init_cdb(SCSI.OPCODE.INQUIRY)
-        if (evpd):
+        """
+        cdb = self.init_cdb(OPCODE.INQUIRY)
+        if evpd:
             cdb[1] |= 0x01
             cdb[2] = page_code
         cdb[3] = alloclen >> 8
@@ -74,12 +84,12 @@ class Inquiry(SCSICommand):
         return cdb
 
     def unmarshall(self):
-        '''
+        """
         method to extract relevant data from the byte array that the inquiry command returns
 
         the content of the result dict depends if vital product data is enabled or not. if vpd is
         enabled we create a list with the received vpd.
-        '''
+        """
         if self._evpd == 0:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
