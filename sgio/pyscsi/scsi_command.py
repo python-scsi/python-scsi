@@ -73,26 +73,6 @@ class SCSICommand(object):
         cdb[0] = opcode
         return cdb
 
-    def build_cdb(self, evpd, page_code, alloclen):
-        """
-        method to create a byte array for a Command Descriptor Block with a proper length
-
-        init_cdb returns a byte array of 6,10,12 or 16 bytes depending on the operation code and if
-        vital product data is enabled
-
-        :param evpd: the byte to enable or disable vital product data
-        :param page_code: the page code for the vpd page
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = self.init_cdb(OPCODE.INQUIRY)
-        if evpd:
-            cdb[1] |= 0x01
-            cdb[2] = page_code
-        cdb[3] = alloclen >> 8
-        cdb[4] = alloclen & 0xff
-        return cdb
-
     def execute(self):
         """
         method to call the SCSIDevice.execute method
