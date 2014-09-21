@@ -19,6 +19,7 @@
 from scsi_command import SCSICommand, OPCODE
 from sgio.utils.converter import scsi_16_to_ba
 from sgio.utils.enum import Enum
+
 #
 # SCSI Inquiry command and definitions
 #
@@ -77,17 +78,15 @@ tpgss = {'NO_ASSYMETRIC_LUN_ACCESS': 0x00,
          'ONLY_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x02,
          'BOTH_IMPLICIT_AND_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x03, }
 
-TPGS = Enum(tpgss);
+TPGS = Enum(tpgss)
 
 #
 # INQUIRY VPD pages
 #
-class VPD(object):
-    """
-    A class to act as a fake enumerator for vital product data page codes
-    """
-    SUPPORTED_VPD_PAGES = 0x00
-    DEVICE_IDENTIFICATION = 0x83
+vpd = {'SUPPORTED_VPD_PAGES': 0x00,
+        'DEVICE_IDENTIFICATION': 0x83, }
+
+VPD = Enum(vpd)
 
 
 class Inquiry(SCSICommand):
