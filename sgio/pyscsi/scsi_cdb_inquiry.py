@@ -19,9 +19,31 @@
 from scsi_command import SCSICommand, OPCODE
 from sgio.utils.converter import scsi_16_to_ba
 from sgio.utils.enum import Enum
+
 #
 # SCSI Inquiry command and definitions
 #
+
+
+inq_std_bits = {'normaca': 0x20,
+                'hisup': 0x10,
+                'response_data_format': 0x0f,
+                'sccs': 0x80,
+                'acc': 0x40,
+                'tpgs': 0x03,
+                '3pc':0x08,
+                'protect': 0x01,
+                'encserv': 0x40,
+                'vs': 0x20,
+                'multip': 0x10,
+                'addr16': 0x01,
+                'wbus16': 0x20,
+                'sync': 0x10,
+                'cmdque': 0x02,
+                'vs2': 0x01,
+                'clocking': 0x03,
+                'qas': 0x02,
+                'ius': 0x01, }
 
 #
 # Device qualifier
@@ -77,17 +99,15 @@ tpgss = {'NO_ASSYMETRIC_LUN_ACCESS': 0x00,
          'ONLY_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x02,
          'BOTH_IMPLICIT_AND_EXPLICIT_ASSYMETRIC_LUN_ACCESS': 0x03, }
 
-TPGS = Enum(tpgss);
+TPGS = Enum(tpgss)
 
 #
 # INQUIRY VPD pages
 #
-class VPD(object):
-    """
-    A class to act as a fake enumerator for vital product data page codes
-    """
-    SUPPORTED_VPD_PAGES = 0x00
-    DEVICE_IDENTIFICATION = 0x83
+vpd = {'SUPPORTED_VPD_PAGES': 0x00,
+        'DEVICE_IDENTIFICATION': 0x83, }
+
+VPD = Enum(vpd)
 
 
 class Inquiry(SCSICommand):
@@ -161,11 +181,15 @@ class Inquiry(SCSICommand):
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
-            self.add_result('clocking', (self.datain[56] >> 2) & 0x03)
+            # a shift and check bit
+            self.result.update(self.shift_and_check_bit('clocking', 56,
+                                                        inq_std_bits['clocking'], 2))
             self.add_result('qas', self.datain[56] & 0x02)
-            self.add_result('ius', self.datain[56] & 0x01)
+            # a check bit
+            self.result.update(self.check_bit('ius', 56, inq_std_bits['ius']))
         elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
-            self.add_result('peripheral_qualifier', self.datain[0] >> 5)
+            # a shift
+            self.result.update(self.shift_bit('peripheral_qualifier', 0, 5))
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('page_code', self.datain[1])
             page_length = self.datain[2] * 256 + self.datain[3]

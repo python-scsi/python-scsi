@@ -2,9 +2,7 @@
 # coding: utf-8
 
 import sys
-
 from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi import scsi_cdb_readcapacity16 as READCAPACITY16
 
 
 def main(device):
