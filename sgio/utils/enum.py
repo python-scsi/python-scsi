@@ -61,6 +61,11 @@ class Enum(type):
         setattr(self, 'add', classmethod(self.__class__.add))
         setattr(self, 'remove', classmethod(self.__class__.remove))
 
+    def __getitem__(self, value):
+        for key in self._enums:
+            if self.__getattribute__(self, key) == value:
+                return key
+
     def add(self, key, value):
         if not key in self._enums:
             self._enums.append(key)
