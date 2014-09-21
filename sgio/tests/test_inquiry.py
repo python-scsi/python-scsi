@@ -23,6 +23,9 @@ def main(device):
     for k, v in i.iteritems():
         print '%s - %s' % (k, v)
 
+    print
+    print 'Device is a', INQUIRY.DEVICE_TYPE[i['peripheral_device_type']]
+
 if __name__ == "__main__":
     main(sys.argv[1])
 
