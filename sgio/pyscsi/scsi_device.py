@@ -16,35 +16,36 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import scsi
+import scsi_command
 import scsi_sense
 import sgio
 
+
 class SCSIDevice(object):
-    '''
+    """
     The base class for a derived  scsi device class
 
-    '''
+    """
     def __init__(self, device):
-        '''
+        """
         initialize a  new instance
 
         :param device: the file descriptor
-        '''
+        """
         self._fd = sgio.open(device)
 
     def execute(self, cdb, dataout, datain, sense):
-        '''
+        """
         execute a scsi command
 
         :param cdb: a byte array representing a command descriptor block
         :param dataout: a byte array to hold received data from the ioctl call
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
-        '''
+        """
         status = sgio.execute(self._fd, cdb, dataout, datain, sense)
-        if status == scsi.SCSI_STATUS_CHECK_CONDITION:
+        if status == scsi_command.SCSI_STATUS_CHECK_CONDITION:
             raise scsi_sense.SCSICheckCondition(sense)
-        if status == scsi.SCSI_STATUS_SGIO_ERROR:
+        if status == scsi_command.SCSI_STATUS_SGIO_ERROR:
             raise scsi_sense.SCSISGIOError()
 
