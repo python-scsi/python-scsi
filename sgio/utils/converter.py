@@ -64,3 +64,34 @@ def scsi_64_to_ba(i):
     ba[6] = (i >> 8) & 0xff
     ba[7] = i & 0xff
     return ba
+
+def scsi_ba_to_16(ba):
+    """
+    This function converts a bytearray(2) in BigEndian byte order
+    to an integer.
+
+    param ba: a bytearray(2) 
+    return: an integer
+    """
+    return sum(ba[i] << ((1 - i) * 8) for i in range(2))
+
+def scsi_ba_to_32(ba):
+    """
+    This function converts a bytearray(4) in BigEndian byte order
+    to an integer.
+
+    param ba: a bytearray(4) 
+    return: an integer
+    """
+    return sum(ba[i] << ((3 - i) * 8) for i in range(4))
+
+def scsi_ba_to_64(ba):
+    """
+    This function converts a bytearray(8) in BigEndian byte order
+    to an integer.
+
+    param ba: a bytearray(8) 
+    return: an integer
+    """
+    return sum(ba[i] << ((7 - i) * 8) for i in range(8))
+

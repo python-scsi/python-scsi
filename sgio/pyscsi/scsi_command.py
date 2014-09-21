@@ -18,9 +18,15 @@
 
 from sgio.utils.enum import Enum
 
-opcodes = {'INQUIRY': 0x12, }
+opcodes = {'INQUIRY':           0x12,
+           'SERVICE_ACTION_IN': 0x9e,
+           }
 
 OPCODE = Enum(opcodes)
+
+service_action_ins = {'READ_CAPACITY_16': 0x10, }
+
+SERVICE_ACTION_IN = Enum(service_action_ins)
 
 SCSI_STATUS_GOOD = 0x00
 SCSI_STATUS_CHECK_CONDITION = 0x02
