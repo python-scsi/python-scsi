@@ -16,8 +16,8 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand, OPCODE, scsi_16_to_ba
-
+from scsi_command import SCSICommand, OPCODE
+from sgio.utils.converter import scsi_16_to_ba
 #
 # SCSI Inquiry command and definitions
 #
