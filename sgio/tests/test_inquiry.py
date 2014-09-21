@@ -9,10 +9,10 @@ from sgio.pyscsi import scsi_cdb_inquiry as INQUIRY
 def main(device):
     s = SCSI(device)
 
-    i = s.Inquiry().result
+    i = s.inquiry().result
     print i
 
-    i = s.Inquiry(evpd = 1, page_code = INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
+    i = s.inquiry(evpd = 1, page_code = INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
     print i
 
 if __name__ == "__main__":
