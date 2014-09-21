@@ -93,6 +93,22 @@ class SCSICommand(object):
         self.device.execute(self.cdb, self.dataout, self.datain, self.sense)
         self.unmarshall()
 
+    def check_bit(self, key, pos, bit):
+        v = self.datain[pos] & bit
+        k = key
+        return {k: v}
+
+    def shift_bit(self, key, pos, bits):
+        v = self.datain[pos] >> bits
+        k = key
+        return {k: v}
+
+    def shift_and_check_bit(self, key, pos, bit, bits):
+        tmp = self.shift_bit(key, pos, bits)
+        v = tmp[key] & bit
+        k = key
+        return {k: v}
+
     @property
     def result(self):
         """
