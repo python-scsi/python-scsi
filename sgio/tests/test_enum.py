@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-
 from sgio.utils.enum import Enum
 
 enum_dict = {'a': 1,
