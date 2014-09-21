@@ -181,16 +181,13 @@ class Inquiry(SCSICommand):
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
-            #self.add_result('clocking', (self.datain[56] >> 2) & 0x03)
             # a shift and check bit
             self.result.update(self.shift_and_check_bit('clocking', 56,
                                                         inq_std_bits['clocking'], 2))
             self.add_result('qas', self.datain[56] & 0x02)
-            #self.add_result('ius', self.datain[56] & 0x01)
             # a check bit
             self.result.update(self.check_bit('ius', 56, inq_std_bits['ius']))
         elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
-            #self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             # a shift
             self.result.update(self.shift_bit('peripheral_qualifier', 0, 5))
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
