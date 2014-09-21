@@ -16,9 +16,11 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from sgio.utils.enum import Enum
 
-class OPCODE(object):
-    INQUIRY = 0x12
+opcodes = {'INQUIRY': 0x12, }
+
+OPCODE = Enum(opcodes)
 
 SCSI_STATUS_GOOD = 0x00
 SCSI_STATUS_CHECK_CONDITION = 0x02
