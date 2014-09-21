@@ -80,15 +80,37 @@ tpgss = {'NO_ASSYMETRIC_LUN_ACCESS': 0x00,
 TPGS = Enum(tpgss);
 
 #
-# INQUIRY VPD pages
+# VPD pages
 #
-class VPD(object):
-    """
-    A class to act as a fake enumerator for vital product data page codes
-    """
-    SUPPORTED_VPD_PAGES = 0x00
-    DEVICE_IDENTIFICATION = 0x83
+vpds = {'SUPPORTED_VPD_PAGES':                          0x00,
+        'UNIT_SERIAL_NUMBER':                           0x80,
+        'DEVICE_IDENTIFICATION':                        0x83,
+        'SOFTWARE_INTERFACE_IDENTIFICATION':            0x84,
+        'MANAGEMENT_NETWORK_ADDRESS':                   0x85,
+        'EXTENDED_INQUIRY_DATA':                        0x86,
+        'MODE_PAGE_POLICT':                             0x87,
+        'SCSI_PORTS':                                   0x88,
+        'ATA_INFORMATION':                              0x89,
+        'POWER_CONDITION':                              0x8a,
+        'DEVICE_CONSTITUENTS':                          0x8b,
+        'CFA_PROFILE_INFORMATION':                      0x8c,
+        'POWER_CONSUMPTION':                            0x8d,
+        'THIRD_PARTY_COPY':                             0x8f,
+        'PROTOCOL_SPECIFIC_LOGICAL_UNIT_INFORMATION':   0x90,
+        'PROTOCOL_SPECIFIC_PORT_INFORMATION':           0x91,
 
+        #
+        # SBC
+        #
+        'BLOCK_LIMITS':                                 0xb0,
+        'BLOCK_DEVICE_CHARACTERISTICS':                 0xb1,
+        'LOGICAL_BLOCK_PROVISIONING':                   0xb2,
+        'REFERRALS':                                    0xb3,
+        'SUPPORTED_BLOCK_LENGTHS_AND_PROTECTION_TYPES': 0xb4,
+        'BLOCK_DEVICE_CHARACTERISTICS_EXTENSION':       0xb5,
+}
+
+VPD = Enum(vpds)
 
 class Inquiry(SCSICommand):
     """
