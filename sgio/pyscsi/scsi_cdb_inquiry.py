@@ -49,20 +49,12 @@ class Inquiry(SCSICommand):
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        self._evpd = evpd
-        self._page_code = page_code
-        self._device = dev
+        self.device = dev
         SCSICommand.__init__(self, self.device, 0, alloclen)
-        self._cdb = self.build_cdb(evpd, self.pagecode, alloclen)
+        self._evpd = evpd
+        self.pagecode = page_code
+        self.cdb = self.build_cdb(evpd, self.pagecode, alloclen)
         self.execute()
-
-    @property
-    def pagecode(self):
-        return self._page_code
-
-    @pagecode.setter
-    def pagecode(self, value):
-        self._page_code = value
 
     def build_cdb(self, evpd, page_code, alloclen):
         """
@@ -76,7 +68,7 @@ class Inquiry(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(OPCODE.INQUIRY)
+        cdb = SCSICommand.init_cdb(OPCODE.INQUIRY)
         if evpd:
             cdb[1] |= 0x01
             cdb[2] = page_code
@@ -119,13 +111,12 @@ class Inquiry(SCSICommand):
             self.add_result('clocking', (self.datain[56] >> 2) & 0x03)
             self.add_result('qas', self.datain[56] & 0x02)
             self.add_result('ius', self.datain[56] & 0x01)
-
-        if self._page_code == VPD.SUPPORTED_VPD_PAGES:
+        elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
             self.add_result('peripheral_qualifier', self.datain[0] >> 5)
             self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('page_code', self.datain[1])
             page_length = self.datain[2] * 256 + self.datain[3]
-            self.add_result('page_length', page_length )
+            self.add_result('page_length', page_length)
 
             vpd_pages = []
             for i in range(page_length):
