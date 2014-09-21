@@ -51,8 +51,9 @@ class Inquiry(SCSICommand):
         """
         self._evpd = evpd
         self._page_code = page_code
-        SCSICommand.__init__(self, dev, 0, alloclen)
-        self._cdb = self.build_cdb(evpd, page_code, alloclen)
+        self._device = dev
+        SCSICommand.__init__(self, self.device, 0, alloclen)
+        self._cdb = self.build_cdb(evpd, self.pagecode, alloclen)
         self.execute()
 
     @property
@@ -130,4 +131,3 @@ class Inquiry(SCSICommand):
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
                 self.add_result('vpd_pages', vpd_pages )
-
