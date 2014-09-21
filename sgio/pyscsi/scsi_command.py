@@ -43,14 +43,16 @@ class SCSICommand(object):
         :param dataout_alloclen: integer representing the size of the data_out buffer
         :param datain_alloclen: integer representing the size of the data_in buffer
         """
-        self._device = dev
-        self._sense = bytearray(32)
-        self._dataout = bytearray(dataout_alloclen)
-        self._datain = bytearray(datain_alloclen)
-        self._result = {}
-        self._cdb = None
+        self.device = dev
+        self.sense = bytearray(32)
+        self.dataout = bytearray(dataout_alloclen)
+        self.datain = bytearray(datain_alloclen)
+        self.result = {}
+        self.cdb = None
+        self.pagecode = None
 
-    def init_cdb(self, opcode):
+    @classmethod
+    def init_cdb(cls, opcode):
         """
         init a byte array representing a command descriptor block with fixed length depending on the Opcode
 
@@ -191,6 +193,14 @@ class SCSICommand(object):
         """
         self._device = value
 
+    @property
+    def pagecode(self):
+        return self._page_code
+
+    @pagecode.setter
+    def pagecode(self, value):
+        self._page_code = value
+
     def add_result(self, key, value):
         """
         method to update the result dictionary
@@ -199,9 +209,3 @@ class SCSICommand(object):
         :param value: a byte or byte array
         """
         self.result.update({key: value})
-
-    def unmarshall(self):
-        """
-        you don't even need to define this here but it just feels right
-        """
-        pass
