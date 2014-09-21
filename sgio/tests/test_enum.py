@@ -3,7 +3,7 @@
 
 import sys
 
-from sgio.pyscsi.enum import Enum
+from sgio.utils.enum import Enum
 
 enum_dict = {'a': 1,
              'b': 2,

@@ -11,6 +11,6 @@ setup (name='SGIO',
        author='Ronnie Sahlberg',
        author_email='ronniesahlberg@gmail.com',
        description='Module for calling ioctl(SG_IO)',
-       packages=['sgio','sgio.pyscsi','sgio.tests'],
+       packages=['sgio', 'sgio.pyscsi', 'sgio.tests', 'sgio.utils'],
        ext_modules=[module1])
 
