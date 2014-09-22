@@ -159,9 +159,9 @@ class Inquiry(SCSICommand):
         the content of the result dict depends if vital product data is enabled or not. if vpd is
         enabled we create a list with the received vpd.
         """
+        self.add_result('peripheral_qualifier', self.datain[0] >> 5)
+        self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
         if self._evpd == 0:
-            self.add_result('peripheral_qualifier', self.datain[0] >> 5)
-            self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('version', self.datain[2])
             self.add_result('normaca', self.datain[3] & 0x20)
             self.add_result('hisup', self.datain[3] & 0x10)
@@ -187,8 +187,6 @@ class Inquiry(SCSICommand):
             self.add_result('qas', self.datain[56] & 0x02)
             self.add_result('ius', self.datain[56] & 0x01)
         elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
-            self.add_result('peripheral_qualifier', self.datain[0] >> 5)
-            self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
             self.add_result('page_code', self.datain[1])
             page_length = self.datain[2] * 256 + self.datain[3]
             self.add_result('page_length', page_length)
