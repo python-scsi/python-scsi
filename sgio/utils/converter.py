@@ -16,6 +16,25 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+def scsi_to_ba(to_convert=0, array_size=4):
+    """
+    This function converts a  integer of (8 *array_size)-bit to a bytearray(array_size) in
+    BigEndian byte order. Here we use the 32-bit as default.
+
+    example:
+
+        >>scsi_to_ba(34,4)
+        bytearray(b'\x00\x00\x00"')
+
+        so we take a 32-bit integer and get a byte array(4)
+
+    :to_convert: a integer
+    :array_size: a integer defining the size of the byte array
+    :return: a byte array
+    """
+    return bytearray((to_convert >> i * 8) & 0xff for i in reversed(range(array_size)))
+
+
 def scsi_16_to_ba(i):
     """
     This function converts a 16-bit integer to a bytearray(2) in
