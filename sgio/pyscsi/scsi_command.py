@@ -17,6 +17,8 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from sgio.utils.enum import Enum
+from scsi_exception import SCSICommandExceptionMeta as ExMETA
+
 
 opcodes = {'INQUIRY':           0x12,
            'SERVICE_ACTION_IN': 0x9e,
@@ -43,6 +45,8 @@ class SCSICommand(object):
     """
     The base class for a derived scsi command class
     """
+    __metaclass__ = ExMETA
+
     def __init__(self, dev, dataout_alloclen, datain_alloclen):
         """
         initialize a new instance
@@ -72,13 +76,13 @@ class SCSICommand(object):
         elif opcode < 0x60:
             cdb = bytearray(10)
         elif opcode < 0x80:
-            raise OpcodeException
+            raise SCSICommand.OpcodeException
         elif opcode < 0xa0:
             cdb = bytearray(16)
         elif opcode < 0xc0:
             cdb = bytearray(12)
         else:
-            raise OpcodeException
+            raise SCSICommand.OpcodeException
 
         cdb[0] = opcode
         return cdb
@@ -94,12 +98,31 @@ class SCSICommand(object):
         self.unmarshall()
 
     def decode_all_bit(self, check_dict={}):
+        """
+        helper method to perform some simple bit operations
+
+        the list in the value of each key:value pair contains 3 values
+         - the bit mask
+         - thy byte number for the byte in the datain byte array
+         - number of bits to shift
+
+        for now we assume he have to right shift only
+
+        :check_dict: a dict with a list as value in each key:value pair
+        """
         for key in check_dict.iterkeys():
-            value = check_dict[key]
-            if value[2] > 0:
-                v = (self.datain[value[1]] >> value[2]) & value[0]
+            # get the values from dict
+            bitmask, byte_pos, shift = check_dict[key]
+            # what to do?
+            if shift > 0 and bitmask is None:
+                # perform a shift without masking
+                v = self.datain[byte_pos] >> shift
+            elif shift > 0 and bitmask is not None:
+                # perform a shift with masking
+                v = (self.datain[byte_pos] >> shift) & bitmask
             else:
-                v = self.datain[value[1]] & value[0]
+                # simply masking the byte
+                v = self.datain[byte_pos] & bitmask
             self.add_result(key, v)
 
     @property
@@ -212,10 +235,21 @@ class SCSICommand(object):
 
     @property
     def pagecode(self):
+        """
+        getter method of the pagecode property
+
+        :return:
+        """
         return self._page_code
 
     @pagecode.setter
     def pagecode(self, value):
+        """
+        setter method of the pagecode property
+
+        :param value:
+        :return:
+        """
         self._page_code = value
 
     def add_result(self, key, value):
