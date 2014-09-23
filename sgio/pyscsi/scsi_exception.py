@@ -11,6 +11,10 @@ class SCSICommandExceptionMeta(type):
         class CommandNotImplemented(Exception):
             pass
 
+        class OpcodeException(Exception):
+            pass
+
         attributes.update({'CommandNotImplemented': CommandNotImplemented})
+        attributes.update({'OpcodeException': OpcodeException})
 
         return type.__new__(meta, cls, bases, attributes)
