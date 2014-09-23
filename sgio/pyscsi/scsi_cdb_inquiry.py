@@ -24,6 +24,7 @@ from sgio.utils.enum import Enum
 # SCSI Inquiry command and definitions
 #
 
+# dict with decode informations -> key: [bit_mask, byte_to_decode, bits_to_shift]
 inq_std_bits = {'normaca': [0x20, 3, 0],
                 'hisup': [0x10, 3, 0],
                 'response_data_format': [0x0f, 3, 0],
