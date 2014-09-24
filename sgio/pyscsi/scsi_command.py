@@ -101,10 +101,9 @@ class SCSICommand(object):
         """
         helper method to perform some simple bit operations
 
-        the list in the value of each key:value pair contains 3 values
+        the list in the value of each key:value pair contains 2 values
          - the bit mask
          - thy byte number for the byte in the datain byte array
-         - number of bits to shift
 
         for now we assume he have to right shift only
 
@@ -112,18 +111,12 @@ class SCSICommand(object):
         """
         for key in check_dict.iterkeys():
             # get the values from dict
-            bitmask, byte_pos, shift = check_dict[key]
-            # what to do?
-            if shift > 0 and bitmask is None:
-                # perform a shift without masking
-                v = self.datain[byte_pos] >> shift
-            elif shift > 0 and bitmask is not None:
-                # perform a shift with masking
-                v = (self.datain[byte_pos] >> shift) & bitmask
-            else:
-                # simply masking the byte
-                v = self.datain[byte_pos] & bitmask
-            self.add_result(key, v)
+            bitmask, byte_pos = check_dict[key]
+            value = self.datain[byte_pos]
+            while bitmask & 0x01:
+                bitmask >>= 1
+                value >>= 1
+            self.add_result(key, value)
 
     @property
     def result(self):
