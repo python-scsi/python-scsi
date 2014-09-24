@@ -116,6 +116,7 @@ class SCSICommand(object):
             while bitmask & 0x01:
                 bitmask >>= 1
                 value >>= 1
+            value &= bitmask
             self.add_result(key, value)
 
     @property
