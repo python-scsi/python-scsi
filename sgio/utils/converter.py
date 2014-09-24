@@ -37,10 +37,10 @@ def scsi_to_ba(to_convert=0, array_size=4):
 
 def scsi_ba_to_int(ba, array_size):
     """
-    This function converts a bytearray(2) in BigEndian byte order
+    This function converts a bytearray of size array_size in BigEndian byte order
     to an integer.
 
-    param ba: a bytearray(2)
+    param ba: a bytearray of size array_size
     return: an integer
     """
     return sum(ba[i] << ((array_size - 1 - i) * 8) for i in range(array_size))
