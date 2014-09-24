@@ -25,25 +25,25 @@ from sgio.utils.enum import Enum
 #
 
 # dict with decode informations -> key: [bit_mask, byte_to_decode, bits_to_shift]
-inq_std_bits = {'normaca': [0x20, 3, 0],
-                'hisup': [0x10, 3, 0],
-                'response_data_format': [0x0f, 3, 0],
-                'sccs': [0x80, 5, 0],
-                'acc': [0x40, 5, 0],
-                'tpgs': [0x03, 5, 4],
-                '3pc': [0x08, 5, 0],
-                'protect': [0x01, 5, 0],
-                'encserv': [0x40, 6, 0],
-                'vs': [0x20, 6, 0],
-                'multip': [0x10, 6, 0],
-                'addr16': [0x01, 6, 0],
-                'wbus16': [0x20, 7, 0],
-                'sync': [0x10, 7, 0],
-                'cmdque': [0x02, 7, 0],
-                'vs2': [0x01, 7, 0],
-                'clocking': [0x03, 56, 2],
-                'qas': [0x02, 56, 0],
-                'ius': [0x01, 56, 0]}
+inq_std_bits = {'normaca': [0x20, 3],
+                'hisup': [0x10, 3],
+                'response_data_format': [0x0f, 3],
+                'sccs': [0x80, 5],
+                'acc': [0x40, 5],
+                'tpgs': [0x03, 5],
+                '3pc': [0x08, 5],
+                'protect': [0x01, 5],
+                'encserv': [0x40, 6],
+                'vs': [0x20, 6],
+                'multip': [0x10, 6],
+                'addr16': [0x01, 6],
+                'wbus16': [0x20, 7],
+                'sync': [0x10, 7],
+                'cmdque': [0x02, 7],
+                'vs2': [0x01, 7],
+                'clocking': [0x03, 56],
+                'qas': [0x02, 56],
+                'ius': [0x01, 56]}
 
 #
 # Device qualifier
