@@ -41,9 +41,9 @@ inq_std_bits = {'normaca': [0x20, 3],
                 'sync': [0x10, 7],
                 'cmdque': [0x02, 7],
                 'vs2': [0x01, 7],
-                'clocking': [0x03, 56],
+                'clocking': [0x0c, 56],
                 'qas': [0x02, 56],
-                'ius': [0x01, 56]}
+                'ius': [0x01, 56], }
 
 #
 # Device qualifier
@@ -160,6 +160,10 @@ class Inquiry(SCSICommand):
         self.add_result('peripheral_qualifier', self.datain[0] >> 5)
         self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
         if self._evpd == 0:
+            self.add_result('additional_length', self.datain[4])
+            self.add_result('t10_vendor_identification', self.datain[8:16])
+            self.add_result('product_identification', self.datain[16:32])
+            self.add_result('product_revision_level', self.datain[32:36])
             self.decode_all_bit(inq_std_bits)
         elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
             self.add_result('page_code', self.datain[1])
