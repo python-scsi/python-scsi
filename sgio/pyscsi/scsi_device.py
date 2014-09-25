@@ -17,8 +17,9 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import scsi_command
-import scsi_sense
 import sgio
+
+from scsi_exception import SCSIDeviceExceptionMeta as ExMETA
 
 
 class SCSIDevice(object):
@@ -26,6 +27,8 @@ class SCSIDevice(object):
     The base class for a derived  scsi device class
 
     """
+    __metaclass__ = ExMETA
+
     def __init__(self, device):
         """
         initialize a  new instance
@@ -45,7 +48,7 @@ class SCSIDevice(object):
         """
         status = sgio.execute(self._fd, cdb, dataout, datain, sense)
         if status == scsi_command.SCSI_STATUS_CHECK_CONDITION:
-            raise scsi_sense.SCSICheckCondition(sense)
+            raise SCSIDevice.CheckCondition(sense)
         if status == scsi_command.SCSI_STATUS_SGIO_ERROR:
-            raise scsi_sense.SCSISGIOError()
+            raise SCSIDevice.SCSISGIOError
 
