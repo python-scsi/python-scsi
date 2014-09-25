@@ -47,8 +47,8 @@ class SCSIDevice(object):
         :param sense: a byte array to hold sense data
         """
         status = sgio.execute(self._fd, cdb, dataout, datain, sense)
-        if status == scsi_command.SCSI_STATUS_CHECK_CONDITION:
+        if status == scsi_command.SCSI_STATUS.CHECK_CONDITION:
             raise SCSIDevice.CheckCondition(sense)
-        if status == scsi_command.SCSI_STATUS_SGIO_ERROR:
+        if status == scsi_command.SCSI_STATUS.SGIO_ERROR:
             raise SCSIDevice.SCSISGIOError
 

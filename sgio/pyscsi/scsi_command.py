@@ -30,15 +30,17 @@ service_action_ins = {'READ_CAPACITY_16': 0x10, }
 
 SERVICE_ACTION_IN = Enum(service_action_ins)
 
-SCSI_STATUS_GOOD = 0x00
-SCSI_STATUS_CHECK_CONDITION = 0x02
-SCSI_STATUS_CONDITIONS_MET = 0x04
-SCSI_STATUS_BUSY = 0x08
-SCSI_STATUS_RESERVATION_CONFLICT = 0x18
-SCSI_STATUS_TASK_SET_FULL = 0x28
-SCSI_STATUS_ACA_ACTIVE = 0x30
-SCSI_STATUS_TASK_ABORTED = 0x40
-SCSI_STATUS_SGIO_ERROR = 0xff
+scsi_status = {'GOOD': 0x00,
+               'CHECK_CONDITION': 0x02,
+               'CONDITIONS_MET': 0x04,
+               'BUSY': 0x08,
+               'RESERVATION_CONFLICT': 0x18,
+               'TASK_SET_FULL': 0x28,
+               'ACA_ACTIVE': 0x30,
+               'TASK_ABORTED': 0x40,
+               'SGIO_ERROR': 0xff, }
+
+SCSI_STATUS = Enum(scsi_status)
 
 
 class SCSICommand(object):
