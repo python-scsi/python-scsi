@@ -24,6 +24,27 @@ from sgio.utils.enum import Enum
 # SCSI Inquiry command and definitions
 #
 
+# dict with decode informations -> key: [bit_mask, byte_to_decode, bits_to_shift]
+inq_std_bits = {'normaca': [0x20, 3],
+                'hisup': [0x10, 3],
+                'response_data_format': [0x0f, 3],
+                'sccs': [0x80, 5],
+                'acc': [0x40, 5],
+                'tpgs': [0x03, 5],
+                '3pc': [0x08, 5],
+                'protect': [0x01, 5],
+                'encserv': [0x40, 6],
+                'vs': [0x20, 6],
+                'multip': [0x10, 6],
+                'addr16': [0x01, 6],
+                'wbus16': [0x20, 7],
+                'sync': [0x10, 7],
+                'cmdque': [0x02, 7],
+                'vs2': [0x01, 7],
+                'clocking': [0x0c, 56],
+                'qas': [0x02, 56],
+                'ius': [0x01, 56], }
+
 #
 # Device qualifier
 #
@@ -165,36 +186,16 @@ class Inquiry(SCSICommand):
         self.add_result('peripheral_qualifier', self.datain[0] >> 5)
         self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
         if self._evpd == 0:
-            self.add_result('version', self.datain[2])
-            self.add_result('normaca', self.datain[3] & 0x20)
-            self.add_result('hisup', self.datain[3] & 0x10)
-            self.add_result('response_data_format', self.datain[3] & 0x0f)
             self.add_result('additional_length', self.datain[4])
-            self.add_result('sccs', self.datain[5] & 0x80)
-            self.add_result('acc', self.datain[5] & 0x40)
-            self.add_result('tpgs', (self.datain[5] >> 4) & 0x03)
-            self.add_result('3pc', self.datain[5] & 0x08)
-            self.add_result('protect', self.datain[5] & 0x01)
-            self.add_result('encserv', self.datain[6] & 0x40)
-            self.add_result('vs', self.datain[6] & 0x20)
-            self.add_result('multip', self.datain[6] & 0x10)
-            self.add_result('addr16', self.datain[6] & 0x01)
-            self.add_result('wbus16', self.datain[7] & 0x20)
-            self.add_result('sync', self.datain[7] & 0x10)
-            self.add_result('cmdque', self.datain[7] & 0x02)
-            self.add_result('vs2', self.datain[7] & 0x01)
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
-            self.add_result('clocking', (self.datain[56] >> 2) & 0x03)
-            self.add_result('qas', self.datain[56] & 0x02)
-            self.add_result('ius', self.datain[56] & 0x01)
+            self.decode_all_bit(inq_std_bits)
         elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
             self.add_result('page_code', self.datain[1])
             page_length = self.datain[2] * 256 + self.datain[3]
             self.add_result('page_length', page_length)
-
             vpd_pages = []
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
-                self.add_result('vpd_pages', vpd_pages )
+                self.add_result('vpd_pages', vpd_pages)
