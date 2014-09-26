@@ -15,6 +15,8 @@ def main(device):
     i = s.inquiry().result
     for k, v in i.iteritems():
         print '%s - %s' % (k, v)
+    print
+    print 'Device is a', INQUIRY.DEVICE_TYPE[i['peripheral_device_type']]
 
     print
     print 'Inquiry: Supported VPD Pages VPD Page'
@@ -22,9 +24,12 @@ def main(device):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
     for k, v in i.iteritems():
         print '%s - %s' % (k, v)
-
     print
-    print 'Device is a', INQUIRY.DEVICE_TYPE[i['peripheral_device_type']]
+    print 'Supported VPD Pages:'
+    vpd_pages = i['vpd_pages']
+    for pg in vpd_pages:
+        print '%02x: %s' % (pg, INQUIRY.VPD[pg])
+
 
 if __name__ == "__main__":
     main(sys.argv[1])
