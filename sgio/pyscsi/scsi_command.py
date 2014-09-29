@@ -17,6 +17,8 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from sgio.utils.enum import Enum
+from scsi_exception import SCSICommandExceptionMeta as ExMETA
+
 
 opcodes = {'INQUIRY':           0x12,
            'SERVICE_ACTION_IN': 0x9e,
@@ -28,21 +30,25 @@ service_action_ins = {'READ_CAPACITY_16': 0x10, }
 
 SERVICE_ACTION_IN = Enum(service_action_ins)
 
-SCSI_STATUS_GOOD = 0x00
-SCSI_STATUS_CHECK_CONDITION = 0x02
-SCSI_STATUS_CONDITIONS_MET = 0x04
-SCSI_STATUS_BUSY = 0x08
-SCSI_STATUS_RESERVATION_CONFLICT = 0x18
-SCSI_STATUS_TASK_SET_FULL = 0x28
-SCSI_STATUS_ACA_ACTIVE = 0x30
-SCSI_STATUS_TASK_ABORTED = 0x40
-SCSI_STATUS_SGIO_ERROR = 0xff
+scsi_status = {'GOOD': 0x00,
+               'CHECK_CONDITION': 0x02,
+               'CONDITIONS_MET': 0x04,
+               'BUSY': 0x08,
+               'RESERVATION_CONFLICT': 0x18,
+               'TASK_SET_FULL': 0x28,
+               'ACA_ACTIVE': 0x30,
+               'TASK_ABORTED': 0x40,
+               'SGIO_ERROR': 0xff, }
+
+SCSI_STATUS = Enum(scsi_status)
 
 
 class SCSICommand(object):
     """
     The base class for a derived scsi command class
     """
+    __metaclass__ = ExMETA
+
     def __init__(self, dev, dataout_alloclen, datain_alloclen):
         """
         initialize a new instance
@@ -72,13 +78,13 @@ class SCSICommand(object):
         elif opcode < 0x60:
             cdb = bytearray(10)
         elif opcode < 0x80:
-            raise OpcodeException
+            raise SCSICommand.OpcodeException
         elif opcode < 0xa0:
             cdb = bytearray(16)
         elif opcode < 0xc0:
             cdb = bytearray(12)
         else:
-            raise OpcodeException
+            raise SCSICommand.OpcodeException
 
         cdb[0] = opcode
         return cdb
@@ -92,6 +98,28 @@ class SCSICommand(object):
         """
         self.device.execute(self.cdb, self.dataout, self.datain, self.sense)
         self.unmarshall()
+
+    def decode_all_bit(self, check_dict={}):
+        """
+        helper method to perform some simple bit operations
+
+        the list in the value of each key:value pair contains 2 values
+         - the bit mask
+         - thy byte number for the byte in the datain byte array
+
+        for now we assume he have to right shift only
+
+        :check_dict: a dict with a list as value in each key:value pair
+        """
+        for key in check_dict.iterkeys():
+            # get the values from dict
+            bitmask, byte_pos = check_dict[key]
+            value = self.datain[byte_pos]
+            while bitmask & 0x01:
+                bitmask >>= 1
+                value >>= 1
+            value &= bitmask
+            self.add_result(key, value)
 
     @property
     def result(self):
@@ -203,10 +231,21 @@ class SCSICommand(object):
 
     @property
     def pagecode(self):
+        """
+        getter method of the pagecode property
+
+        :return:
+        """
         return self._page_code
 
     @pagecode.setter
     def pagecode(self, value):
+        """
+        setter method of the pagecode property
+
+        :param value:
+        :return:
+        """
         self._page_code = value
 
     def add_result(self, key, value):

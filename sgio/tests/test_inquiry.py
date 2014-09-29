@@ -21,7 +21,7 @@ def main(device):
     print
     print 'Inquiry: Supported VPD Pages VPD Page'
     print '==========================================\n'
-    i = s.inquiry(evpd = 1, page_code = INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
     for k, v in i.iteritems():
         print '%s - %s' % (k, v)
     print
