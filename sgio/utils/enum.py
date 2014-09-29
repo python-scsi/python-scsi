@@ -34,7 +34,6 @@ class Enum(type):
 
         TODO:
 
-          - adding check if key exists
           - adding check if value exists
     """
 
@@ -44,7 +43,7 @@ class Enum(type):
                 if type(args[0]).__name__ == 'dict':
                     tmp = args[0]
                 else:
-                    tmp ={}
+                    tmp = {}
             else:
                 tmp = dict()
         elif len(kwargs) > 0:
@@ -62,16 +61,20 @@ class Enum(type):
         setattr(self, 'remove', classmethod(self.__class__.remove))
 
     def __getitem__(self, value):
-        for key in self._enums:
-            if self.__getattribute__(self, key) == value:
-                return key
+        return (key for key in self._enums
+                if self.__getattribute__(self, key) == value).next()
 
     def add(self, key, value):
-        if not key in self._enums:
+        try:
+            getattr(self, key)
+            print "key %s already exist" % key
+        except:
             self._enums.append(key)
             setattr(self, key, value)
 
     def remove(self, key):
-        if key in self._enums:
+        try:
             delattr(self, key)
             self._enums.remove(key)
+        except (AttributeError, KeyError) as e:
+            print "Key %s not found" % e
