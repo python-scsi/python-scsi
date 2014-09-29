@@ -17,7 +17,8 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from sgio.utils.enum import Enum
-from scsi_exception import SCSICommandExceptionMeta as ExMETA
+from sgio.pyscsi.scsi_exception import SCSICommandExceptionMeta as ExMETA
+from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
 
 opcodes = {'INQUIRY':           0x12,
@@ -96,8 +97,12 @@ class SCSICommand(object):
         this method takes no arguments but it calls the execute method of the device instance
         with the local attributes of the SCSICommand class.
         """
-        self.device.execute(self.cdb, self.dataout, self.datain, self.sense)
-        self.unmarshall()
+        try:
+            self.device.execute(self.cdb, self.dataout, self.datain, self.sense)
+        except (DeviceErrors.CheckConditionError, DeviceErrors.SCSISGIOError) as e:
+            print e
+        else:
+            self.unmarshall()
 
     def decode_all_bit(self, check_dict={}):
         """
