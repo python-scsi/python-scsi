@@ -41,7 +41,7 @@ P_TYPE = Enum(p_types)
 
 class ReadCapacity16(SCSICommand):
     """
-    A class to hold information from a inquiry command to a scsi device
+    A class to hold information from a ReadCapacity(16) command to a scsi device
     """
 
     def __init__(self, dev, alloclen=32):

@@ -19,6 +19,7 @@
 from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_readcapacity16 import ReadCapacity16
+from scsi_cdb_readcapacity10 import ReadCapacity10
 from scsi_cdb_testunitready import TestUnitReady
 
 
@@ -45,6 +46,15 @@ class SCSI(SCSIDevice):
         :return: a ReadCapacity16 instance
         """
         return ReadCapacity16(self, alloc_len)
+
+    def readcapacity10(self, alloc_len=8):
+        """
+        Returns a ReadCapacity10 Instance
+
+        :param alloc_len: a integer , the size of the data_in buffer
+        :return: a ReadCapacity10 instance
+        """
+        return ReadCapacity10(self, alloc_len)
 
     def testunitready(self):
         """
