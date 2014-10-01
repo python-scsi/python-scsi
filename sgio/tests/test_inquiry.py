@@ -10,6 +10,8 @@ from sgio.pyscsi import scsi_cdb_inquiry as INQUIRY
 def main(device):
     s = SCSI(device)
 
+    i = s.testunitready()
+
     print 'Inquiry: Standard Page'
     print '==========================================\n'
     i = s.inquiry().result

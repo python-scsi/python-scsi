@@ -23,6 +23,7 @@ from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
 opcodes = {'INQUIRY':           0x12,
            'SERVICE_ACTION_IN': 0x9e,
+           'TEST_UNIT_READY':   0x00,
            }
 
 OPCODE = Enum(opcodes)
@@ -102,7 +103,8 @@ class SCSICommand(object):
         except (DeviceErrors.CheckConditionError, DeviceErrors.SCSISGIOError) as e:
             print e
         else:
-            self.unmarshall()
+            if hasattr(self, 'unmarshall'):
+                self.unmarshall()
 
     def decode_all_bit(self, check_dict={}):
         """
