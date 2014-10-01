@@ -58,6 +58,15 @@ inq_blocklimits_bits = {'wsnz': [0x01, 4],
                         'ugavalid': [0x80, 32], }
 
 #
+# BLOCK DEVICE CHARACTERISTICS PAGE
+#
+inq_blockdevchar_bits = {'wabereq': [0xc0, 7],
+                         'wacereq': [0x30, 7],
+                         'nominal_form_factor': [0x0f, 7],
+                         'fuab': [0x02, 8],
+                         'vbuls': [0x01, 8], }
+
+#
 # Device qualifier
 #
 qualifiers = {'CONNECTED': 0x00,
@@ -226,3 +235,8 @@ class Inquiry(SCSICommand):
             self.add_result('unmap_gran_alignment', scsi_ba_to_32(self.datain[32:36]) & 0x7fffffff)
             self.add_result('max_ws_len', scsi_ba_to_32(self.datain[36:40]))
             self.decode_all_bit(inq_blocklimits_bits)
+
+        if self._page_code == VPD.BLOCK_DEVICE_CHARACTERISTICS:
+            self.add_result('medium_rotation_rate', scsi_ba_to_16(self.datain[4:6]))
+            self.add_result('product_type', self.datain[6])
+            self.decode_all_bit(inq_blockdevchar_bits)
