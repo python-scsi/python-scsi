@@ -17,14 +17,20 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_16_to_ba
+from sgio.utils.converter import scsi_16_to_ba, scsi_ba_to_16, scsi_ba_to_32
 from sgio.utils.enum import Enum
 
 #
 # SCSI Inquiry command and definitions
 #
 
-# dict with decode informations -> key: [bit_mask, byte_to_decode, bits_to_shift]
+#
+# dicts with decode informations -> key: [bit_mask, byte_to_decode, bits_to_shift]
+#
+
+#
+# STANDARD PAGE
+#
 inq_std_bits = {'normaca': [0x20, 3],
                 'hisup': [0x10, 3],
                 'response_data_format': [0x0f, 3],
@@ -44,6 +50,12 @@ inq_std_bits = {'normaca': [0x20, 3],
                 'clocking': [0x0c, 56],
                 'qas': [0x02, 56],
                 'ius': [0x01, 56], }
+
+#
+# BLOCK LIMITS PAGE
+#
+inq_blocklimits_bits = {'wsnz': [0x01, 4],
+                        'ugavalid': [0x80, 32], }
 
 #
 # Device qualifier
@@ -191,11 +203,26 @@ class Inquiry(SCSICommand):
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
             self.decode_all_bit(inq_std_bits)
-        elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
-            self.add_result('page_code', self.datain[1])
-            page_length = self.datain[2] * 256 + self.datain[3]
-            self.add_result('page_length', page_length)
+            return
+
+        self.add_result('page_code', self.datain[1])
+        self.add_result('page_length', scsi_ba_to_16(self.datain[2:4]))
+
+        if self._page_code == VPD.SUPPORTED_VPD_PAGES:
             vpd_pages = []
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
                 self.add_result('vpd_pages', vpd_pages)
+
+        if self._page_code == VPD.BLOCK_LIMITS:
+            self.add_result('max_caw_len', self.datain[5])
+            self.add_result('opt_xfer_len_gran', scsi_ba_to_16(self.datain[6:8]))
+            self.add_result('max_xfer_len', scsi_ba_to_32(self.datain[8:12]))
+            self.add_result('opt_xfer_len', scsi_ba_to_32(self.datain[12:16]))
+            self.add_result('max_pfetch_len', scsi_ba_to_32(self.datain[16:20]))
+            self.add_result('max_unmap_lba_count', scsi_ba_to_32(self.datain[20:24]))
+            self.add_result('max_unmap_bd_count', scsi_ba_to_32(self.datain[24:28]))
+            self.add_result('opt_unmap_gran', scsi_ba_to_32(self.datain[28:32]))
+            self.add_result('unmap_gran_alignment', scsi_ba_to_32(self.datain[32:36]) & 0x7fffffff)
+            self.add_result('max_ws_len', scsi_ba_to_32(self.datain[36:40]))
+            self.decode_all_bit(inq_blocklimits_bits)
