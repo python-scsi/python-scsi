@@ -102,7 +102,8 @@ class SCSICommand(object):
         except (DeviceErrors.CheckConditionError, DeviceErrors.SCSISGIOError) as e:
             print e
         else:
-            self.unmarshall()
+            if hasattr(self, 'unmarshall'):
+                self.unmarshall()
 
     def decode_all_bit(self, check_dict={}):
         """
