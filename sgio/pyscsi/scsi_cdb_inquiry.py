@@ -17,7 +17,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_16_to_ba
+from sgio.utils.converter import scsi_16_to_ba, scsi_ba_to_16
 from sgio.utils.enum import Enum
 
 #
@@ -191,10 +191,13 @@ class Inquiry(SCSICommand):
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
             self.decode_all_bit(inq_std_bits)
-        elif self._page_code == VPD.SUPPORTED_VPD_PAGES:
-            self.add_result('page_code', self.datain[1])
-            page_length = self.datain[2] * 256 + self.datain[3]
-            self.add_result('page_length', page_length)
+            return
+
+        self.add_result('page_code', self.datain[1])
+        page_length = scsi_ba_to_16(self.datain[2:4])
+        self.add_result('page_length', page_length)
+
+        if self._page_code == VPD.SUPPORTED_VPD_PAGES:
             vpd_pages = []
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
