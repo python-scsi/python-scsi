@@ -233,7 +233,7 @@ class Inquiry(SCSICommand):
             self.add_result('max_unmap_lba_count', scsi_ba_to_int(self.datain[20:24]))
             self.add_result('max_unmap_bd_count', scsi_ba_to_int(self.datain[24:28]))
             self.add_result('opt_unmap_gran', scsi_ba_to_int(self.datain[28:32]))
-            self.add_result('unmap_gran_alignment', scsi_ba_to_int(self.datain[32:36] & 0x7fffffff))
+            self.add_result('unmap_gran_alignment', scsi_ba_to_int(self.datain[32:36]) & 0x7fffffff)
             self.add_result('max_ws_len', scsi_ba_to_int(self.datain[36:40]))
             self.decode_all_bit(inq_blocklimits_bits)
 
