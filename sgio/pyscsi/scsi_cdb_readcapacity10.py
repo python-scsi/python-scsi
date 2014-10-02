@@ -57,5 +57,5 @@ class ReadCapacity10(SCSICommand):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:4], 4))
-        self.add_result('block_length', scsi_ba_to_int(self.datain[4:8], 4))
+        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:4]))
+        self.add_result('block_length', scsi_ba_to_int(self.datain[4:8]))

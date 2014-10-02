@@ -17,7 +17,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE, SERVICE_ACTION_IN
-from sgio.utils.converter import scsi_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
 from sgio.utils.enum import Enum
 #
 # SCSI ReadCapacity16 command and definitions
@@ -65,15 +65,15 @@ class ReadCapacity16(SCSICommand):
         """
         cdb = SCSICommand.init_cdb(OPCODE.SERVICE_ACTION_IN)
         cdb[1] = SERVICE_ACTION_IN.READ_CAPACITY_16
-        cdb[10:14] = scsi_to_ba(alloclen, 4)
+        cdb[10:14] = scsi_int_to_ba(alloclen, 4)
         return cdb
 
     def unmarshall(self):
         """
         Unmarshall the ReadCapacity16 data.
         """
-        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:8], 8))
-        self.add_result('block_length', scsi_ba_to_int(self.datain[8:12], 4))
+        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:8]))
+        self.add_result('block_length', scsi_ba_to_int(self.datain[8:12]))
         self.decode_all_bit(readcapacity16_bits)
         self.add_result('lowest_aligned_lba',
-                        scsi_ba_to_int(self.datain[14:16], 2) & 0x3fff)
+                        scsi_ba_to_int(self.datain[14:16]) & 0x3fff)
