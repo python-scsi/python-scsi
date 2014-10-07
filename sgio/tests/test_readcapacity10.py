@@ -3,10 +3,12 @@
 
 import sys
 from sgio.pyscsi.scsi import SCSI
+from sgio.pyscsi.scsi_device import SCSIDevice
 
 
 def main(device):
-    s = SCSI(device)
+    sd = SCSIDevice(device)
+    s = SCSI(sd)
 
     print 'ReadCapacity10'
     print '==========================================\n'

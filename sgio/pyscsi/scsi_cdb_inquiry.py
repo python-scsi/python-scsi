@@ -162,17 +162,16 @@ class Inquiry(SCSICommand):
     A class to hold information from a inquiry command to a scsi device
     """
 
-    def __init__(self, dev, evpd=0, page_code=0, alloclen=96):
+    def __init__(self, scsi, evpd=0, page_code=0, alloclen=96):
         """
         initialize a new instance
 
-        :param dev: a SCSIDevice instance
+        :param scsi: a SCSI instance
         :param evpd: the byte to enable or disable vital product data
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        self.device = dev
-        SCSICommand.__init__(self, self.device, 0, alloclen)
+        SCSICommand.__init__(self, scsi, 0, alloclen)
         self._evpd = evpd
         self.pagecode = page_code
         self.cdb = self.build_cdb(evpd, self.pagecode, alloclen)

@@ -4,11 +4,13 @@
 import sys
 
 from sgio.pyscsi.scsi import SCSI
+from sgio.pyscsi.scsi_device import SCSIDevice
 from sgio.pyscsi import scsi_cdb_inquiry as INQUIRY
 
 
 def main(device):
-    s = SCSI(device)
+    sd = SCSIDevice(device)
+    s = SCSI(sd)
 
     i = s.testunitready()
 
