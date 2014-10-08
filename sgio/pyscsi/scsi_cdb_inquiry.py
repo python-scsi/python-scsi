@@ -31,12 +31,15 @@ from sgio.utils.enum import Enum
 #
 # STANDARD PAGE
 #
-inq_std_bits = {'normaca': [0x20, 3],
+inq_std_bits = {'rmb': [0x80, 1],
+                'version': [0xff, 2],
+                'normaca': [0x20, 3],
                 'hisup': [0x10, 3],
                 'response_data_format': [0x0f, 3],
+                'additional_length': [0xff, 4],
                 'sccs': [0x80, 5],
                 'acc': [0x40, 5],
-                'tpgs': [0x03, 5],
+                'tpgs': [0x30, 5],
                 '3pc': [0x08, 5],
                 'protect': [0x01, 5],
                 'encserv': [0x40, 6],
@@ -206,7 +209,6 @@ class Inquiry(SCSICommand):
         self.add_result('peripheral_qualifier', self.datain[0] >> 5)
         self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
         if self._evpd == 0:
-            self.add_result('additional_length', self.datain[4])
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
