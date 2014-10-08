@@ -44,15 +44,14 @@ class ReadCapacity16(SCSICommand):
     A class to hold information from a ReadCapacity(16) command to a scsi device
     """
 
-    def __init__(self, dev, alloclen=32):
+    def __init__(self, scsi, alloclen=32):
         """
         initialize a new instance
 
-        :param dev: a SCSIDevice instance
+        :param scsi: a SCSI instance
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        self.device = dev
-        SCSICommand.__init__(self, self.device, 0, alloclen)
+        SCSICommand.__init__(self, scsi, 0, alloclen)
         self.cdb = self.build_cdb(alloclen)
         self.execute()
 

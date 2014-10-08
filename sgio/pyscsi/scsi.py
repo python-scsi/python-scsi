@@ -23,10 +23,13 @@ from scsi_cdb_readcapacity10 import ReadCapacity10
 from scsi_cdb_testunitready import TestUnitReady
 
 
-class SCSI(SCSIDevice):
+class SCSI(object):
     """
     The interface to  the specialized scsi classes
     """
+    def __init__(self, dev):
+        self.device = dev
+
     def inquiry(self, evpd=0, page_code=0, alloc_len=96):
         """
         Returns a Inquiry Instance

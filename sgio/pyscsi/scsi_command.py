@@ -52,7 +52,7 @@ class SCSICommand(object):
     """
     __metaclass__ = ExMETA
 
-    def __init__(self, dev, dataout_alloclen, datain_alloclen):
+    def __init__(self, scsi, dataout_alloclen, datain_alloclen):
         """
         initialize a new instance
 
@@ -60,7 +60,7 @@ class SCSICommand(object):
         :param dataout_alloclen: integer representing the size of the data_out buffer
         :param datain_alloclen: integer representing the size of the data_in buffer
         """
-        self.device = dev
+        self.scsi = scsi
         self.sense = bytearray(32)
         self.dataout = bytearray(dataout_alloclen)
         self.datain = bytearray(datain_alloclen)
@@ -100,7 +100,7 @@ class SCSICommand(object):
         with the local attributes of the SCSICommand class.
         """
         try:
-            self.device.execute(self.cdb, self.dataout, self.datain, self.sense)
+            self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
         except (DeviceErrors.CheckConditionError, DeviceErrors.SCSISGIOError) as e:
             print e
         else:
@@ -218,24 +218,6 @@ class SCSICommand(object):
         :param value: a byte array
         """
         self._sense = value
-
-    @property
-    def device(self):
-        """
-        getter method of the cdb property
-
-        :return: a SCSIDevice object
-        """
-        return self._device
-
-    @device.setter
-    def device(self, value):
-        """
-        setter method of the device property
-
-        :param value: a SCSIDevice object
-        """
-        self._device = value
 
     @property
     def pagecode(self):

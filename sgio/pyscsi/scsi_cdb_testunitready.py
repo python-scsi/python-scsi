@@ -28,14 +28,13 @@ class TestUnitReady(SCSICommand):
     A class to hold information from a testunitready command to a scsi device
     """
 
-    def __init__(self, dev):
+    def __init__(self, scsi):
         """
         initialize a new instance
 
-        :param dev: a SCSIDevice instance
+        :param scsi: a SCSI instance
         """
-        self.device = dev
-        SCSICommand.__init__(self, self.device, 0, 0)
+        SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb()
         self.execute()
 
