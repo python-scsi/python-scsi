@@ -123,7 +123,7 @@ class SCSICommand(object):
             # get the values from dict
             bitmask, byte_pos = check_dict[key]
             value = self.datain[byte_pos]
-            while bitmask & 0x01:
+            while not bitmask & 0x01:
                 bitmask >>= 1
                 value >>= 1
             value &= bitmask
