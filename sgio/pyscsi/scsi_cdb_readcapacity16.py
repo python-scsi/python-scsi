@@ -23,9 +23,9 @@ from sgio.utils.enum import Enum
 # SCSI ReadCapacity16 command and definitions
 #
 
-readcapacity16_bits = {'p_type': [0x07, 12],
+readcapacity16_bits = {'p_type': [0x0e, 12],
                        'prot_en': [0x01, 12],
-                       'p_i_exponent': [0x0f, 13],
+                       'p_i_exponent': [0xf0, 13],
                        'lbppbe': [0x0f, 13],
                        'lbpme': [0x80, 14],
                        'lbprz': [0x40, 14], }
