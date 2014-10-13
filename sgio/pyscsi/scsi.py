@@ -18,8 +18,11 @@
 
 from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
-from scsi_cdb_readcapacity16 import ReadCapacity16
+from scsi_cdb_read10 import Read10
+from scsi_cdb_read12 import Read12
+from scsi_cdb_read16 import Read16
 from scsi_cdb_readcapacity10 import ReadCapacity10
+from scsi_cdb_readcapacity16 import ReadCapacity16
 from scsi_cdb_testunitready import TestUnitReady
 
 
@@ -29,6 +32,25 @@ class SCSI(object):
     """
     def __init__(self, dev):
         self.device = dev
+        self._blocksize = 0
+
+    @property
+    def blocksize(self):
+        """
+        getter method of the blocksize property
+
+        :return blocksize in bytes
+        """
+        return self._blocksize
+
+    @blocksize.setter
+    def blocksize(self, value):
+        """
+        setter method of the blocksize property
+
+        :param blocksize in bytes
+        """
+        self._blocksize = value
 
     def inquiry(self, evpd=0, page_code=0, alloc_len=96):
         """
@@ -41,14 +63,47 @@ class SCSI(object):
         """
         return Inquiry(self, evpd, page_code, alloc_len)
 
-    def readcapacity16(self, alloc_len=32):
+    def read10(self, lba, tl, **kwargs):
         """
-        Returns a ReadCapacity16 Instance
+        Returns a Read10 Instance
 
-        :param alloc_len: a integer , the size of the data_in buffer
-        :return: a ReadCapacity16 instance
+        :lba Logical Block Address
+        :tl Transfer Length
+        :rdprotect ReadProtect
+        :dpo DPO
+        :fua FUA
+        :rarc RARC
+        :group Group Number
         """
-        return ReadCapacity16(self, alloc_len)
+        return Read10(self, lba, tl, **kwargs)
+
+    def read12(self, lba, tl, **kwargs):
+        """
+        Returns a Read12 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :rdprotect ReadProtect
+        :dpo DPO
+        :fua FUA
+        :rarc RARC
+        :group Group Number
+        """
+        return Read12(self, lba, tl, **kwargs)
+
+    def read16(self, lba, tl, **kwargs):
+        """
+        Returns a Read16 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :rdprotect ReadProtect
+        :dpo DPO
+        :fua FUA
+        :rarc RARC
+        :group Group Number
+        """
+        return Read16(self, lba, tl, **kwargs)
 
     def readcapacity10(self, alloc_len=8):
         """
@@ -58,6 +113,15 @@ class SCSI(object):
         :return: a ReadCapacity10 instance
         """
         return ReadCapacity10(self, alloc_len)
+
+    def readcapacity16(self, alloc_len=32):
+        """
+        Returns a ReadCapacity16 Instance
+
+        :param alloc_len: a integer , the size of the data_in buffer
+        :return: a ReadCapacity16 instance
+        """
+        return ReadCapacity16(self, alloc_len)
 
     def testunitready(self):
         """
