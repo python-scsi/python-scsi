@@ -22,8 +22,8 @@ class Read12(SCSICommand):
         Build a Read12 CDB
         """
         cdb = SCSICommand.init_cdb(OPCODE.READ_12)
-        cdb[2:6] = scsi_int_to_ba(lba, 4);
-        cdb[6:10] = scsi_int_to_ba(tl, 4);
+        cdb[2:6] = scsi_int_to_ba(lba, 4)
+        cdb[6:10] = scsi_int_to_ba(tl, 4)
         cdb[1] |= (rdprotect << 5) & 0xe0
         cdb[1] |= 0x10 if dpo else 0
         cdb[1] |= 0x08 if fua else 0
