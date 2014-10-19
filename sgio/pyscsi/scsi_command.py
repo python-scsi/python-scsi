@@ -22,6 +22,7 @@ from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
 
 opcodes = {'INQUIRY':           0x12,
+           'MODE_SENSE_6':      0x1a,
            'READ_10':           0x28,
            'READ_12':           0xa8,
            'READ_16':           0x88,
