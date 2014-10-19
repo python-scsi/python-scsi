@@ -57,26 +57,27 @@ class SCSI(object):
         """
         self._blocksize = value
 
-    def inquiry(self, evpd=0, page_code=0, alloc_len=96):
+    def inquiry(self, **kwargs):
         """
         Returns a Inquiry Instance
 
-        :param evpd: a byte indicating if vital product data is supported
-        :param page_code: a byte representing a page code for vpd
-        :param alloc_len: a integer , the size of the data_in buffer
+        :param evpd = 0: a byte indicating if vital product data is supported
+        :param page_code = 0: a byte representing a page code for vpd
+        :param alloc_len = 96: a integer , the size of the data_in buffer
         :return: a Inquiry instance
         """
-        return Inquiry(self, evpd, page_code, alloc_len)
+        return Inquiry(self, **kwargs)
 
     def modesense6(self, page_code, **kwargs):
         """
         Returns a ModeSense6 Instance
 
-        :page_code
-        :sub_page_code = 0
-        :dbd = 0
-        :pc = 0
-        :alloclen = 96
+        :param page_code:  The page requested
+        :param sub_page_code = 0: Requested subpage
+        :param dbd = 0: Disable Block Descriptors flag
+        :param pc = 0: Page Control flag
+        :param alloclen = 96
+        :return: a ModeSense6 instance
         """
         return ModeSense6(self, page_code, **kwargs)
 
@@ -84,13 +85,14 @@ class SCSI(object):
         """
         Returns a Read10 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :rdprotect ReadProtect
-        :dpo DPO
-        :fua FUA
-        :rarc RARC
-        :group Group Number
+        :param lba: Logical Block Address
+        :param tl: Transfer Length
+        :param rdprotect = 0: ReadProtect flags
+        :param dpo = 0: DisablePageOut flag
+        :param fua = 0: Force Unit Access flag 
+        :param rarc = 0: Rebuild Assist Recovery control flag
+        :param group = 0: Group Number
+        :returns the data returned in self.datain
         """
         return Read10(self, lba, tl, **kwargs)
 
@@ -98,13 +100,14 @@ class SCSI(object):
         """
         Returns a Read12 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :rdprotect ReadProtect
-        :dpo DPO
-        :fua FUA
-        :rarc RARC
-        :group Group Number
+        :param lba: Logical Block Address
+        :param tl: Transfer Length
+        :param rdprotect = 0: ReadProtect flags
+        :param dpo = 0: DisablePageOut flag
+        :param fua = 0: Force Unit Access flag 
+        :param rarc = 0: Rebuild Assist Recovery control flag
+        :param group = 0: Group Number
+        :returns the data returned in self.datain
         """
         return Read12(self, lba, tl, **kwargs)
 
@@ -112,40 +115,47 @@ class SCSI(object):
         """
         Returns a Read16 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :rdprotect ReadProtect
-        :dpo DPO
-        :fua FUA
-        :rarc RARC
-        :group Group Number
+        :param lba: Logical Block Address
+        :param tl: Transfer Length
+        :param rdprotect = 0: ReadProtect flags
+        :param dpo = 0: DisablePageOut flag
+        :param fua = 0: Force Unit Access flag 
+        :param rarc = 0: Rebuild Assist Recovery control flag
+        :param group = 0: Group Number
+        :returns the data returned in self.datain
         """
         return Read16(self, lba, tl, **kwargs)
 
-    def readcapacity10(self, alloc_len=8):
+    def readcapacity10(self, **kwargs):
         """
         Returns a ReadCapacity10 Instance
 
-        :param alloc_len: a integer , the size of the data_in buffer
+        :param alloc_len = 8: size of requested datain
         :return: a ReadCapacity10 instance
         """
-        return ReadCapacity10(self, alloc_len)
+        return ReadCapacity10(self, **kwargs)
 
-    def readcapacity16(self, alloc_len=32):
+    def readcapacity16(self, **kwargs):
         """
         Returns a ReadCapacity16 Instance
 
-        :param alloc_len: a integer , the size of the data_in buffer
+        :param alloc_len = 32: size of requested datain
         :return: a ReadCapacity16 instance
         """
-        return ReadCapacity16(self, alloc_len)
+        return ReadCapacity16(self, **kwargs)
 
     def readelementstatus(self, start, num, **kwargs):
         """
         Returns a ReadElementStatus Instance
 
-        :param
-        :return: a ReadElementStatus instance
+        :param start: starting address for first element to return
+        :param num: numbver of elements to return
+        :param element_type=ELEMENT_TYPE.ALL: type of elements to return
+        :param voltag = 0: whether volume tag data should be returned
+        :param curdata = 1: check current data
+        :param dvcid = 0: whether to return device identifiers
+        :param alloclen=16384: max amount od data to return
+        :return: an ReadElementStatus instance
         """
         return ReadElementStatus(self, start, num, **kwargs)
 
@@ -162,13 +172,14 @@ class SCSI(object):
         """
         Returns a Write10 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :data bytearray containing the data to write
-        :wrprotect WriteProtect
-        :dpo DPO
-        :fua FUA
-        :group Group Number
+        :param lba: Logical Block Address to write to
+        :param tl: Transfer Length in blocks
+        :param data: bytearray containing the data to write
+        :param wrprotect = 0: WriteProtect flags
+        :param dpo = 0: disable Page Out flag
+        :param fua = 0: Force Unit Access flag
+        :param group = 0: Group Number
+        :return: a Write10 instance
         """
         return Write10(self, lba, tl, data, **kwargs)
 
@@ -176,13 +187,14 @@ class SCSI(object):
         """
         Returns a Write12 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :data bytearray containing the data to write
-        :wrprotect WriteProtect
-        :dpo DPO
-        :fua FUA
-        :group Group Number
+        :param lba: Logical Block Address to write to
+        :param tl: Transfer Length in blocks
+        :param data: bytearray containing the data to write
+        :param wrprotect = 0: WriteProtect flags
+        :param dpo = 0: disable Page Out flag
+        :param fua = 0: Force Unit Access flag
+        :param group = 0: Group Number
+        :return: a Write12 instance
         """
         return Write12(self, lba, tl, data, **kwargs)
 
@@ -190,13 +202,14 @@ class SCSI(object):
         """
         Returns a Write16 Instance
 
-        :lba Logical Block Address
-        :tl Transfer Length
-        :data bytearray containing the data to write
-        :wrprotect WriteProtect
-        :dpo DPO
-        :fua FUA
-        :group Group Number
+        :param lba: Logical Block Address to write to
+        :param tl: Transfer Length in blocks
+        :param data: bytearray containing the data to write
+        :param wrprotect = 0: WriteProtect flags
+        :param dpo = 0: disable Page Out flag
+        :param fua = 0: Force Unit Access flag
+        :param group = 0: Group Number
+        :return: a Write16 instance
         """
         return Write16(self, lba, tl, data, **kwargs)
 

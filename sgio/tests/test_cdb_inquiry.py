@@ -15,14 +15,14 @@ def main():
     s = SCSI(MockInquiry())
 
     # cdb for standard page request
-    cdb = s.inquiry(alloc_len=128)._cdb
+    cdb = s.inquiry(alloclen=128)._cdb
     assert cdb[0] == OPCODE.INQUIRY
     assert cdb[1:3] == bytearray(2)
     assert scsi_ba_to_int(cdb[3:5]) == 128
     assert cdb[5] == 0
 
     # supported vpd pages
-    cdb = s.inquiry(evpd=1, page_code=0x88, alloc_len=128)._cdb
+    cdb = s.inquiry(evpd=1, page_code=0x88, alloclen=128)._cdb
     assert cdb[0] == OPCODE.INQUIRY
     assert cdb[1] == 0x01
     assert cdb[2] == 0x88

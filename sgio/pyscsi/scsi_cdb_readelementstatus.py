@@ -40,7 +40,7 @@ class ReadElementStatus(SCSICommand):
     """
 
     def __init__(self, scsi, start, num, element_type=ELEMENT_TYPE.ALL,
-                 voltag=0, curdata=0, dvcid=0, alloclen=16384):
+                 voltag=0, curdata=1, dvcid=0, alloclen=16384):
         """
         initialize a new instance
 
