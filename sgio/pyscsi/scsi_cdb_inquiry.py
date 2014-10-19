@@ -212,7 +212,7 @@ class Inquiry(SCSICommand):
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
-            self.decode_all_bit(inq_std_bits)
+            self.decode_bits(self.datain, inq_std_bits)
             return
 
         self.add_result('page_code', self.datain[1])
@@ -236,9 +236,9 @@ class Inquiry(SCSICommand):
             self.add_result('opt_unmap_gran', scsi_ba_to_int(self.datain[28:32]))
             self.add_result('unmap_gran_alignment', scsi_ba_to_int(self.datain[32:36]) & 0x7fffffff)
             self.add_result('max_ws_len', scsi_ba_to_int(self.datain[36:40]))
-            self.decode_all_bit(inq_blocklimits_bits)
+            self.decode_bits(self.datain, inq_blocklimits_bits)
 
         if self._page_code == VPD.BLOCK_DEVICE_CHARACTERISTICS:
             self.add_result('medium_rotation_rate', scsi_ba_to_int(self.datain[4:6]))
             self.add_result('product_type', self.datain[6])
-            self.decode_all_bit(inq_blockdevchar_bits)
+            self.decode_bits(self.datain, inq_blockdevchar_bits)

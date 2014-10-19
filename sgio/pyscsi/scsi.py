@@ -18,12 +18,17 @@
 
 from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
+from scsi_cdb_modesense6 import ModeSense6
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
 from scsi_cdb_readcapacity10 import ReadCapacity10
 from scsi_cdb_readcapacity16 import ReadCapacity16
+from scsi_cdb_readelementstatus import ReadElementStatus
 from scsi_cdb_testunitready import TestUnitReady
+from scsi_cdb_write10 import Write10
+from scsi_cdb_write12 import Write12
+from scsi_cdb_write16 import Write16
 
 
 class SCSI(object):
@@ -62,6 +67,18 @@ class SCSI(object):
         :return: a Inquiry instance
         """
         return Inquiry(self, evpd, page_code, alloc_len)
+
+    def modesense6(self, page_code, **kwargs):
+        """
+        Returns a ModeSense6 Instance
+
+        :page_code
+        :sub_page_code = 0
+        :dbd = 0
+        :pc = 0
+        :alloclen = 96
+        """
+        return ModeSense6(self, page_code, **kwargs)
 
     def read10(self, lba, tl, **kwargs):
         """
@@ -123,6 +140,15 @@ class SCSI(object):
         """
         return ReadCapacity16(self, alloc_len)
 
+    def readelementstatus(self, start, num, **kwargs):
+        """
+        Returns a ReadElementStatus Instance
+
+        :param
+        :return: a ReadElementStatus instance
+        """
+        return ReadElementStatus(self, start, num, **kwargs)
+
     def testunitready(self):
         """
         Returns a TestUnitReady Instance
@@ -131,4 +157,46 @@ class SCSI(object):
         No return value
         """
         return TestUnitReady(self)
+
+    def write10(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write10 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write10(self, lba, tl, data, **kwargs)
+
+    def write12(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write12 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write12(self, lba, tl, data, **kwargs)
+
+    def write16(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write16 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write16(self, lba, tl, data, **kwargs)
 

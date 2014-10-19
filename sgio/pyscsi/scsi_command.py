@@ -22,12 +22,17 @@ from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
 
 opcodes = {'INQUIRY':           0x12,
+           'MODE_SENSE_6':      0x1a,
            'READ_10':           0x28,
            'READ_12':           0xa8,
            'READ_16':           0x88,
            'READ_CAPACITY_10':  0x25,
+           'READ_ELEMENT_STATUS':  0xb8,
            'SERVICE_ACTION_IN': 0x9e,
            'TEST_UNIT_READY':   0x00,
+           'WRITE_10':          0x2a,
+           'WRITE_12':          0xaa,
+           'WRITE_16':          0x8a,
            }
 
 OPCODE = Enum(opcodes)
@@ -110,7 +115,7 @@ class SCSICommand(object):
             if hasattr(self, 'unmarshall'):
                 self.unmarshall()
 
-    def decode_all_bit(self, check_dict={}):
+    def decode_bits(self, data, check_dict={}):
         """
         helper method to perform some simple bit operations
 
@@ -120,12 +125,13 @@ class SCSICommand(object):
 
         for now we assume he have to right shift only
 
+        :data: a buffer containing the bits to decode
         :check_dict: a dict with a list as value in each key:value pair
         """
         for key in check_dict.iterkeys():
             # get the values from dict
             bitmask, byte_pos = check_dict[key]
-            value = self.datain[byte_pos]
+            value = data[byte_pos]
             while not bitmask & 0x01:
                 bitmask >>= 1
                 value >>= 1

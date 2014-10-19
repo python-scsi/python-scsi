@@ -73,6 +73,6 @@ class ReadCapacity16(SCSICommand):
         """
         self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:8]))
         self.add_result('block_length', scsi_ba_to_int(self.datain[8:12]))
-        self.decode_all_bit(readcapacity16_bits)
+        self.decode_bits(self.datain, readcapacity16_bits)
         self.add_result('lowest_aligned_lba',
                         scsi_ba_to_int(self.datain[14:16]) & 0x3fff)
