@@ -18,6 +18,7 @@
 
 from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
+from scsi_cdb_modesense6 import ModeSense6
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
@@ -65,6 +66,18 @@ class SCSI(object):
         :return: a Inquiry instance
         """
         return Inquiry(self, evpd, page_code, alloc_len)
+
+    def modesense6(self, page_code, **kwargs):
+        """
+        Returns a ModeSense6 Instance
+
+        :page_code
+        :sub_page_code = 0
+        :dbd = 0
+        :pc = 0
+        :alloclen = 96
+        """
+        return ModeSense6(self, page_code, **kwargs)
 
     def read10(self, lba, tl, **kwargs):
         """
