@@ -107,7 +107,7 @@ class ModeSense6(SCSICommand):
                             scsi_ba_to_int(mode_data[10:12]))
             self.add_result('num_import_elements',
                             scsi_ba_to_int(mode_data[12:14]))
-            self.add_result('first_data_transport_element_address',
+            self.add_result('first_data_transfer_element_address',
                             scsi_ba_to_int(mode_data[14:16]))
-            self.add_result('num_data_transport_elements',
+            self.add_result('num_data_transfer_elements',
                             scsi_ba_to_int(mode_data[16:18]))

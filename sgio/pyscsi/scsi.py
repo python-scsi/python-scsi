@@ -24,6 +24,7 @@ from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
 from scsi_cdb_readcapacity10 import ReadCapacity10
 from scsi_cdb_readcapacity16 import ReadCapacity16
+from scsi_cdb_readelementstatus import ReadElementStatus
 from scsi_cdb_testunitready import TestUnitReady
 from scsi_cdb_write10 import Write10
 from scsi_cdb_write12 import Write12
@@ -138,6 +139,15 @@ class SCSI(object):
         :return: a ReadCapacity16 instance
         """
         return ReadCapacity16(self, alloc_len)
+
+    def readelementstatus(self, start, num, **kwargs):
+        """
+        Returns a ReadElementStatus Instance
+
+        :param
+        :return: a ReadElementStatus instance
+        """
+        return ReadElementStatus(self, start, num, **kwargs)
 
     def testunitready(self):
         """
