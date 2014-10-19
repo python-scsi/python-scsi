@@ -24,6 +24,9 @@ from scsi_cdb_read16 import Read16
 from scsi_cdb_readcapacity10 import ReadCapacity10
 from scsi_cdb_readcapacity16 import ReadCapacity16
 from scsi_cdb_testunitready import TestUnitReady
+from scsi_cdb_write10 import Write10
+from scsi_cdb_write12 import Write12
+from scsi_cdb_write16 import Write16
 
 
 class SCSI(object):
@@ -131,4 +134,46 @@ class SCSI(object):
         No return value
         """
         return TestUnitReady(self)
+
+    def write10(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write10 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write10(self, lba, tl, data, **kwargs)
+
+    def write12(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write12 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write12(self, lba, tl, data, **kwargs)
+
+    def write16(self, lba, tl, data, **kwargs):
+        """
+        Returns a Write16 Instance
+
+        :lba Logical Block Address
+        :tl Transfer Length
+        :data bytearray containing the data to write
+        :wrprotect WriteProtect
+        :dpo DPO
+        :fua FUA
+        :group Group Number
+        """
+        return Write16(self, lba, tl, data, **kwargs)
 

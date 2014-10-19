@@ -28,6 +28,9 @@ opcodes = {'INQUIRY':           0x12,
            'READ_CAPACITY_10':  0x25,
            'SERVICE_ACTION_IN': 0x9e,
            'TEST_UNIT_READY':   0x00,
+           'WRITE_10':          0x2a,
+           'WRITE_12':          0xaa,
+           'WRITE_16':          0x8a,
            }
 
 OPCODE = Enum(opcodes)
