@@ -113,7 +113,7 @@ class SCSICommand(object):
             if hasattr(self, 'unmarshall'):
                 self.unmarshall()
 
-    def decode_all_bit(self, check_dict={}):
+    def decode_bits(self, data, check_dict={}):
         """
         helper method to perform some simple bit operations
 
@@ -123,12 +123,13 @@ class SCSICommand(object):
 
         for now we assume he have to right shift only
 
+        :data: a buffer containing the bits to decode
         :check_dict: a dict with a list as value in each key:value pair
         """
         for key in check_dict.iterkeys():
             # get the values from dict
             bitmask, byte_pos = check_dict[key]
-            value = self.datain[byte_pos]
+            value = data[byte_pos]
             while not bitmask & 0x01:
                 bitmask >>= 1
                 value >>= 1
