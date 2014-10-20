@@ -253,4 +253,13 @@ class SCSICommand(object):
         :param key: a string
         :param value: a byte or byte array
         """
-        self.result.update({key: value})
+        self.add_result_to_dict(key, value, self.result)
+
+    def add_result_to_dict(self, key, value, dict):
+        """
+        method to update the result dictionary
+
+        :param key: a string
+        :param value: a byte or byte array
+        """
+        dict.update({key: value})
