@@ -114,7 +114,7 @@ class SCSICommand(object):
             if hasattr(self, 'unmarshall'):
                 self.unmarshall()
 
-    def decode_bits(self, data, check_dict={}):
+    def decode_bits(self, data, check_dict):
         """
         helper method to perform some simple bit operations
 
