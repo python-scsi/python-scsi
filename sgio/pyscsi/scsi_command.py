@@ -115,6 +115,9 @@ class SCSICommand(object):
                 self.unmarshall()
 
     def decode_bits(self, data, check_dict):
+        self.decode_bits_into_dict(data, check_dict, self.result)
+
+    def decode_bits_into_dict(self, data, check_dict, dict):
         """
         helper method to perform some simple bit operations
 
@@ -135,7 +138,7 @@ class SCSICommand(object):
                 bitmask >>= 1
                 value >>= 1
             value &= bitmask
-            self.add_result(key, value)
+            self.add_result_to_dict(key, value, dict)
 
     @property
     def result(self):
