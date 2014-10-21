@@ -27,6 +27,7 @@ opcodes = {'INQUIRY':           0x12,
            'READ_12':           0xa8,
            'READ_16':           0x88,
            'READ_CAPACITY_10':  0x25,
+           'READ_ELEMENT_STATUS':  0xb8,
            'SERVICE_ACTION_IN': 0x9e,
            'TEST_UNIT_READY':   0x00,
            'WRITE_10':          0x2a,
@@ -114,7 +115,10 @@ class SCSICommand(object):
             if hasattr(self, 'unmarshall'):
                 self.unmarshall()
 
-    def decode_bits(self, data, check_dict={}):
+    def decode_bits(self, data, check_dict):
+        self.decode_bits_into_dict(data, check_dict, self.result)
+
+    def decode_bits_into_dict(self, data, check_dict, dict):
         """
         helper method to perform some simple bit operations
 
@@ -135,7 +139,7 @@ class SCSICommand(object):
                 bitmask >>= 1
                 value >>= 1
             value &= bitmask
-            self.add_result(key, value)
+            self.add_result_to_dict(key, value, dict)
 
     @property
     def result(self):
@@ -253,4 +257,13 @@ class SCSICommand(object):
         :param key: a string
         :param value: a byte or byte array
         """
-        self.result.update({key: value})
+        self.add_result_to_dict(key, value, self.result)
+
+    def add_result_to_dict(self, key, value, dict):
+        """
+        method to update the result dictionary
+
+        :param key: a string
+        :param value: a byte or byte array
+        """
+        dict.update({key: value})
