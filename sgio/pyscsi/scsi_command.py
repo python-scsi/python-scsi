@@ -17,6 +17,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from sgio.utils.enum import Enum
+from sgio.utils.converter import decode_bits
 from sgio.pyscsi.scsi_exception import SCSICommandExceptionMeta as ExMETA
 from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
@@ -114,32 +115,6 @@ class SCSICommand(object):
         else:
             if hasattr(self, 'unmarshall'):
                 self.unmarshall()
-
-    def decode_bits(self, data, check_dict):
-        self.decode_bits_into_dict(data, check_dict, self.result)
-
-    def decode_bits_into_dict(self, data, check_dict, dict):
-        """
-        helper method to perform some simple bit operations
-
-        the list in the value of each key:value pair contains 2 values
-         - the bit mask
-         - thy byte number for the byte in the datain byte array
-
-        for now we assume he have to right shift only
-
-        :data: a buffer containing the bits to decode
-        :check_dict: a dict with a list as value in each key:value pair
-        """
-        for key in check_dict.iterkeys():
-            # get the values from dict
-            bitmask, byte_pos = check_dict[key]
-            value = data[byte_pos]
-            while not bitmask & 0x01:
-                bitmask >>= 1
-                value >>= 1
-            value &= bitmask
-            self.add_result_to_dict(key, value, dict)
 
     @property
     def result(self):

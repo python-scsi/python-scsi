@@ -11,7 +11,7 @@ class MockModeSenseEAA(object):
        datain[0] = 96 # mode data length
        datain[1] = 97 # medium type
        datain[2] = 98 # device specific parameter
-       datain[3] = 99 # block descriptor length
+       datain[3] = 0 # block descriptor length
 
        datain[4] = 0xdd # PS=1 SPF=1 PAGECODE=0x1d
        datain[5] = 16   # Parameter List Length
@@ -32,7 +32,7 @@ def main():
     assert i['mode_data_length'] == 96
     assert i['medium_type'] == 97
     assert i['device_specific_parameter'] == 98
-    assert i['block_descriptor_length'] == 99
+    assert i['block_descriptor_length'] == 0
 
     assert i['ps'] == 1
     assert i['spf'] == 1
@@ -44,8 +44,8 @@ def main():
     assert i['num_storage_elements'] == 260
     assert i['first_import_element_address'] == 261
     assert i['num_import_elements'] == 262
-    assert i['first_data_transport_element_address'] == 263
-    assert i['num_data_transport_elements'] == 264
+    assert i['first_data_transfer_element_address'] == 263
+    assert i['num_data_transfer_elements'] == 264
 
 if __name__ == "__main__":
     main()
