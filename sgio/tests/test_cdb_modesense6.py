@@ -16,21 +16,39 @@ def main():
     s = SCSI(MockModeSense6())
 
     # cdb for SMC: ElementAddressAssignment
-    cdb = s.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT)._cdb
+    m = s.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT)
+    cdb = m._cdb
     assert cdb[0] == OPCODE.MODE_SENSE_6
     assert cdb[1] == 0
     assert cdb[2] == MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
     assert cdb[3] == 0
     assert cdb[4] == 96
     assert cdb[5] == 0
+    cdb = m.unmarshall_cdb(cdb)
+    assert cdb['opcode'] == OPCODE.MODE_SENSE_6
+    assert cdb['dbd'] == 0
+    assert cdb['pc'] == 0
+    assert cdb['page_code'] == MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
+    assert cdb['sub_page_code'] == 0
+    assert cdb['alloc_len'] == 96
 
-    cdb = s.modesense6(page_code=0, sub_page_code=3, dbd=1, pc=MODESENSE6.PC.DEFAULT, alloclen=90)._cdb
+
+    m = s.modesense6(page_code=0, sub_page_code=3, dbd=1, pc=MODESENSE6.PC.DEFAULT, alloclen=90)
+    cdb = m._cdb
     assert cdb[0] == OPCODE.MODE_SENSE_6
     assert cdb[1] == 0x08
     assert cdb[2] == MODESENSE6.PC.DEFAULT << 6
     assert cdb[3] == 3
     assert cdb[4] == 90
     assert cdb[5] == 0
+    cdb = m.unmarshall_cdb(cdb)
+    assert cdb['opcode'] == OPCODE.MODE_SENSE_6
+    assert cdb['dbd'] == 1
+    assert cdb['pc'] == MODESENSE6.PC.DEFAULT
+    assert cdb['page_code'] == 0
+    assert cdb['sub_page_code'] == 3
+    assert cdb['alloc_len'] == 90
+
 if __name__ == "__main__":
     main()
 

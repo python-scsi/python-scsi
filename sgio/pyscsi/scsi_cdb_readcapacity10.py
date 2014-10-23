@@ -25,7 +25,14 @@ from sgio.utils.converter import decode_bits
 # SCSI ReadCapacity10 command and definitions
 #
 
-readcapacity10_bits = {
+#
+# CDB
+#
+_cdb_bits = {
+    'opcode': [0xff, 0],
+}
+
+_readcapacity10_bits = {
     'returned_lba': [0xffffffff, 0],
     'block_length': [0xffffffff, 4],
 }
@@ -60,4 +67,12 @@ class ReadCapacity10(SCSICommand):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        decode_bits(self.datain, readcapacity10_bits, self.result)
+        decode_bits(self.datain, _readcapacity10_bits, self.result)
+
+    def unmarshall_cdb(self, cdb):
+        """
+        method to unmarshall a byte array containing a cdb.
+        """
+        _tmp = {}
+        decode_bits(cdb, _cdb_bits, _tmp)
+        return _tmp

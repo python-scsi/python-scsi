@@ -19,11 +19,20 @@
 from scsi_command import SCSICommand, OPCODE, SERVICE_ACTION_IN
 from sgio.utils.converter import scsi_int_to_ba, decode_bits
 from sgio.utils.enum import Enum
+
 #
 # SCSI ReadCapacity16 command and definitions
 #
+#
+# CDB
+#
+_cdb_bits = {
+    'opcode': [0xff, 0],
+    'service_action': [0x1f, 1],
+    'alloc_len': [0xffffffff, 10],
+}
 
-readcapacity16_bits = {
+_readcapacity16_bits = {
     'returned_lba': [0xffffffffffffffff, 0],
     'block_length': [0xffffffff, 8],
     'p_type': [0x0e, 12],
@@ -38,11 +47,13 @@ readcapacity16_bits = {
 #
 # P_TYPE
 #
-p_types = {'TYPE_1_PROTECTION': 0x00,
-           'TYPE_2_PROTECTION': 0x01,
-           'TYPE_3_PROTECTION': 0x02, }
+_p_types = {
+    'TYPE_1_PROTECTION': 0x00,
+    'TYPE_2_PROTECTION': 0x01,
+    'TYPE_3_PROTECTION': 0x02,
+}
 
-P_TYPE = Enum(p_types)
+P_TYPE = Enum(_p_types)
 
 
 class ReadCapacity16(SCSICommand):
@@ -73,8 +84,16 @@ class ReadCapacity16(SCSICommand):
         cdb[10:14] = scsi_int_to_ba(alloclen, 4)
         return cdb
 
+    def unmarshall_cdb(self, cdb):
+        """
+        method to unmarshall a byte array containing a cdb.
+        """
+        _tmp = {}
+        decode_bits(cdb, _cdb_bits, _tmp)
+        return _tmp
+
     def unmarshall(self):
         """
         Unmarshall the ReadCapacity16 data.
         """
-        decode_bits(self.datain, readcapacity16_bits, self.result)
+        decode_bits(self.datain, _readcapacity16_bits, self.result)
