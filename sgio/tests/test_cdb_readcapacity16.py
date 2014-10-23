@@ -14,12 +14,17 @@ class MockReadCapacity16(object):
 def main():
     s = SCSI(MockReadCapacity16())
 
-    cdb = s.readcapacity16(alloclen=37)._cdb
+    r = s.readcapacity16(alloclen=37)
+    cdb = r._cdb
     assert cdb[0] == OPCODE.SERVICE_ACTION_IN
     assert cdb[1] == SERVICE_ACTION_IN.READ_CAPACITY_16
     assert cdb[2:10] == bytearray(8)
     assert scsi_ba_to_int(cdb[10:14]) == 37
     assert cdb[14:16] == bytearray(2)
+    cdb = r.unmarshall_cdb(cdb)
+    assert cdb['opcode'] == OPCODE.SERVICE_ACTION_IN
+    assert cdb['service_action'] == SERVICE_ACTION_IN.READ_CAPACITY_16
+    assert cdb['alloc_len'] == 37
 
 if __name__ == "__main__":
     main()

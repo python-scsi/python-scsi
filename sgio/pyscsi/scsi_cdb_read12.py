@@ -1,11 +1,25 @@
 # coding: utf-8
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 
 #
 # SCSI Read12 command and definitions
 #
+
+#
+# CDB
+#
+_cdb_bits = {
+    'opcode': [0xff, 0],
+    'rdprotect': [0xe0, 1],
+    'dpo': [0x10, 1],
+    'fua': [0x08, 1],
+    'rarc': [0x04, 1],
+    'lba': [0xffffffff, 2],
+    'tl': [0xffffffff, 6],
+    'group': [0x1f, 10],
+}
 
 class Read12(SCSICommand):
     """
@@ -31,3 +45,11 @@ class Read12(SCSICommand):
         cdb[10] |= group & 0x1f
 
         return cdb
+
+    def unmarshall_cdb(self, cdb):
+        """
+        method to unmarshall a byte array containing a cdb.
+        """
+        _tmp = {}
+        decode_bits(cdb, _cdb_bits, _tmp)
+        return _tmp

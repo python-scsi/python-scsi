@@ -9,9 +9,23 @@ from sgio.utils.enum import Enum
 #
 
 #
+# CDB
+#
+_cdb_bits = {
+    'opcode': [0xff, 0],
+    'voltag': [0x10, 1],
+    'element_type': [0x07, 1],
+    'starting_element_address': [0xffff, 2],
+    'num_elements': [0xffff, 4],
+    'curdata': [0x02, 6],
+    'dvcid': [0x01, 6],
+    'alloc_len': [0xffffff, 7],
+}
+
+#
 # Element Status Data
 #
-element_status_data_bits = {
+_element_status_data_bits = {
         'first_element_address': [0xffff, 0],
         'num_elements': [0xffff, 2],
         'byte_count': [0xffffff, 5],
@@ -20,7 +34,7 @@ element_status_data_bits = {
 #
 # Element Descriptor bits
 #
-element_descriptor_bits = {
+_element_descriptor_bits = {
     'element_address': [0xffff, 0],
     'access': [0x08, 2],
     'except': [0x04, 2],
@@ -34,7 +48,7 @@ element_descriptor_bits = {
     'source_storage_element_address': [0xffff, 10],
 }
 
-element_descriptor_trailer_bits = {
+_element_descriptor_trailer_bits = {
     'code_set': [0x0f, 0],
     'identifier_type':  [0x0f, 1],
     'identifier_length': [0xff, 3],
@@ -43,13 +57,15 @@ element_descriptor_trailer_bits = {
 #
 # Element Type Code
 #
-element_type = {'ALL': 0x00,
-                'MEDIUM_TRANSPORT': 0x01,
-                'STORAGE': 0x02,
-                'IMPORT_EXPORT': 0x03,
-                'DATA_TRANSFER': 0x04, }
+_element_type = {
+    'ALL': 0x00,
+    'MEDIUM_TRANSPORT': 0x01,
+    'STORAGE': 0x02,
+    'IMPORT_EXPORT': 0x03,
+    'DATA_TRANSFER': 0x04,
+}
 
-ELEMENT_TYPE = Enum(element_type)
+ELEMENT_TYPE = Enum(_element_type)
 
 class ReadElementStatus(SCSICommand):
     """
@@ -97,7 +113,7 @@ class ReadElementStatus(SCSICommand):
     #
     def unmarshall_element_descriptor(self, type, data, pvoltag, avoltag):
         _storage = {}
-        decode_bits(data, element_descriptor_bits, _storage)
+        decode_bits(data, _element_descriptor_bits, _storage)
 
         _data = data[12:]
         if pvoltag:
@@ -109,7 +125,7 @@ class ReadElementStatus(SCSICommand):
                                     _data[0:36], _storage)
             _data = _data[36:]
 
-        decode_bits(_data, element_descriptor_trailer_bits, _storage)
+        decode_bits(_data, _element_descriptor_trailer_bits, _storage)
         if _storage['identifier_length']:
             self.add_result_to_dict('identifier',
                                     _data[4:4 + _storage['identifier_length']],
@@ -149,7 +165,7 @@ class ReadElementStatus(SCSICommand):
     def unmarshall(self):
         """
         """
-        decode_bits(self.datain, element_status_data_bits, self.result)
+        decode_bits(self.datain, _element_status_data_bits, self.result)
 
         #
         # Loop over the remaining data until we have consumed all
@@ -175,3 +191,11 @@ class ReadElementStatus(SCSICommand):
                 self.add_result('data_transfer_elements', _descriptors)
 
             _data = _data[8 + _bytes:]
+
+    def unmarshall_cdb(self, cdb):
+        """
+        method to unmarshall a byte array containing a cdb.
+        """
+        _tmp = {}
+        decode_bits(cdb, _cdb_bits, _tmp)
+        return _tmp

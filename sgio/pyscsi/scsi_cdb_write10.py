@@ -1,11 +1,24 @@
 # coding: utf-8
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 
 #
 # SCSI Write10 command and definitions
 #
+
+#
+# CDB
+#
+_cdb_bits = {
+    'opcode': [0xff, 0],
+    'wrprotect': [0xe0, 1],
+    'dpo': [0x10, 1],
+    'fua': [0x08, 1],
+    'lba': [0xffffffff, 2],
+    'group': [0x1f, 6],
+    'tl': [0xffff, 7],
+}
 
 class Write10(SCSICommand):
     """
@@ -31,3 +44,11 @@ class Write10(SCSICommand):
         cdb[6] |= group & 0x1f
 
         return cdb
+
+    def unmarshall_cdb(self, cdb):
+        """
+        method to unmarshall a byte array containing a cdb.
+        """
+        _tmp = {}
+        decode_bits(cdb, _cdb_bits, _tmp)
+        return _tmp
