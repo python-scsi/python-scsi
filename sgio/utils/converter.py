@@ -45,3 +45,31 @@ def scsi_ba_to_int(ba):
     """
     return sum(ba[i] << ((len(ba) - 1 - i) * 8) for i in range(len(ba)))
 
+def decode_bits(data, check_dict, dict):
+    """
+    helper method to perform some simple bit operations
+
+    the list in the value of each key:value pair contains 2 values
+    - the bit mask
+    - thy byte number for the byte in the datain byte array
+
+    for now we assume he have to right shift only
+
+    :data: a buffer containing the bits to decode
+    :check_dict: a dict with a list as value in each key:value pair
+    """
+    for key in check_dict.iterkeys():
+        # get the values from dict
+        bitmask, byte_pos = check_dict[key]
+        _num = 1
+        _bm = bitmask
+        while _bm > 0xff:
+            _bm >>= 8
+            _num += 1
+        value = scsi_ba_to_int(data[byte_pos:byte_pos + _num])
+        while not bitmask & 0x01:
+            bitmask >>= 1
+            value >>= 1
+        value &= bitmask
+        dict.update({key: value})
+

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 from sgio.utils.enum import Enum
 
 #
@@ -15,6 +15,20 @@ mode_header_bits = {'mode_data_length': [0xff, 0],
                     'medium_type': [0xff, 1],
                     'device_specific_parameter': [0xff, 2],
                     'block_descriptor_length': [0xff, 3], }
+
+#
+# Element Address Assignment
+#
+element_address_assignment_bits = {
+    'first_medium_transport_element_address': [0xffff, 2],
+    'num_medium_transport_elements': [0xffff, 4],
+    'first_storage_element_address': [0xffff, 6],
+    'num_storage_elements': [0xffff, 8],
+    'first_import_element_address': [0xffff, 10],
+    'num_import_elements': [0xffff, 12],
+    'first_data_transfer_element_address': [0xffff, 14],
+    'num_data_transfer_elements': [0xffff, 16],
+}
 
 #
 # Page Header
@@ -86,28 +100,13 @@ class ModeSense6(SCSICommand):
     def unmarshall(self):
         """
         """
-        self.decode_bits(self.datain[0:4], mode_header_bits)
-        bdl = self.result['block_descriptor_length']
+        decode_bits(self.datain[0:4], mode_header_bits, self.result)
+        _bdl = self.result['block_descriptor_length']
 
         block_descriptor = self.datain[4:]
         
-        mode_data = block_descriptor[bdl:]
-        self.decode_bits(mode_data, page_header_bits)
+        mode_data = block_descriptor[_bdl:]
+        decode_bits(mode_data, page_header_bits, self.result)
 
         if self.page_code == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-            self.add_result('first_medium_transport_element_address',
-                            scsi_ba_to_int(mode_data[2:4]))
-            self.add_result('num_medium_transport_elements',
-                            scsi_ba_to_int(mode_data[4:6]))
-            self.add_result('first_storage_element_address',
-                            scsi_ba_to_int(mode_data[6:8]))
-            self.add_result('num_storage_elements',
-                            scsi_ba_to_int(mode_data[8:10]))
-            self.add_result('first_import_element_address',
-                            scsi_ba_to_int(mode_data[10:12]))
-            self.add_result('num_import_elements',
-                            scsi_ba_to_int(mode_data[12:14]))
-            self.add_result('first_data_transfer_element_address',
-                            scsi_ba_to_int(mode_data[14:16]))
-            self.add_result('num_data_transfer_elements',
-                            scsi_ba_to_int(mode_data[16:18]))
+            decode_bits(mode_data, element_address_assignment_bits, self.result)

@@ -17,18 +17,24 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE, SERVICE_ACTION_IN
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, decode_bits
 from sgio.utils.enum import Enum
 #
 # SCSI ReadCapacity16 command and definitions
 #
 
-readcapacity16_bits = {'p_type': [0x0e, 12],
-                       'prot_en': [0x01, 12],
-                       'p_i_exponent': [0xf0, 13],
-                       'lbppbe': [0x0f, 13],
-                       'lbpme': [0x80, 14],
-                       'lbprz': [0x40, 14], }
+readcapacity16_bits = {
+    'returned_lba': [0xffffffffffffffff, 0],
+    'block_length': [0xffffffff, 8],
+    'p_type': [0x0e, 12],
+    'prot_en': [0x01, 12],
+    'p_i_exponent': [0xf0, 13],
+    'lbppbe': [0x0f, 13],
+    'lbpme': [0x80, 14],
+    'lbprz': [0x40, 14],
+    'lowest_aligned_lba': [0x3fff, 14],
+}
+
 #
 # P_TYPE
 #
@@ -71,8 +77,4 @@ class ReadCapacity16(SCSICommand):
         """
         Unmarshall the ReadCapacity16 data.
         """
-        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:8]))
-        self.add_result('block_length', scsi_ba_to_int(self.datain[8:12]))
-        self.decode_bits(self.datain, readcapacity16_bits)
-        self.add_result('lowest_aligned_lba',
-                        scsi_ba_to_int(self.datain[14:16]) & 0x3fff)
+        decode_bits(self.datain, readcapacity16_bits, self.result)

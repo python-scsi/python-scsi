@@ -17,7 +17,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 from sgio.utils.enum import Enum
 
 #
@@ -58,7 +58,18 @@ inq_std_bits = {'rmb': [0x80, 1],
 # BLOCK LIMITS PAGE
 #
 inq_blocklimits_bits = {'wsnz': [0x01, 4],
-                        'ugavalid': [0x80, 32], }
+                        'ugavalid': [0x80, 32],
+                        'max_caw_len': [0xff, 5],
+                        'opt_xfer_len_gran': [0xffff, 6],
+                        'max_xfer_len': [0xffffffff, 8],
+                        'opt_xfer_len': [0xffffffff, 12],
+                        'max_pfetch_len': [0xffffffff, 16],
+                        'max_unmap_lba_count': [0xffffffff, 20],
+                        'max_unmap_bd_count': [0xffffffff, 24],
+                        'opt_unmap_gran': [0xffffffff, 28],
+                        'unmap_gran_alignment': [0xffffffff, 32],
+                        'max_ws_len': [0xffffffff, 36],
+}
 
 #
 # BLOCK DEVICE CHARACTERISTICS PAGE
@@ -67,7 +78,10 @@ inq_blockdevchar_bits = {'wabereq': [0xc0, 7],
                          'wacereq': [0x30, 7],
                          'nominal_form_factor': [0x0f, 7],
                          'fuab': [0x02, 8],
-                         'vbuls': [0x01, 8], }
+                         'vbuls': [0x01, 8],
+                         'medium_rotation_rate': [0xffff, 4],
+                         'product_type': [0xff, 6]
+}
 
 #
 # Device qualifier
@@ -212,7 +226,7 @@ class Inquiry(SCSICommand):
             self.add_result('t10_vendor_identification', self.datain[8:16])
             self.add_result('product_identification', self.datain[16:32])
             self.add_result('product_revision_level', self.datain[32:36])
-            self.decode_bits(self.datain, inq_std_bits)
+            decode_bits(self.datain, inq_std_bits, self.result)
             return
 
         self.add_result('page_code', self.datain[1])
@@ -226,19 +240,7 @@ class Inquiry(SCSICommand):
                 self.add_result('vpd_pages', vpd_pages)
 
         if self._page_code == VPD.BLOCK_LIMITS:
-            self.add_result('max_caw_len', self.datain[5])
-            self.add_result('opt_xfer_len_gran', scsi_ba_to_int(self.datain[6:8]))
-            self.add_result('max_xfer_len', scsi_ba_to_int(self.datain[8:12]))
-            self.add_result('opt_xfer_len', scsi_ba_to_int(self.datain[12:16]))
-            self.add_result('max_pfetch_len', scsi_ba_to_int(self.datain[16:20]))
-            self.add_result('max_unmap_lba_count', scsi_ba_to_int(self.datain[20:24]))
-            self.add_result('max_unmap_bd_count', scsi_ba_to_int(self.datain[24:28]))
-            self.add_result('opt_unmap_gran', scsi_ba_to_int(self.datain[28:32]))
-            self.add_result('unmap_gran_alignment', scsi_ba_to_int(self.datain[32:36]) & 0x7fffffff)
-            self.add_result('max_ws_len', scsi_ba_to_int(self.datain[36:40]))
-            self.decode_bits(self.datain, inq_blocklimits_bits)
+            decode_bits(self.datain, inq_blocklimits_bits, self.result)
 
         if self._page_code == VPD.BLOCK_DEVICE_CHARACTERISTICS:
-            self.add_result('medium_rotation_rate', scsi_ba_to_int(self.datain[4:6]))
-            self.add_result('product_type', self.datain[6])
-            self.decode_bits(self.datain, inq_blockdevchar_bits)
+            decode_bits(self.datain, inq_blockdevchar_bits, self.result)

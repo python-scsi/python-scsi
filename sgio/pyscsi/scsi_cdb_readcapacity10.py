@@ -18,13 +18,17 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_ba_to_int
+from sgio.utils.converter import decode_bits
 
 
 #
 # SCSI ReadCapacity10 command and definitions
 #
 
+readcapacity10_bits = {
+    'returned_lba': [0xffffffff, 0],
+    'block_length': [0xffffffff, 4],
+}
 
 class ReadCapacity10(SCSICommand):
     """
@@ -56,5 +60,4 @@ class ReadCapacity10(SCSICommand):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        self.add_result('returned_lba', scsi_ba_to_int(self.datain[0:4]))
-        self.add_result('block_length', scsi_ba_to_int(self.datain[4:8]))
+        decode_bits(self.datain, readcapacity10_bits, self.result)

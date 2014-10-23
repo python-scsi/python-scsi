@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int
+from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 from sgio.utils.enum import Enum
 
 #
@@ -9,9 +9,19 @@ from sgio.utils.enum import Enum
 #
 
 #
+# Element Status Data
+#
+element_status_data_bits = {
+        'first_element_address': [0xffff, 0],
+        'num_elements': [0xffff, 2],
+        'byte_count': [0xffffff, 5],
+}
+
+#
 # Element Descriptor bits
 #
 element_descriptor_bits = {
+    'element_address': [0xffff, 0],
     'access': [0x08, 2],
     'except': [0x04, 2],
     'full': [0x01, 2],
@@ -21,6 +31,13 @@ element_descriptor_bits = {
     'invert': [0x40, 9],
     'ed': [0x08, 9],
     'medium_type': [0x07, 9],
+    'source_storage_element_address': [0xffff, 10],
+}
+
+element_descriptor_trailer_bits = {
+    'code_set': [0x0f, 0],
+    'identifier_type':  [0x0f, 1],
+    'identifier_length': [0xff, 3],
 }
 
 #
@@ -40,7 +57,7 @@ class ReadElementStatus(SCSICommand):
     """
 
     def __init__(self, scsi, start, num, element_type=ELEMENT_TYPE.ALL,
-                 voltag=0, curdata=0, dvcid=0, alloclen=16384):
+                 voltag=0, curdata=1, dvcid=0, alloclen=16384):
         """
         initialize a new instance
 
@@ -80,11 +97,7 @@ class ReadElementStatus(SCSICommand):
     #
     def unmarshall_element_descriptor(self, type, data, pvoltag, avoltag):
         _storage = {}
-        self.decode_bits_into_dict(data, element_descriptor_bits, _storage)
-        self.add_result_to_dict('element_address',
-                                scsi_ba_to_int(data[0:2]), _storage);
-        self.add_result_to_dict('source_storage_element_address',
-                                scsi_ba_to_int(data[10:12]), _storage);
+        decode_bits(data, element_descriptor_bits, _storage)
 
         _data = data[12:]
         if pvoltag:
@@ -96,14 +109,11 @@ class ReadElementStatus(SCSICommand):
                                     _data[0:36], _storage)
             _data = _data[36:]
 
-        self.add_result_to_dict('code_set',
-                                _data[0] & 0x0f, _storage)
-        self.add_result_to_dict('identifier_type',
-                                _data[1] & 0x0f, _storage)
-        _il = data[3]
-        self.add_result_to_dict('identifier_length', _il, _storage)
-        if _il:
-            self.add_result_to_dict('identifier', _data[4:_il], _storage)
+        decode_bits(_data, element_descriptor_trailer_bits, _storage)
+        if _storage['identifier_length']:
+            self.add_result_to_dict('identifier',
+                                    _data[4:4 + _storage['identifier_length']],
+                                    _storage)
             
         return _storage
 
@@ -139,28 +149,27 @@ class ReadElementStatus(SCSICommand):
     def unmarshall(self):
         """
         """
-        _first = scsi_ba_to_int(self.datain[0:2])
-        self.add_result('first_element_address', _first)
-
-        _num = scsi_ba_to_int(self.datain[2:4])
-        self.add_result('num_elements', _num)
-
-        _bytes = scsi_ba_to_int(self.datain[5:8])
-        self.add_result('byte_count', _bytes)
+        decode_bits(self.datain, element_status_data_bits, self.result)
 
         #
         # Loop over the remaining data until we have consumed all
         # element status pages
         #
-        _data = self.datain[8:8 + _bytes]
+        _data = self.datain[8:8 + self.result['byte_count']]
         while len(_data):
             _bytes = scsi_ba_to_int(_data[5:8])
 
             _type, _descriptors = self.unmarshall_element_status_page(
                 _data[:8 + _bytes])
 
+            if _type == ELEMENT_TYPE.MEDIUM_TRANSPORT:
+                self.add_result('medium_transport_elements', _descriptors)
+
             if _type == ELEMENT_TYPE.STORAGE:
                 self.add_result('storage_elements', _descriptors)
+
+            if _type == ELEMENT_TYPE.IMPORT_EXPORT:
+                self.add_result('import_export_elements', _descriptors)
 
             if _type == ELEMENT_TYPE.DATA_TRANSFER:
                 self.add_result('data_transfer_elements', _descriptors)
