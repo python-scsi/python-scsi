@@ -1,4 +1,4 @@
-__all__ = ['test_inquiry', 'test_enum',
+__all__ = ['test_enum',
            'test_cdb_inquiry',
            'test_cdb_modesense6',
            'test_cdb_read10',
