@@ -2,6 +2,7 @@
 
 from scsi_sense import SCSICheckCondition
 
+
 class SCSICommandExceptionMeta(type):
     """A meta class for class depending SCSICommand exceptions
 

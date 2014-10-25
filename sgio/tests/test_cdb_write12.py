@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-
 from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi.scsi_command import OPCODE
+from sgio.pyscsi.scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_ba_to_int
 
+
 class MockWrite12(object):
-   def execute(self, cdb, dataout, datain, sense):
-      pass
+    def execute(self, cdb, dataout, datain, sense):
+        pass
+
 
 def main():
     s = SCSI(MockWrite12())
     data = bytearray(27 * 512)
 
     w = s.write12(1024, 27, data)
-    cdb = w._cdb
+    cdb = w.cdb
     assert cdb[0] == OPCODE.WRITE_12
     assert cdb[1] == 0
     assert scsi_ba_to_int(cdb[2:6]) == 1024
@@ -33,7 +33,7 @@ def main():
     assert cdb['tl'] == 27
 
     w = s.write12(65536, 27, data, wrprotect=2, dpo=1, fua=1, group=19)
-    cdb = w._cdb
+    cdb = w.cdb
     assert cdb[0] == OPCODE.WRITE_12
     assert cdb[1] == 0x58
     assert scsi_ba_to_int(cdb[2:6]) == 65536

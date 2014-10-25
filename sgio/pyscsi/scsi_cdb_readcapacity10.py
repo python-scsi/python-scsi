@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 
@@ -17,25 +16,15 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand, OPCODE
+from scsi_command import SCSICommand
+from scsi_enum_command import OPCODE
 from sgio.utils.converter import decode_bits
-
+import scsi_enum_readcapacity10 as readcapacity10_enums
 
 #
 # SCSI ReadCapacity10 command and definitions
 #
 
-#
-# CDB
-#
-_cdb_bits = {
-    'opcode': [0xff, 0],
-}
-
-_readcapacity10_bits = {
-    'returned_lba': [0xffffffff, 0],
-    'block_length': [0xffffffff, 4],
-}
 
 class ReadCapacity10(SCSICommand):
     """
@@ -67,12 +56,12 @@ class ReadCapacity10(SCSICommand):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        decode_bits(self.datain, _readcapacity10_bits, self.result)
+        decode_bits(self.datain, readcapacity10_enums.readcapacity10_bits, self.result)
 
     def unmarshall_cdb(self, cdb):
         """
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, _cdb_bits, _tmp)
+        decode_bits(cdb, readcapacity10_enums.cdb_bits, _tmp)
         return _tmp

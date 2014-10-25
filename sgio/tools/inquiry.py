@@ -7,8 +7,10 @@ from sgio.pyscsi.scsi import SCSI
 from sgio.pyscsi.scsi_device import SCSIDevice
 from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
 
+
 def usage():
     print 'Usage: inquiry.py [-p <page-code>] [--help] <device>'
+
 
 def inquiry_standard(s):
     i = s.inquiry().result
@@ -49,6 +51,7 @@ def inquiry_standard(s):
     print 'Product identification:', i['product_identification'][:32]
     print 'Product revision level:', i['product_revision_level']
 
+
 def inquiry_supported_vpd_pages(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
     print 'Supported VPD Pages, page_code=0x00'
@@ -59,6 +62,7 @@ def inquiry_supported_vpd_pages(s):
     print '  Supported VPD pages:'
     for pg in i['vpd_pages']:
         print '    0x%02x: %s' % (pg, INQUIRY.VPD[pg])
+
 
 def inquiry_block_limits(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_LIMITS).result
@@ -75,6 +79,7 @@ def inquiry_block_limits(s):
     print '  Unmap granularity alignment valid:', i['ugavalid']
     print '  Unmap granularity alignment:', i['unmap_gran_alignment']
 
+
 def inquiry_block_dev_char(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS).result
     print 'Block Device Characteristics, page_code=0xb1 (SBC)'
@@ -87,13 +92,15 @@ def inquiry_block_dev_char(s):
         INQUIRY.NOMINAL_FORM_FACTOR[i['nominal_form_factor']])
     print '  VBULS=%d' % (i['vbuls'])
 
+
 def inquiry_logical_block_prov(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
     print 'Logical Block Provisioning, page_code=0xb2 (SBC)'
     print '================================================'
     print '  Threshold=%d blocks  [%s]' % (
         1 << i['threshold_exponent'], 
-        'NO LOGICAL BLOCK PROVISIONING SUPPORT' if not i['threshold_exponent'] else 'exponent=%d' % (i['threshold_exponent']))
+        'NO LOGICAL BLOCK PROVISIONING SUPPORT' if not i['threshold_exponent'] else 'exponent=%d' % (
+            i['threshold_exponent']))
     print '  LBPU=%d  LBPWS=%d  LBPWS10=%d  LBPRZ=%d  ANC_SUP=%d  DP=%d' % (
         i['lbpu'],
         i['lpbws'],
@@ -105,26 +112,28 @@ def inquiry_logical_block_prov(s):
         i['provisioning_type'],
         INQUIRY.PROVISIONING_TYPE[i['provisioning_type']])
 
+
 def inquiry_unit_serial_number(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
     print 'Unit Serial Number, page_code=0x80'
     print '=================================='
     print '  Unit serial number: %s' % (i['unit_serial_number'])
 
+
 def main():
     i = 1
     page_code = 0
     evpd = 0
     while i < len(sys.argv):
-       if sys.argv[i] == '--help':
-           return usage()
-       if sys.argv[i] == '-p':
-          del sys.argv[i]
-          page_code = int(sys.argv[i], 16)
-          evpd = 1
-          del sys.argv[i]
-          continue
-       i += 1
+        if sys.argv[i] == '--help':
+            return usage()
+        if sys.argv[i] == '-p':
+            del sys.argv[i]
+            page_code = int(sys.argv[i], 16)
+            evpd = 1
+            del sys.argv[i]
+            continue
+        i += 1
 
     if len(sys.argv) < 2:
         return usage()
@@ -160,7 +169,7 @@ def main():
         inquiry_unit_serial_number(s)
         return
 
-    print 'No pretty print for this page, page_code=0x%02x' % (page_code)
+    print 'No pretty print for this page, page_code=0x%02x' % page_code
     print '=============================================\n'
     i = s.inquiry(evpd=1, page_code=page_code).result
     for k, v in i.iteritems():

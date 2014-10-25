@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-
 from sgio.pyscsi.scsi import SCSI
 
+
 class MockReadCapacity10(object):
-   def execute(self, cdb, dataout, datain, sense):
-       # lba
-       datain[0:4] = [0x00, 0x01, 0x00, 0x00]
-       # block size
-       datain[4:8] = [0x00, 0x00, 0x10, 0x00]
+    def execute(self, cdb, dataout, datain, sense):
+        # lba
+        datain[0:4] = [0x00, 0x01, 0x00, 0x00]
+        # block size
+        datain[4:8] = [0x00, 0x00, 0x10, 0x00]
+
 
 def main():
     s = SCSI(MockReadCapacity10())

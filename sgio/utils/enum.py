@@ -37,7 +37,7 @@ class Enum(type):
           - adding check if value exists
     """
 
-    def __new__(cls,*args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         if len(args) > 0:
             if len(args) == 1:
                 if type(args[0]).__name__ == 'dict':

@@ -1,83 +1,14 @@
 # coding: utf-8
 
-from scsi_command import SCSICommand, OPCODE
-from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
-from sgio.utils.enum import Enum
+from scsi_command import SCSICommand
+from scsi_enum_command import OPCODE
+from sgio.utils.converter import decode_bits
+import scsi_enum_modesense6 as modesensense_enums
 
 #
 # SCSI ModeSense6 command and definitions
 #
 
-#
-# CDB
-#
-_cdb_bits = {
-    'opcode': [0xff, 0],
-    'dbd': [0x08, 1],
-    'pc': [0xc0, 2],
-    'page_code': [0x3f, 2],
-    'sub_page_code': [0xff, 3],
-    'alloc_len': [0xff, 4],
-}
-
-#
-# Mode Header
-#
-_mode_header_bits = {
-    'mode_data_length': [0xff, 0],
-    'medium_type': [0xff, 1],
-    'device_specific_parameter': [0xff, 2],
-    'block_descriptor_length': [0xff, 3],
-}
-
-#
-# Element Address Assignment
-#
-_element_address_assignment_bits = {
-    'first_medium_transport_element_address': [0xffff, 2],
-    'num_medium_transport_elements': [0xffff, 4],
-    'first_storage_element_address': [0xffff, 6],
-    'num_storage_elements': [0xffff, 8],
-    'first_import_element_address': [0xffff, 10],
-    'num_import_elements': [0xffff, 12],
-    'first_data_transfer_element_address': [0xffff, 14],
-    'num_data_transfer_elements': [0xffff, 16],
-}
-
-#
-# Page Header
-#
-_page_header_bits = {
-    'ps': [0x80, 0],
-    'spf': [0x40, 0],
-    'page_code': [0x3f, 0],
-    'parameter_list_length': [0xff, 1],
-}
-
-#
-# Page Control
-#
-_pc = {
-    'CURRENT': 0x00,
-    'CHANGEABLE': 0x01,
-    'DEFAULT': 0x02,
-    'SAVED': 0x03,
-}
-
-PC = Enum(_pc)
-
-#
-# Page Codes
-#
-
-_page_code = {
-        #
-        # SMC
-        #
-        'ELEMENT_ADDRESS_ASSIGNMENT':          0x1d,
-}
-
-PAGE_CODE = Enum(_page_code)
 
 class ModeSense6(SCSICommand):
     """
@@ -110,7 +41,7 @@ class ModeSense6(SCSICommand):
         if dbd:
             cdb[1] |= 0x08
         cdb[2] |= (pc << 6) & 0xc0
-        cdb[2] |= page_code &0x3f
+        cdb[2] |= page_code & 0x3f
         cdb[3] = sub_page_code
         cdb[4] = alloclen
         return cdb
@@ -120,20 +51,20 @@ class ModeSense6(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, _cdb_bits, _tmp)
+        decode_bits(cdb, modesensense_enums.cdb_bits, _tmp)
         return _tmp
 
     def unmarshall(self):
         """
         """
-        decode_bits(self.datain[0:4], _mode_header_bits, self.result)
+        decode_bits(self.datain[0:4], modesensense_enums.mode_header_bits, self.result)
         _bdl = self.result['block_descriptor_length']
 
         block_descriptor = self.datain[4:]
         
         mode_data = block_descriptor[_bdl:]
-        decode_bits(mode_data, _page_header_bits, self.result)
+        decode_bits(mode_data, modesensense_enums.page_header_bits, self.result)
 
-        if self.page_code == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-            decode_bits(mode_data, _element_address_assignment_bits,
+        if self.page_code == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
+            decode_bits(mode_data, modesensense_enums.element_address_assignment_bits,
                         self.result)

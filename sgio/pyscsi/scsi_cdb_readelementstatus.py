@@ -1,78 +1,21 @@
 # coding: utf-8
 
-from scsi_command import SCSICommand, OPCODE
+from scsi_command import SCSICommand
+from scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
-from sgio.utils.enum import Enum
+import scsi_enum_readelementstatus as readelementstatus_enums
 
 #
 # SCSI ReadElementStatus command and definitions
 #
 
-#
-# CDB
-#
-_cdb_bits = {
-    'opcode': [0xff, 0],
-    'voltag': [0x10, 1],
-    'element_type': [0x07, 1],
-    'starting_element_address': [0xffff, 2],
-    'num_elements': [0xffff, 4],
-    'curdata': [0x02, 6],
-    'dvcid': [0x01, 6],
-    'alloc_len': [0xffffff, 7],
-}
-
-#
-# Element Status Data
-#
-_element_status_data_bits = {
-        'first_element_address': [0xffff, 0],
-        'num_elements': [0xffff, 2],
-        'byte_count': [0xffffff, 5],
-}
-
-#
-# Element Descriptor bits
-#
-_element_descriptor_bits = {
-    'element_address': [0xffff, 0],
-    'access': [0x08, 2],
-    'except': [0x04, 2],
-    'full': [0x01, 2],
-    'additional_sense_code': [0xff, 4],
-    'additional_sense_code_qualifier': [0xff, 5],
-    'svalid': [0x80, 9],
-    'invert': [0x40, 9],
-    'ed': [0x08, 9],
-    'medium_type': [0x07, 9],
-    'source_storage_element_address': [0xffff, 10],
-}
-
-_element_descriptor_trailer_bits = {
-    'code_set': [0x0f, 0],
-    'identifier_type':  [0x0f, 1],
-    'identifier_length': [0xff, 3],
-}
-
-#
-# Element Type Code
-#
-_element_type = {
-    'ALL': 0x00,
-    'MEDIUM_TRANSPORT': 0x01,
-    'STORAGE': 0x02,
-    'IMPORT_EXPORT': 0x03,
-    'DATA_TRANSFER': 0x04,
-}
-
-ELEMENT_TYPE = Enum(_element_type)
 
 class ReadElementStatus(SCSICommand):
     """
     A class to hold information from a readelementstatus command
     """
 
-    def __init__(self, scsi, start, num, element_type=ELEMENT_TYPE.ALL,
+    def __init__(self, scsi, start, num, element_type=readelementstatus_enums.ELEMENT_TYPE.ALL,
                  voltag=0, curdata=1, dvcid=0, alloclen=16384):
         """
         initialize a new instance
@@ -99,13 +42,13 @@ class ReadElementStatus(SCSICommand):
         if voltag:
             cdb[1] |= 0x10
         cdb[1] |= element_type & 0x0f
-        cdb[2:4] = scsi_int_to_ba(start, 2);
-        cdb[4:6] = scsi_int_to_ba(num, 2);
+        cdb[2:4] = scsi_int_to_ba(start, 2)
+        cdb[4:6] = scsi_int_to_ba(num, 2)
         if curdata:
             cdb[6] |= 0x02
         if dvcid:
             cdb[6] |= 0x01
-        cdb[7:10] = scsi_int_to_ba(alloclen, 3);
+        cdb[7:10] = scsi_int_to_ba(alloclen, 3)
         return cdb
 
     #
@@ -113,7 +56,7 @@ class ReadElementStatus(SCSICommand):
     #
     def unmarshall_element_descriptor(self, type, data, pvoltag, avoltag):
         _storage = {}
-        decode_bits(data, _element_descriptor_bits, _storage)
+        decode_bits(data, readelementstatus_enums.element_descriptor_bits, _storage)
 
         _data = data[12:]
         if pvoltag:
@@ -123,7 +66,7 @@ class ReadElementStatus(SCSICommand):
             self._storage.update({'alternate_volume_tag': _data[0:36]})
             _data = _data[36:]
 
-        decode_bits(_data, _element_descriptor_trailer_bits, _storage)
+        decode_bits(_data, readelementstatus_enums.element_descriptor_trailer_bits, _storage)
         if _storage['identifier_length']:
             self._storage.update({'identifier': _data[4:4 + _storage['identifier_length']]})
             
@@ -161,7 +104,7 @@ class ReadElementStatus(SCSICommand):
     def unmarshall(self):
         """
         """
-        decode_bits(self.datain, _element_status_data_bits, self.result)
+        decode_bits(self.datain, readelementstatus_enums.element_status_data_bits, self.result)
 
         #
         # Loop over the remaining data until we have consumed all
@@ -174,16 +117,16 @@ class ReadElementStatus(SCSICommand):
             _type, _descriptors = self.unmarshall_element_status_page(
                 _data[:8 + _bytes])
 
-            if _type == ELEMENT_TYPE.MEDIUM_TRANSPORT:
+            if _type == readelementstatus_enums.ELEMENT_TYPE.MEDIUM_TRANSPORT:
                 self.result.update({'medium_transport_elements': _descriptors})
 
-            if _type == ELEMENT_TYPE.STORAGE:
+            if _type == readelementstatus_enums.ELEMENT_TYPE.STORAGE:
                 self.result.update({'storage_elements': _descriptors})
 
-            if _type == ELEMENT_TYPE.IMPORT_EXPORT:
+            if _type == readelementstatus_enums.ELEMENT_TYPE.IMPORT_EXPORT:
                 self.result.update({'import_export_elements': _descriptors})
 
-            if _type == ELEMENT_TYPE.DATA_TRANSFER:
+            if _type == readelementstatus_enums.ELEMENT_TYPE.DATA_TRANSFER:
                 self.result.update({'data_transfer_elements': _descriptors})
 
             _data = _data[8 + _bytes:]
@@ -193,5 +136,5 @@ class ReadElementStatus(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, _cdb_bits, _tmp)
+        decode_bits(cdb, readelementstatus_enums.cdb_bits, _tmp)
         return _tmp

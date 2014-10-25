@@ -45,6 +45,7 @@ def scsi_ba_to_int(ba):
     """
     return sum(ba[i] << ((len(ba) - 1 - i) * 8) for i in range(len(ba)))
 
+
 def decode_bits(data, check_dict, dict):
     """
     helper method to perform some simple bit operations

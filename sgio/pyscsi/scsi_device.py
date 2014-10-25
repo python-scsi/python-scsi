@@ -16,7 +16,7 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-import scsi_command
+import scsi_enum_command
 import sgio
 
 from scsi_exception import SCSIDeviceExceptionMeta as ExMETA
@@ -47,8 +47,8 @@ class SCSIDevice(object):
         :param sense: a byte array to hold sense data
         """
         status = sgio.execute(self._fd, cdb, dataout, datain, sense)
-        if status == scsi_command.SCSI_STATUS.CHECK_CONDITION:
+        if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
             raise SCSIDevice.CheckCondition(sense)
-        if status == scsi_command.SCSI_STATUS.SGIO_ERROR:
+        if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
             raise SCSIDevice.SCSISGIOError
 

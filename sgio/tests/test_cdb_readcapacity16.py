@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-
 from sgio.pyscsi.scsi import SCSI
 from sgio.utils.converter import scsi_ba_to_int
-from sgio.pyscsi.scsi_command import OPCODE, SERVICE_ACTION_IN
+from sgio.pyscsi.scsi_enum_command import OPCODE, SERVICE_ACTION_IN
+
 
 class MockReadCapacity16(object):
-   def execute(self, cdb, dataout, datain, sense):
-      pass
+    def execute(self, cdb, dataout, datain, sense):
+        pass
+
 
 def main():
     s = SCSI(MockReadCapacity16())
 
     r = s.readcapacity16(alloclen=37)
-    cdb = r._cdb
+    cdb = r.cdb
     assert cdb[0] == OPCODE.SERVICE_ACTION_IN
     assert cdb[1] == SERVICE_ACTION_IN.READ_CAPACITY_16
     assert cdb[2:10] == bytearray(8)

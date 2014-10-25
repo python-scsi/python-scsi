@@ -1,6 +1,5 @@
 # coding: utf-8
 
-
 #      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #
 #	   This program is free software; you can redistribute it and/or modify
@@ -16,42 +15,9 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from sgio.utils.enum import Enum
+
 from sgio.pyscsi.scsi_exception import SCSICommandExceptionMeta as ExMETA
 from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
-
-
-opcodes = {'INQUIRY':           0x12,
-           'MODE_SENSE_6':      0x1a,
-           'READ_10':           0x28,
-           'READ_12':           0xa8,
-           'READ_16':           0x88,
-           'READ_CAPACITY_10':  0x25,
-           'READ_ELEMENT_STATUS':  0xb8,
-           'SERVICE_ACTION_IN': 0x9e,
-           'TEST_UNIT_READY':   0x00,
-           'WRITE_10':          0x2a,
-           'WRITE_12':          0xaa,
-           'WRITE_16':          0x8a,
-           }
-
-OPCODE = Enum(opcodes)
-
-service_action_ins = {'READ_CAPACITY_16': 0x10, }
-
-SERVICE_ACTION_IN = Enum(service_action_ins)
-
-scsi_status = {'GOOD': 0x00,
-               'CHECK_CONDITION': 0x02,
-               'CONDITIONS_MET': 0x04,
-               'BUSY': 0x08,
-               'RESERVATION_CONFLICT': 0x18,
-               'TASK_SET_FULL': 0x28,
-               'ACA_ACTIVE': 0x30,
-               'TASK_ABORTED': 0x40,
-               'SGIO_ERROR': 0xff, }
-
-SCSI_STATUS = Enum(scsi_status)
 
 
 class SCSICommand(object):
@@ -69,12 +35,12 @@ class SCSICommand(object):
         :param datain_alloclen: integer representing the size of the data_in buffer
         """
         self.scsi = scsi
-        self.sense = bytearray(32)
-        self.dataout = bytearray(dataout_alloclen)
-        self.datain = bytearray(datain_alloclen)
-        self.result = {}
-        self.cdb = None
-        self.pagecode = None
+        self._sense = bytearray(32)
+        self._dataout = bytearray(dataout_alloclen)
+        self._datain = bytearray(datain_alloclen)
+        self._result = {}
+        self._cdb = None
+        self._page_code = None
 
     @classmethod
     def init_cdb(cls, opcode):
@@ -109,7 +75,7 @@ class SCSICommand(object):
         """
         try:
             self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
-        except (DeviceErrors.CheckConditionError, DeviceErrors.SCSISGIOError) as e:
+        except (DeviceErrors.CheckCondition, DeviceErrors.SCSISGIOError) as e:
             print e
         else:
             if hasattr(self, 'unmarshall'):

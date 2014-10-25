@@ -16,7 +16,8 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand, OPCODE
+from scsi_command import SCSICommand
+from scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
 import scsi_enum_inquiry as inquiry_enums
 

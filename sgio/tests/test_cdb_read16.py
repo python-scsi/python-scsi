@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-
 from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi.scsi_command import OPCODE
+from sgio.pyscsi.scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_ba_to_int
 
+
 class MockRead16(object):
-   def execute(self, cdb, dataout, datain, sense):
-      pass
+    def execute(self, cdb, dataout, datain, sense):
+        pass
+
 
 def main():
     s = SCSI(MockRead16())
 
     r = s.read16(1024, 27)
-    cdb = r._cdb
+    cdb = r.cdb
     assert cdb[0] == OPCODE.READ_16
     assert cdb[1] == 0
     assert scsi_ba_to_int(cdb[2:10]) == 1024
@@ -33,7 +33,7 @@ def main():
     assert cdb['tl'] == 27
 
     r = s.read16(1024, 27, rdprotect=2, dpo=1, fua=1, rarc=1, group=19)
-    cdb = r._cdb
+    cdb = r.cdb
     assert cdb[0] == OPCODE.READ_16
     assert cdb[1] == 0x5c
     assert scsi_ba_to_int(cdb[2:10]) == 1024
