@@ -162,6 +162,20 @@ _tpgss = {
 TPGS = Enum(_tpgss)
 
 #
+# Nominal Form Factor
+#
+_nff = {
+    'NOT REPORTED': 0x00,
+    '5.25': 0x01,
+    '3.5': 0x02,
+    '2.5': 0x03,
+    '1.8': 0x04,
+    'Less than 1.8': 0x05,
+}
+
+NOMINAL_FORM_FACTOR = Enum(_nff)
+
+#
 # VPD pages
 #
 
