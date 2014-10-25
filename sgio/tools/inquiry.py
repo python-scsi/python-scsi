@@ -5,7 +5,7 @@ import sys
 
 from sgio.pyscsi.scsi import SCSI
 from sgio.pyscsi.scsi_device import SCSIDevice
-from sgio.pyscsi import scsi_cdb_inquiry as INQUIRY
+from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
 
 def usage():
     print 'Usage: inquiry.py [-p <page-code>] [--help] <device>'
