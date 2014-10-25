@@ -105,6 +105,12 @@ def inquiry_logical_block_prov(s):
         i['provisioning_type'],
         INQUIRY.PROVISIONING_TYPE[i['provisioning_type']])
 
+def inquiry_unit_serial_number(s):
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
+    print 'Unit Serial Number, page_code=0x80'
+    print '=================================='
+    print '  Unit serial number: %s' % (i['unit_serial_number'])
+
 def main():
     i = 1
     page_code = 0
@@ -148,6 +154,10 @@ def main():
 
     if page_code == INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING:
         inquiry_logical_block_prov(s)
+        return
+
+    if page_code == INQUIRY.VPD.UNIT_SERIAL_NUMBER:
+        inquiry_unit_serial_number(s)
         return
 
     print 'No pretty print for this page, page_code=0x%02x' % (page_code)

@@ -36,6 +36,14 @@ class MockLBP(object):
        datain[6] = 0x02 # Provisioning Type:2
        datain[7] = 0x00 # 
 
+class MockUSN(object):
+   def execute(self, cdb, dataout, datain, sense):
+       datain[0] = 0x00 # QUAL:0 TYPE:0
+       datain[1] = 0xb2 # logical block provisioning
+       datain[2] = 0x00 #
+       datain[3] = 0x04 # page length == 4
+       datain[4:8] = "ABCD"
+
 def main():
     s = SCSI(MockInquiryStandard())
     i = s.inquiry().result
@@ -79,6 +87,12 @@ def main():
     assert i['anc_sup'] == 1
     assert i['dp'] == 1
     assert i['provisioning_type'] == INQUIRY.PROVISIONING_TYPE.THIN_PROVISIONED
+
+    s = SCSI(MockUSN())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    assert i['unit_serial_number'] == "ABCD"
 
 if __name__ == "__main__":
     main()
