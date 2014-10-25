@@ -60,16 +60,15 @@ class ReadElementStatus(SCSICommand):
 
         _data = data[12:]
         if pvoltag:
-            self._storage.update({'primary_volume_tag': _data[0:36]})
+            _storage.update({'primary_volume_tag': _data[0:36]})
             _data = _data[36:]
         if avoltag:
-            self._storage.update({'alternate_volume_tag': _data[0:36]})
+            _storage.update({'alternate_volume_tag': _data[0:36]})
             _data = _data[36:]
 
         decode_bits(_data, readelementstatus_enums.element_descriptor_trailer_bits, _storage)
         if _storage['identifier_length']:
-            self._storage.update({'identifier': _data[4:4 + _storage['identifier_length']]})
-            
+            _storage.update({'identifier': _data[4:4 + _storage['identifier_length']]})
         return _storage
 
     #

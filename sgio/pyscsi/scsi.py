@@ -16,7 +16,6 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_device import SCSIDevice
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6
 from scsi_cdb_read10 import Read10
@@ -44,7 +43,7 @@ class SCSI(object):
         """
         getter method of the blocksize property
 
-        :return blocksize in bytes
+        :return: blocksize in bytes
         """
         return self._blocksize
 
@@ -53,7 +52,7 @@ class SCSI(object):
         """
         setter method of the blocksize property
 
-        :param blocksize in bytes
+        :param: blocksize in bytes
         """
         self._blocksize = value
 
