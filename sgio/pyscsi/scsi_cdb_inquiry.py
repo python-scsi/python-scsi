@@ -317,3 +317,6 @@ class Inquiry(SCSICommand):
 
         if self._page_code == VPD.LOGICAL_BLOCK_PROVISIONING:
             decode_bits(self.datain, _inq_logicalblockprov_bits, self.result)
+
+        if self._page_code == VPD.UNIT_SERIAL_NUMBER:
+            self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
