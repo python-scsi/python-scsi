@@ -98,6 +98,31 @@ _inq_blockdevchar_bits = {
 }
 
 #
+# LOGICAL BLOCK PROVISIONING PAGE
+#
+_inq_logicalblockprov_bits = {
+    'threshold_exponent': [0xff, 4],
+    'lbpu': [0x80, 5],
+    'lpbws': [0x40, 5],
+    'lbpws10': [0x20, 5],
+    'lbprz': [0x04, 5],
+    'anc_sup': [0x02, 5],
+    'dp': [0x01, 5],
+    'provisioning_type': [0x07, 6],
+}
+
+#
+# Provisioning type
+#
+_provisioning_type = {
+    'NO_PROVISIONING_REPORTED': 0x00,
+    'RESOURCE_PROVISIONED': 0x01,
+    'THIN_PROVISIONED': 0x02,
+}
+
+PROVISIONING_TYPE = Enum(_provisioning_type)
+
+#
 # Device qualifier
 #
 _qualifiers = {
@@ -289,3 +314,6 @@ class Inquiry(SCSICommand):
 
         if self._page_code == VPD.BLOCK_DEVICE_CHARACTERISTICS:
             decode_bits(self.datain, _inq_blockdevchar_bits, self.result)
+
+        if self._page_code == VPD.LOGICAL_BLOCK_PROVISIONING:
+            decode_bits(self.datain, _inq_logicalblockprov_bits, self.result)

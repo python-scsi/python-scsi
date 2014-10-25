@@ -25,9 +25,19 @@ class MockInquiryStandard(object):
        datain[32:36] = ['r', 'e', 'v', 'n']
        datain[56] = 0x09 # CLOCKING:2 QAS:0 IUS:1
 
+class MockLBP(object):
+   def execute(self, cdb, dataout, datain, sense):
+       datain[0] = 0x00 # QUAL:0 TYPE:0
+       datain[1] = 0xb2 # logical block provisioning
+       datain[2] = 0x00 #
+       datain[3] = 0x04 # page length == 4
+       datain[4] = 0x12 # threshold exponent
+       datain[5] = 0xe7 # LBPU:1 LBPWS:1 LBPWS10:1 LBPRZ:1 ANC_SUP:1 DP:1
+       datain[6] = 0x02 # Provisioning Type:2
+       datain[7] = 0x00 # 
+
 def main():
     s = SCSI(MockInquiryStandard())
-
     i = s.inquiry().result
     assert i['peripheral_qualifier'] == 1
     assert i['peripheral_device_type'] == 5
@@ -56,6 +66,19 @@ def main():
     assert i['t10_vendor_identification'] == 'abcdefgh'
     assert i['product_identification'] == 'iiiiiiiijjjjjjjj'
     assert i['product_revision_level'] == 'revn'
+
+    s = SCSI(MockLBP())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    assert i['threshold_exponent'] == 0x12
+    assert i['lbpu'] == 1
+    assert i['lpbws'] == 1
+    assert i['lbpws10'] == 1
+    assert i['lbprz'] == 1
+    assert i['anc_sup'] == 1
+    assert i['dp'] == 1
+    assert i['provisioning_type'] == INQUIRY.PROVISIONING_TYPE.THIN_PROVISIONED
 
 if __name__ == "__main__":
     main()
