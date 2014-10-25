@@ -79,13 +79,31 @@ def inquiry_block_dev_char(s):
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS).result
     print 'Block Device Characteristics, page_code=0xb1 (SBC)'
     print '=================================================='
-    print 'Nominal rotation rate: %d rpm' % (i['medium_rotation_rate'])
-    print 'Product type=%d' % (i['product_type'])
-    print 'WABEREQ=%d' % (i['wabereq'])
-    print 'WACEREQ=%d' % (i['wacereq'])
-    print 'Nominal form factor %s inches' % (
+    print '  Nominal rotation rate: %d rpm' % (i['medium_rotation_rate'])
+    print '  Product type=%d' % (i['product_type'])
+    print '  WABEREQ=%d' % (i['wabereq'])
+    print '  WACEREQ=%d' % (i['wacereq'])
+    print '  Nominal form factor %s inches' % (
         INQUIRY.NOMINAL_FORM_FACTOR[i['nominal_form_factor']])
-    print 'VBULS=%d' % (i['vbuls'])
+    print '  VBULS=%d' % (i['vbuls'])
+
+def inquiry_logical_block_prov(s):
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
+    print 'Logical Block Provisioning, page_code=0xb2 (SBC)'
+    print '================================================'
+    print '  Threshold=%d blocks  [%s]' % (
+        1 << i['threshold_exponent'], 
+        'NO LOGICAL BLOCK PROVISIONING SUPPORT' if not i['threshold_exponent'] else 'exponent=%d' % (i['threshold_exponent']))
+    print '  LBPU=%d  LBPWS=%d  LBPWS10=%d  LBPRZ=%d  ANC_SUP=%d  DP=%d' % (
+        i['lbpu'],
+        i['lpbws'],
+        i['lbpws10'],
+        i['lbprz'],
+        i['anc_sup'],
+        i['dp'])
+    print '  Provisioning Type=%d  [%s]' % (
+        i['provisioning_type'],
+        INQUIRY.PROVISIONING_TYPE[i['provisioning_type']])
 
 def main():
     i = 1
@@ -126,6 +144,10 @@ def main():
 
     if page_code == INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS:
         inquiry_block_dev_char(s)
+        return
+
+    if page_code == INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING:
+        inquiry_logical_block_prov(s)
         return
 
     print 'No pretty print for this page, page_code=0x%02x' % (page_code)
