@@ -17,7 +17,6 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from sgio.utils.enum import Enum
-from sgio.utils.converter import decode_bits
 from sgio.pyscsi.scsi_exception import SCSICommandExceptionMeta as ExMETA
 from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
 
