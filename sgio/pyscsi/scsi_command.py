@@ -225,20 +225,3 @@ class SCSICommand(object):
         """
         self._page_code = value
 
-    def add_result(self, key, value):
-        """
-        method to update the result dictionary
-
-        :param key: a string
-        :param value: a byte or byte array
-        """
-        self.add_result_to_dict(key, value, self.result)
-
-    def add_result_to_dict(self, key, value, dict):
-        """
-        method to update the result dictionary
-
-        :param key: a string
-        :param value: a byte or byte array
-        """
-        dict.update({key: value})

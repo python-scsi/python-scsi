@@ -117,19 +117,15 @@ class ReadElementStatus(SCSICommand):
 
         _data = data[12:]
         if pvoltag:
-            self.add_result_to_dict('primary_volume_tag',
-                                    _data[0:36], _storage)
+            self._storage.update({'primary_volume_tag': _data[0:36]})
             _data = _data[36:]
         if avoltag:
-            self.add_result_to_dict('alternate_volume_tag',
-                                    _data[0:36], _storage)
+            self._storage.update({'alternate_volume_tag': _data[0:36]})
             _data = _data[36:]
 
         decode_bits(_data, _element_descriptor_trailer_bits, _storage)
         if _storage['identifier_length']:
-            self.add_result_to_dict('identifier',
-                                    _data[4:4 + _storage['identifier_length']],
-                                    _storage)
+            self._storage.update({'identifier': _data[4:4 + _storage['identifier_length']]})
             
         return _storage
 
@@ -179,16 +175,16 @@ class ReadElementStatus(SCSICommand):
                 _data[:8 + _bytes])
 
             if _type == ELEMENT_TYPE.MEDIUM_TRANSPORT:
-                self.add_result('medium_transport_elements', _descriptors)
+                self.result.update({'medium_transport_elements': _descriptors})
 
             if _type == ELEMENT_TYPE.STORAGE:
-                self.add_result('storage_elements', _descriptors)
+                self.result.update({'storage_elements': _descriptors})
 
             if _type == ELEMENT_TYPE.IMPORT_EXPORT:
-                self.add_result('import_export_elements', _descriptors)
+                self.result.update({'import_export_elements': _descriptors})
 
             if _type == ELEMENT_TYPE.DATA_TRANSFER:
-                self.add_result('data_transfer_elements', _descriptors)
+                self.result.update({'data_transfer_elements': _descriptors})
 
             _data = _data[8 + _bytes:]
 

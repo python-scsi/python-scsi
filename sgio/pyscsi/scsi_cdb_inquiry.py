@@ -251,24 +251,24 @@ class Inquiry(SCSICommand):
         the content of the result dict depends if vital product data is enabled or not. if vpd is
         enabled we create a list with the received vpd.
         """
-        self.add_result('peripheral_qualifier', self.datain[0] >> 5)
-        self.add_result('peripheral_device_type', self.datain[0] & 0x1f)
+        self.result.update({'peripheral_qualifier': self.datain[0] >> 5})
+        self.result.update({'peripheral_device_type': self.datain[0] & 0x1f})
         if self._evpd == 0:
-            self.add_result('t10_vendor_identification', self.datain[8:16])
-            self.add_result('product_identification', self.datain[16:32])
-            self.add_result('product_revision_level', self.datain[32:36])
+            self.result.update({'t10_vendor_identification': self.datain[8:16]})
+            self.result.update({'product_identification': self.datain[16:32]})
+            self.result.update({'product_revision_level': self.datain[32:36]})
             decode_bits(self.datain, _inq_std_bits, self.result)
             return
 
-        self.add_result('page_code', self.datain[1])
+        self.result.update({'page_code': self.datain[1]})
         page_length = scsi_ba_to_int(self.datain[2:4])
-        self.add_result('page_length', page_length)
+        self.result.update({'page_length': page_length})
 
         if self._page_code == VPD.SUPPORTED_VPD_PAGES:
             vpd_pages = []
             for i in range(page_length):
                 vpd_pages.append(self.datain[i + 4])
-                self.add_result('vpd_pages', vpd_pages)
+                self.result.update({'vpd_pages': vpd_pages})
 
         if self._page_code == VPD.BLOCK_LIMITS:
             decode_bits(self.datain, _inq_blocklimits_bits, self.result)
