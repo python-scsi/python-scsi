@@ -60,6 +60,21 @@ def inquiry_supported_vpd_pages(s):
     for pg in i['vpd_pages']:
         print '    0x%02x: %s' % (pg, INQUIRY.VPD[pg])
 
+def inquiry_block_limits(s):
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_LIMITS).result
+    print 'Block Limits, page_code=0xb0 (SBC)'
+    print '=================================='
+    print '  Maximum compare and write length:', i['max_caw_len']
+    print '  Optimal transfer length granularity:', i['opt_xfer_len_gran']
+    print '  Maximum transfer length:', i['max_xfer_len']
+    print '  Optimal transfer length:', i['opt_xfer_len']
+    print '  Maximum prefetch, xdread, xdwrite transfer length:', i['max_pfetch_len']
+    print '  Maximum unmap LBA count:', i['max_unmap_lba_count']
+    print '  Maximum unmap block descriptor count:', i['max_unmap_bd_count']
+    print '  Optimal unmap granularity:', i['opt_unmap_gran']
+    print '  Unmap granularity alignment valid:', i['ugavalid']
+    print '  Unmap granularity alignment:', i['unmap_gran_alignment']
+
 def main():
     i = 1
     page_code = 0
@@ -69,7 +84,7 @@ def main():
            return usage()
        if sys.argv[i] == '-p':
           del sys.argv[i]
-          page_code = int(sys.argv[i])
+          page_code = int(sys.argv[i], 16)
           evpd = 1
           del sys.argv[i]
           continue
@@ -93,6 +108,9 @@ def main():
         inquiry_supported_vpd_pages(s)
         return
 
+    if page_code == INQUIRY.VPD.BLOCK_LIMITS:
+        inquiry_block_limits(s)
+        return
 
     print 'No pretty print for this page, page_code=0x%02x' % (page_code)
     print '=============================================\n'
