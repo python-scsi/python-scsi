@@ -3,7 +3,6 @@
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_int_to_ba, decode_bits
-import scsi_enum_read10 as read10_enum
 
 #
 # SCSI Read10 command and definitions
@@ -40,6 +39,14 @@ class Read10(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, read10_enum.cdb_bits, _tmp)
+        _bits = {'opcode': [0xff, 0],
+                'rdprotect': [0xe0, 1],
+                'dpo': [0x10, 1],
+                'fua': [0x08, 1],
+                'rarc': [0x04, 1],
+                'lba': [0xffffffff, 2],
+                'group': [0x1f, 6],
+                'tl': [0xffff, 7], }
+        decode_bits(cdb, _bits, _tmp)
         return _tmp
 

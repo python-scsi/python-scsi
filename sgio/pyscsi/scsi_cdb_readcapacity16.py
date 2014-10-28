@@ -19,7 +19,6 @@
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
 from sgio.utils.converter import scsi_int_to_ba, decode_bits
-import scsi_enum_readcapacity16 as readcapacity16_enums
 
 #
 # SCSI ReadCapacity16 command and definitions
@@ -59,11 +58,23 @@ class ReadCapacity16(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, readcapacity16_enums.cdb_bits, _tmp)
+        _bits = {'opcode': [0xff, 0],
+                'service_action': [0x1f, 1],
+                'alloc_len': [0xffffffff, 10], }
+        decode_bits(cdb, _bits, _tmp)
         return _tmp
 
     def unmarshall(self):
         """
         Unmarshall the ReadCapacity16 data.
         """
-        decode_bits(self.datain, readcapacity16_enums.readcapacity16_bits, self.result)
+        _bits = {'returned_lba': [0xffffffffffffffff, 0],
+                'block_length': [0xffffffff, 8],
+                'p_type': [0x0e, 12],
+                'prot_en': [0x01, 12],
+                'p_i_exponent': [0xf0, 13],
+                'lbppbe': [0x0f, 13],
+                'lbpme': [0x80, 14],
+                'lbprz': [0x40, 14],
+                'lowest_aligned_lba': [0x3fff, 14], }
+        decode_bits(self.datain, _bits, self.result)

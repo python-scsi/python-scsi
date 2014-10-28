@@ -19,7 +19,6 @@
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
 from sgio.utils.converter import decode_bits
-import scsi_enum_readcapacity10 as readcapacity10_enums
 
 #
 # SCSI ReadCapacity10 command and definitions
@@ -56,12 +55,22 @@ class ReadCapacity10(SCSICommand):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        decode_bits(self.datain, readcapacity10_enums.readcapacity10_bits, self.result)
+        _bits = {'returned_lba': [0xffffffff, 0],
+                'block_length': [0xffffffff, 4], }
+        decode_bits(self.datain, _bits, self.result)
 
     def unmarshall_cdb(self, cdb):
         """
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, readcapacity10_enums.cdb_bits, _tmp)
+        _bits = {'opcode': [0xff, 0],
+                'rdprotect': [0xe0, 1],
+                'dpo': [0x10, 1],
+                'fua': [0x08, 1],
+                'rarc': [0x04, 1],
+                'lba': [0xffffffffffffffff, 2],
+                'group': [0x1f, 14],
+                'tl': [0xffffffff, 10], }
+        decode_bits(cdb, _bits, _tmp)
         return _tmp

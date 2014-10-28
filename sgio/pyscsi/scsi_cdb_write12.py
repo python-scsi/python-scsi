@@ -3,7 +3,7 @@
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
 from sgio.utils.converter import scsi_int_to_ba, decode_bits
-import scsi_enum_write12 as write12_enums
+
 #
 # SCSI Write12 command and definitions
 #
@@ -39,5 +39,12 @@ class Write12(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, write12_enums.cdb_bits, _tmp)
+        _bits = {'opcode': [0xff, 0],
+                'wrprotect': [0xe0, 1],
+                'dpo': [0x10, 1],
+                'fua': [0x08, 1],
+                'lba': [0xffffffff, 2],
+                'group': [0x1f, 10],
+                'tl': [0xffffffff, 6], }
+        decode_bits(cdb, _bits, _tmp)
         return _tmp
