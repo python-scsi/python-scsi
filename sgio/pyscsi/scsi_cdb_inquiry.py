@@ -70,7 +70,11 @@ class Inquiry(SCSICommand):
         method to unmarshall a byte array containing a cdb.
         """
         _tmp = {}
-        decode_bits(cdb, inquiry_enums.cdb_bits, _tmp)
+        _bits = {'opcode': [0xff, 0],
+                'evpd': [0x01, 1],
+                'page_code': [0xff, 2],
+                'alloc_len': [0xffff, 3], }
+        decode_bits(cdb, _bits, _tmp)
         return _tmp
 
     def unmarshall(self):
@@ -83,10 +87,32 @@ class Inquiry(SCSICommand):
         self.result.update({'peripheral_qualifier': self.datain[0] >> 5})
         self.result.update({'peripheral_device_type': self.datain[0] & 0x1f})
         if self._evpd == 0:
+            _bits = {'rmb': [0x80, 1],
+                    'version': [0xff, 2],
+                    'normaca': [0x20, 3],
+                    'hisup': [0x10, 3],
+                    'response_data_format': [0x0f, 3],
+                    'additional_length': [0xff, 4],
+                    'sccs': [0x80, 5],
+                    'acc': [0x40, 5],
+                    'tpgs': [0x30, 5],
+                    '3pc': [0x08, 5],
+                    'protect': [0x01, 5],
+                    'encserv': [0x40, 6],
+                    'vs': [0x20, 6],
+                    'multip': [0x10, 6],
+                    'addr16': [0x01, 6],
+                    'wbus16': [0x20, 7],
+                    'sync': [0x10, 7],
+                    'cmdque': [0x02, 7],
+                    'vs2': [0x01, 7],
+                    'clocking': [0x0c, 56],
+                    'qas': [0x02, 56],
+                    'ius': [0x01, 56], }
             self.result.update({'t10_vendor_identification': self.datain[8:16]})
             self.result.update({'product_identification': self.datain[16:32]})
             self.result.update({'product_revision_level': self.datain[32:36]})
-            decode_bits(self.datain, inquiry_enums.inq_std_bits, self.result)
+            decode_bits(self.datain, _bits, self.result)
             return
 
         self.result.update({'page_code': self.datain[1]})
@@ -100,13 +126,40 @@ class Inquiry(SCSICommand):
                 self.result.update({'vpd_pages': vpd_pages})
 
         if self._page_code == inquiry_enums.VPD.BLOCK_LIMITS:
-            decode_bits(self.datain, inquiry_enums.inq_blocklimits_bits, self.result)
+            _bits = {'wsnz': [0x01, 4],
+                    'ugavalid': [0x80, 32],
+                    'max_caw_len': [0xff, 5],
+                    'opt_xfer_len_gran': [0xffff, 6],
+                    'max_xfer_len': [0xffffffff, 8],
+                    'opt_xfer_len': [0xffffffff, 12],
+                    'max_pfetch_len': [0xffffffff, 16],
+                    'max_unmap_lba_count': [0xffffffff, 20],
+                    'max_unmap_bd_count': [0xffffffff, 24],
+                    'opt_unmap_gran': [0xffffffff, 28],
+                    'unmap_gran_alignment': [0xffffffff, 32],
+                    'max_ws_len': [0xffffffff, 36], }
+            decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.BLOCK_DEVICE_CHARACTERISTICS:
-            decode_bits(self.datain, inquiry_enums.inq_blockdevchar_bits, self.result)
+            _bits = {'wabereq': [0xc0, 7],
+                    'wacereq': [0x30, 7],
+                    'nominal_form_factor': [0x0f, 7],
+                    'fuab': [0x02, 8],
+                    'vbuls': [0x01, 8],
+                    'medium_rotation_rate': [0xffff, 4],
+                    'product_type': [0xff, 6], }
+            decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
-            decode_bits(self.datain, inquiry_enums.inq_logicalblockprov_bits, self.result)
+            _bits = {'threshold_exponent': [0xff, 4],
+                    'lbpu': [0x80, 5],
+                    'lpbws': [0x40, 5],
+                    'lbpws10': [0x20, 5],
+                    'lbprz': [0x04, 5],
+                    'anc_sup': [0x02, 5],
+                    'dp': [0x01, 5],
+                    'provisioning_type': [0x07, 6], }
+            decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
             self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
