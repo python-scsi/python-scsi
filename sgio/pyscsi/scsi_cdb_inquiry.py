@@ -77,6 +77,103 @@ class Inquiry(SCSICommand):
         decode_bits(cdb, _bits, _tmp)
         return _tmp
 
+    def unmarshall_designator(self, type, data):
+        _d = {}
+        if type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+            _d['vendor_specific'] = data
+
+        if type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+            _d['t10_vendor_id'] = data[:8]
+            _d['vendor_specific_id'] = data[8:]
+
+        if type == inquiry_enums.DESIGNATOR.EUI_64:
+            if len(data) == 8:
+                _d['ieee_company_id'] = scsi_ba_to_int(data[:3])
+                _d['vendor_specific_extension_id'] = data[3:8]
+            if len(data) == 12:
+                _d['ieee_company_id'] = scsi_ba_to_int(data[:3])
+                _d['vendor_specific_extension_id'] = data[3:8]
+                _d['directory_id'] = data[8:]
+            if len(data) == 16:
+                _d['identifier_extension'] = data[:8]
+                _d['ieee_company_id'] = scsi_ba_to_int(data[8:11])
+                _d['vendor_specific_extension_id'] = data[11:]
+
+        if type == inquiry_enums.DESIGNATOR.NAA:
+            _d['naa'] = data[0] >> 4
+            if _d['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
+                _bits = {
+                    'vendor_specific_identifier_a': [0x0fff, 0],
+                    'ieee_company_id': [0xffffff, 2],
+                    'vendor_specific_identifier_b': [0xffffff, 5],
+                }
+                decode_bits(data, _bits, _d)
+            if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
+                _d['locally_administered_value'] = data[0:8]
+            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
+                _bits = {
+                    'ieee_company_id': [0x0ffffff0, 0],
+                    'vendor_specific_identifier': [0x0fffffffff, 3],
+                   }
+                decode_bits(data, _bits, _d)
+            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
+                _bits = {
+                    'ieee_company_id': [0x0ffffff0, 0],
+                    'vendor_specific_identifier': [0x0fffffffff, 3],
+                    'vendor_specific_identifier_extension': [0xffffffffffffffff, 8]
+                }
+                decode_bits(data, _bits, _d)
+
+        if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+                _bits = {
+                    'relative_port': [0xffff, 2],
+                }
+                decode_bits(data, _bits, _d)
+
+        if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
+                _bits = {
+                    'target_portal_group': [0xffff, 2],
+                }
+                decode_bits(data, _bits, _d)
+
+        if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
+                _bits = {
+                    'logical_unit_group': [0xffff, 2],
+                }
+                decode_bits(data, _bits, _d)
+
+        if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+                _d['md5_logical_identifier'] = data[0:16]
+
+        if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+                _d['scsi_name_string'] = data
+
+        if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+                _bits = {
+                    'pci_express_routing_id': [0xffff, 0],
+                }
+                decode_bits(data, _bits, _d)
+
+        return _d
+
+    def unmarshall_designator_descriptor(self, data):
+        _bits = {
+            'protocol_identifier': [0xf0, 0],
+            'code_set': [0x0f, 0],
+            'piv': [0x80, 1],
+            'association': [0x30, 1],
+            'designator_type': [0x0f, 1],
+            'designator_length': [0xff, 3],
+            }
+        _d = {}
+        decode_bits(data, _bits, _d)
+        if _d['piv'] == 0 or (_d['association'] != 1 and _d['association'] != 2):
+            del _d['protocol_identifier']
+
+
+        _d['designator'] = self.unmarshall_designator(_d['designator_type'], data[4:])
+        return _d
+
     def unmarshall(self):
         """
         method to extract relevant data from the byte array that the inquiry command returns
@@ -163,3 +260,13 @@ class Inquiry(SCSICommand):
 
         if self._page_code == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
             self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
+
+        if self._page_code == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
+            _data = self.datain[4:4 + page_length]
+            _d = []
+            while len(_data):
+                _bytes = _data[3] + 4
+                _d.append(self.unmarshall_designator_descriptor(_data[:_bytes]))
+                _data = _data[_bytes:]
+
+            self.result.update({'designator_descriptors': _d})

@@ -91,6 +91,63 @@ _nff = {
 
 NOMINAL_FORM_FACTOR = Enum(_nff)
 
+_protocol_identifier = {
+    'FIBRE_CHANNEL':                               0x00,
+    'SCSI_PARALLEL_INTERFACE':                     0x01,
+    'SERIAL_STORAGE_ARCHITECTURE':                 0x02,
+    'SERIAL_BUS_PROTOCOL':                         0x03,
+    'RDMA':                                        0x04,
+    'ISCSI':                                       0x05,
+    'SAS':                                         0x06,
+    'AUTOMATION_DRIVE_INTERFACE':                  0x07,
+    'AT_ATTACHMENT_INTERFACE':                     0x08,
+    'USB_ATTACHED_SCSI':                           0x09,
+    'SCSI_OVER_PCI_EXPRESS':                       0x0a,
+    'NO_SPECIFIC_PROTOCOL':                        0x0f,
+}
+
+PROTOCOL_IDENTIFIER = Enum(_protocol_identifier)
+
+_code_set = {
+    'BINARY':                              0x01,
+    'ASCII':                               0x02,
+    'UTF8':                                0x03,
+}
+
+CODE_SET = Enum(_code_set)
+
+_association = {
+    'ASSOCIATED_WITH_LUN':                    0x00,
+    'ASSOCIATED_WITH_TARGET_PORT':            0x01,
+    'ASSOCIATED_WITH_TARGET_DEVICE':          0x02,
+}
+
+ASSOCIATION = Enum(_association)
+
+_designator = {
+    'VENDOR_SPECIFIC':                    0x00,
+    'T10_VENDOR_ID':                      0x01,
+    'EUI_64':                             0x02,
+    'NAA':                                0x03,
+    'RELATIVE_TARGET_PORT_IDENTIFIER':    0x04,
+    'TARGET_PORTAL_GROUP':                0x05,
+    'LOGICAL_UNIT_GROUP':                 0x06,
+    'MD5_LOGICAL_IDENTIFIER':             0x07,
+    'SCSI_NAME_STRING':                   0x08,
+    'PCI_EXPRESS_ROUTING_ID':             0x09,
+}
+
+DESIGNATOR = Enum(_designator)
+
+_naa = {
+    'IEEE_EXTENDED':                    0x02,
+    'LOCALLY_ASSIGNED':                 0x03,
+    'IEEE_REGISTERED':                  0x05,
+    'IEEE_REGISTERED_EXTENDED':         0x06,
+}
+
+NAA = Enum(_naa)
+
 #
 # VPD pages
 #
