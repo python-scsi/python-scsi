@@ -22,9 +22,13 @@ def status(scsi, eaa):
         elements = res['data_transfer_elements']
         if elements:
             for element in elements['element_descriptors']:
-                print 'Data Transfer Element: %d:%s' % (
-                    element['element_address'],
-                    "Full" if element['full'] else 'Empty')
+                if element['full']:
+                    print 'Data Transfer Element: %d:Full VolumeTag:%s' % (
+                        element['element_address'],
+                        element['primary_volume_tag'][0:32])
+                else:
+                    print 'Data Transfer Element: %d:Empty' % (
+                        element['element_address'])
 
     if eaa['num_storage_elements'] > 0:
         res = scsi.readelementstatus(start=eaa['first_storage_element_address'],
@@ -35,11 +39,13 @@ def status(scsi, eaa):
         if ses:
             _first = res['first_element_address']
             for se in ses['element_descriptors']:
-                print '      Storage Element: %d:%s :VolumeTag=%s' % (
-                    se['element_address'] - _first + 1,
-                    "Full" if se['full'] else 'Empty',
-                    se['primary_volume_tag'][0:32])
-
+                if se['full']:
+                    print '      Storage Element: %d:Full VolumeTag:%s' % (
+                        se['element_address'] - _first + 1,
+                        se['primary_volume_tag'][0:32])
+                else:
+                    print '      Storage Element: %d:Empty' % (
+                        se['element_address'] - _first + 1)
 
 def main():
     device = '/dev/changer'
