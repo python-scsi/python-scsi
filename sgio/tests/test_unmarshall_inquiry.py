@@ -40,11 +40,63 @@ class MockLBP(object):
 class MockUSN(object):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
-        datain[1] = 0xb2  # logical block provisioning
+        datain[1] = 0xb2  # unit serial number
         datain[2] = 0x00  #
         datain[3] = 0x04  # page length == 4
         datain[4:8] = "ABCD"
 
+
+class MockDevId(object):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 0x00  # QUAL:0 TYPE:0
+        datain[1] = 0x83  # device identifier
+        datain[2] = 0x00
+        datain[3] = 0x00
+        pos = 4
+        
+        # Designation Descriptor: T10_VENDOR_ID
+        t10 = bytearray(8)
+        t10[0] = 'T'
+        t10[1] = 'e'
+        t10[2] = 's'
+        t10[3] = 't'
+        t10[4] = ' '
+        t10[5] = 'T'
+        t10[6] = '1'
+        t10[7] = '0'
+        dd = bytearray(4)
+        dd += t10
+        dd[0] = 0x52 # iSCSI, ASCII
+        dd[1] = 0xa1 # AssociatedWithTargetDevice, T10_VENDOR_ID
+        dd[2] = len(t10) / 256
+        dd[3] = len(t10) % 256
+        datain[pos:pos + len(dd)] = dd
+        pos += len(dd)
+
+        # Designation Descriptor: EUI-64, 8 byte version
+        eui = bytearray(8)
+        # IEEE company identifier
+        eui[0] = 0x11
+        eui[1] = 0x22
+        eui[2] = 0x33
+        # vendor specific
+        eui[3] = 'a'
+        eui[4] = 'b'
+        eui[5] = 'c'
+        eui[6] = 'd'
+        eui[7] = 'e'
+        dd = bytearray(4)
+        dd += eui
+        dd[0] = 0x01 # BINARY
+        dd[1] = 0x22 # AssociatedWithTargetDevice, EUI-64 
+        dd[2] = len(t10) / 256
+        dd[3] = len(t10) % 256
+        datain[pos:pos + len(dd)] = dd
+        pos += len(dd)
+
+        page_len = pos - 4
+        datain[2] = page_len / 256
+        datain[3] = page_len % 256
 
 def main():
     s = SCSI(MockInquiryStandard())
@@ -96,6 +148,30 @@ def main():
     assert i['peripheral_qualifier'] == 0
     assert i['unit_serial_number'] == "ABCD"
 
+    s = SCSI(MockDevId())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    dd = i['designator_descriptors']
+    assert len(dd) == 2
+    # T10 designation descriptor
+    assert dd[0]['association'] == 2
+    assert dd[0]['code_set'] == 2
+    assert dd[0]['designator_length'] == 8
+    assert dd[0]['designator_type'] == 1
+    assert dd[0]['piv'] == 1
+    assert dd[0]['protocol_identifier'] == 5
+    assert dd[0]['designator']['t10_vendor_id'] == 'Test T10'
+    assert dd[0]['designator']['vendor_specific_id'] == ''
+    # EUI-64 designation descriptor
+    assert dd[1]['association'] == 2
+    assert dd[1]['code_set'] == 1
+    assert dd[1]['designator_length'] == 8
+    assert dd[1]['designator_type'] == 2
+    assert dd[1]['piv'] == 0
+    assert not hasattr(dd[1], 'protocol_identifier')
+    assert dd[1]['designator']['ieee_company_id'] == 0x112233
+    assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
 
 if __name__ == "__main__":
     main()

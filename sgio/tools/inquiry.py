@@ -120,6 +120,24 @@ def inquiry_unit_serial_number(s):
     print '  Unit serial number: %s' % (i['unit_serial_number'])
 
 
+def inquiry_device_identification(s):
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION, alloclen=16383).result
+    print 'Device Identification, page_code=0x83'
+    print '====================================='
+    _d = i['designator_descriptors']
+    for idx in range(len(_d)):
+        print '  Designation descriptor, descriptor length: %d' % (_d[idx]['designator_length'] + 4)
+        print '    designator type:%d [%s]  code set:%d [%s]' % (
+            _d[idx]['designator_type'],
+            INQUIRY.DESIGNATOR[_d[idx]['designator_type']],
+            _d[idx]['code_set'],
+            INQUIRY.CODE_SET[_d[idx]['code_set']])
+        print '    association:%d [%s]' % (
+            _d[idx]['association'],
+            INQUIRY.ASSOCIATION[_d[idx]['association']])
+        for k, v in _d[idx]['designator'].iteritems():
+            print '      %s: %s' % (k, v)
+
 def main():
     i = 1
     page_code = 0
@@ -167,6 +185,10 @@ def main():
 
     if page_code == INQUIRY.VPD.UNIT_SERIAL_NUMBER:
         inquiry_unit_serial_number(s)
+        return
+
+    if page_code == INQUIRY.VPD.DEVICE_IDENTIFICATION:
+        inquiry_device_identification(s)
         return
 
     print 'No pretty print for this page, page_code=0x%02x' % page_code
