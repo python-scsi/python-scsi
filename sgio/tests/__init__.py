@@ -1,6 +1,7 @@
 __all__ = ['test_enum',
            'test_cdb_inquiry',
            'test_cdb_modesense6',
+           'test_cdb_movemedium',
            'test_cdb_read10',
            'test_cdb_read12',
            'test_cdb_read16',

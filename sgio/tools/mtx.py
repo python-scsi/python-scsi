@@ -47,6 +47,20 @@ def status(scsi, eaa):
                     print '      Storage Element: %d:Empty' % (
                         se['element_address'] - _first + 1)
 
+def load(scsi, eaa, storage_element, data_transfer_element):
+    res = scsi.movemedium(eaa['first_medium_transport_element_address'],
+                         storage_element + eaa['first_storage_element_address'] - 1,
+                         data_transfer_element + eaa['first_data_transfer_element_address']).result
+    print 'Loaded Storage Element %d into Data Transfer drive %d' % (storage_element, data_transfer_element)
+
+
+def unload(scsi, eaa, storage_element, data_transfer_element):
+    res = scsi.movemedium(eaa['first_medium_transport_element_address'],
+                         data_transfer_element + eaa['first_data_transfer_element_address'],
+                         storage_element + eaa['first_storage_element_address'] - 1).result
+    print 'Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element)
+
+
 def main():
     device = '/dev/changer'
     for i in range(len(sys.argv)):
@@ -67,6 +81,11 @@ def main():
     if sys.argv[1] == 'status':
         return status(scsi, eaa)
 
+    if sys.argv[1] == 'load':
+        return load(scsi, eaa, int(sys.argv[2]), int(sys.argv[3]))
+
+    if sys.argv[1] == 'unload':
+        return unload(scsi, eaa, int(sys.argv[2]), int(sys.argv[3]))
 
 if __name__ == "__main__":
     main()
