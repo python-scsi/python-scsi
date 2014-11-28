@@ -258,6 +258,11 @@ class Inquiry(SCSICommand):
                     'provisioning_type': [0x07, 6], }
             decode_bits(self.datain, _bits, self.result)
 
+        if self._page_code == inquiry_enums.VPD.REFERRALS:
+            _bits = {'user_data_segment_size': [0xffffffff, 8],
+                    'user_data_segment_multiplier': [0xffffffff, 12], }
+            decode_bits(self.datain, _bits, self.result)
+
         if self._page_code == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
             self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
 

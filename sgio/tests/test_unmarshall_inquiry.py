@@ -98,6 +98,17 @@ class MockDevId(object):
         datain[2] = page_len / 256
         datain[3] = page_len % 256
 
+
+class MockReferrals(object):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 0x00  # QUAL:0 TYPE:0
+        datain[1] = 0xb3  # referrals
+        datain[2] = 0x00  #
+        datain[3] = 0x0c  # page length: 12
+        datain[11] = 23
+        datain[15] = 37
+
+
 def main():
     s = SCSI(MockInquiryStandard())
     i = s.inquiry().result
@@ -172,6 +183,14 @@ def main():
     assert not hasattr(dd[1], 'protocol_identifier')
     assert dd[1]['designator']['ieee_company_id'] == 0x112233
     assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
+
+    s = SCSI(MockReferrals())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.REFERRALS).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    assert i['user_data_segment_size'] == 23
+    assert i['user_data_segment_multiplier'] == 37
+
 
 if __name__ == "__main__":
     main()
