@@ -4,6 +4,7 @@ from sgio.utils.enum import Enum
 
 opcodes = {'INQUIRY': 0x12,
            'MODE_SENSE_6': 0x1a,
+           'MOVE_MEDIUM': 0xa5,
            'READ_10': 0x28,
            'READ_12': 0xa8,
            'READ_16': 0x88,

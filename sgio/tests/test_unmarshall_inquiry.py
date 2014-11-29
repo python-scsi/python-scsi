@@ -98,6 +98,36 @@ class MockDevId(object):
         datain[2] = page_len / 256
         datain[3] = page_len % 256
 
+
+class MockReferrals(object):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 0x00  # QUAL:0 TYPE:0
+        datain[1] = 0xb3  # referrals
+        datain[2] = 0x00  #
+        datain[3] = 0x0c  # page length: 12
+        datain[11] = 23
+        datain[15] = 37
+
+
+class MockExtendedInquiry(object):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 0x00  # QUAL:0 TYPE:0
+        datain[1] = 0x86  # extended inquiry
+        datain[2] = 0x00  #
+        datain[3] = 0x3c  # page length: 60
+        datain[4] = 0x57  # activate microcode:1 spt:2 grd_chk:1
+                          # app_chk:1 ref_chk:1
+        datain[5] = 0x33  # uask_sup:1 group_sup:1 prior_sup:0 headsup:0
+                          # ordsup:1 simpsup:1
+        datain[6] = 0x05  # wu_sup:0 crd_sup:1 nv_sup:0 v_sup:1
+        datain[7] = 0x11  # p_i_i_sup:1 luiclr:1
+        datain[8] = 0x11  # r_sup:1 cbcs:1
+        datain[9] = 0x03  # multi...:3
+        datain[11] = 0x0f # extended...:15
+        datain[12] = 0xe0 # poa_sup:1 hra_sup:1 vsa_sup:1
+        datain[13] = 0x05 # maximum...:5
+
+
 def main():
     s = SCSI(MockInquiryStandard())
     i = s.inquiry().result
@@ -172,6 +202,44 @@ def main():
     assert not hasattr(dd[1], 'protocol_identifier')
     assert dd[1]['designator']['ieee_company_id'] == 0x112233
     assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
+
+    s = SCSI(MockReferrals())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.REFERRALS).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    assert i['user_data_segment_size'] == 23
+    assert i['user_data_segment_multiplier'] == 37
+
+
+    s = SCSI(MockExtendedInquiry())
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.EXTENDED_INQUIRY_DATA).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    assert i['activate_microcode'] == 1
+    assert i['spt'] == 2
+    assert i['grd_chk'] == 1
+    assert i['app_chk'] == 1
+    assert i['ref_chk'] == 1
+    assert i['uask_sup'] == 1
+    assert i['group_sup'] == 1
+    assert i['prior_sup'] == 0
+    assert i['headsup'] == 0
+    assert i['ordsup'] == 1
+    assert i['simpsup'] == 1
+    assert i['wu_sup'] == 0
+    assert i['crd_sup'] == 1
+    assert i['nv_sup'] == 0
+    assert i['v_sup'] == 1
+    assert i['p_i_i_sup'] == 1
+    assert i['luiclr'] == 1
+    assert i['r_sup'] == 1
+    assert i['cbcs'] == 1
+    assert i['multi_it_nexus_microcode_download'] == 3
+    assert i['extended_self_test_completion_minutes'] == 15
+    assert i['poa_sup'] == 1
+    assert i['hra_sup'] == 1
+    assert i['vsa_sup'] == 1
+    assert i['maximum_supported_sense_data_length'] == 5
 
 if __name__ == "__main__":
     main()

@@ -258,8 +258,41 @@ class Inquiry(SCSICommand):
                     'provisioning_type': [0x07, 6], }
             decode_bits(self.datain, _bits, self.result)
 
+        if self._page_code == inquiry_enums.VPD.REFERRALS:
+            _bits = {'user_data_segment_size': [0xffffffff, 8],
+                     'user_data_segment_multiplier': [0xffffffff, 12], }
+            decode_bits(self.datain, _bits, self.result)
+
         if self._page_code == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
             self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
+
+        if self._page_code == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
+            _bits = {'activate_microcode': [0xc0, 4],
+                     'spt': [0x38, 4],
+                     'grd_chk': [0x04, 4],
+                     'app_chk': [0x02, 4],
+                     'ref_chk': [0x01, 4],
+                     'uask_sup': [0x20, 5],
+                     'group_sup': [0x10, 5],
+                     'prior_sup': [0x08, 5],
+                     'headsup': [0x04, 5],
+                     'ordsup': [0x02, 5],
+                     'simpsup': [0x01, 5],
+                     'wu_sup': [0x08, 6],
+                     'crd_sup': [0x04, 6],
+                     'nv_sup': [0x02, 6],
+                     'v_sup': [0x01, 6],
+                     'p_i_i_sup': [0x10, 7],
+                     'luiclr': [0x01, 7],
+                     'r_sup': [0x10, 8],
+                     'cbcs': [0x01, 8],
+                     'multi_it_nexus_microcode_download': [0x0f, 9],
+                     'extended_self_test_completion_minutes': [0xffff, 10],
+                     'poa_sup': [0x80, 12],
+                     'hra_sup': [0x40, 12],
+                     'vsa_sup': [0x20, 12],
+                     'maximum_supported_sense_data_length': [0xff, 13], }
+            decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
             _data = self.datain[4:4 + page_length]

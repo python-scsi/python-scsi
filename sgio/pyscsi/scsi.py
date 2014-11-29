@@ -18,6 +18,7 @@
 
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6
+from scsi_cdb_movemedium import MoveMedium
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
@@ -157,6 +158,18 @@ class SCSI(object):
         :return: an ReadElementStatus instance
         """
         return ReadElementStatus(self, start, num, **kwargs)
+
+    def movemedium(self, xfer, source, dest, **kwargs):
+        """
+        Returns a MoveMedium Instance
+
+        :param xfer: medium transport element to use
+        :param source: source element
+        :param dest: destination element
+        :param invert=0: invert/rotate the medium before loading
+        :return: an MoveMedium instance
+        """
+        return MoveMedium(self, xfer, source, dest, **kwargs)
 
     def testunitready(self):
         """
