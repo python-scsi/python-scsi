@@ -98,6 +98,9 @@ def main():
     if sys.argv[1] == 'unload':
         return unload(scsi, eaa, int(sys.argv[2]), int(sys.argv[3]))
 
+    usage()
+    exit(1)
+
 if __name__ == "__main__":
     main()
 
