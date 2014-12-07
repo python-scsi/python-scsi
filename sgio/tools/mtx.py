@@ -85,7 +85,7 @@ def main():
     i = scsi.inquiry().result
     if i['peripheral_device_type'] != INQUIRY.DEVICE_TYPE.MEDIA_CHANGER_DEVICE:
         print '%s is not a MediaChanger device' % device
-        return
+        exit(1)
 
     eaa = scsi.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT).result
 
