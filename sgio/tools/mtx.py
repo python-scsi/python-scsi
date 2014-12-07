@@ -61,14 +61,25 @@ def unload(scsi, eaa, storage_element, data_transfer_element):
     print 'Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element)
 
 
+def usage():
+    print 'Usage:'
+    print 'mtx.py -f <device> status'
+    print 'mtx.py -f <device> load <src> <dst>'
+    print 'mtx.py -f <device> unload <dst> <src>'
+
+
 def main():
-    device = '/dev/changer'
+    device = ''
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-f':
             del sys.argv[i]
             device = sys.argv[i]
             del sys.argv[i]
             break
+
+    if not device:
+        usage()
+        exit(1)
 
     scsi = SCSI(SCSIDevice(device))
     i = scsi.inquiry().result
