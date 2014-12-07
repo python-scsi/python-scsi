@@ -14,7 +14,11 @@ from sgio.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 
 
 def status(scsi, eaa):
+    # For ease of use we renumber the element addresses to start at
+    # 0 for data transfer elements and to start at num_data_transfer_elements
+    # for the storage elements.
     if eaa['num_data_transfer_elements'] > 0:
+        first = eaa['first_data_transfer_element_address']
         res = scsi.readelementstatus(start=eaa['first_data_transfer_element_address'],
                                      num=eaa['num_data_transfer_elements'],
                                      element_type=READELEMENTSTATUS.ELEMENT_TYPE.DATA_TRANSFER,
@@ -24,11 +28,11 @@ def status(scsi, eaa):
             for element in elements['element_descriptors']:
                 if element['full']:
                     print 'Data Transfer Element: %d:Full VolumeTag:%s' % (
-                        element['element_address'],
+                        element['element_address'] - first,
                         element['primary_volume_tag'][0:32])
                 else:
                     print 'Data Transfer Element: %d:Empty' % (
-                        element['element_address'])
+                        element['element_address'] - first)
 
     if eaa['num_storage_elements'] > 0:
         res = scsi.readelementstatus(start=eaa['first_storage_element_address'],
@@ -37,19 +41,19 @@ def status(scsi, eaa):
                                      voltag=1, curdata=1, dvcid=1, alloclen=16384).result
         ses = res['storage_elements']
         if ses:
-            _first = res['first_element_address']
+            first = res['first_element_address']
             for se in ses['element_descriptors']:
                 if se['full']:
                     print '      Storage Element: %d:Full VolumeTag:%s' % (
-                        se['element_address'] - _first + 1,
+                        se['element_address'] - first + eaa['num_data_transfer_elements'],
                         se['primary_volume_tag'][0:32])
                 else:
                     print '      Storage Element: %d:Empty' % (
-                        se['element_address'] - _first + 1)
+                        se['element_address'] - first + eaa['num_data_transfer_elements'])
 
 def load(scsi, eaa, storage_element, data_transfer_element):
     res = scsi.movemedium(eaa['first_medium_transport_element_address'],
-                         storage_element + eaa['first_storage_element_address'] - 1,
+                         storage_element + eaa['first_storage_element_address'] - eaa['num_data_transfer_elements'],
                          data_transfer_element + eaa['first_data_transfer_element_address']).result
     print 'Loaded Storage Element %d into Data Transfer drive %d' % (storage_element, data_transfer_element)
 
@@ -57,7 +61,7 @@ def load(scsi, eaa, storage_element, data_transfer_element):
 def unload(scsi, eaa, storage_element, data_transfer_element):
     res = scsi.movemedium(eaa['first_medium_transport_element_address'],
                          data_transfer_element + eaa['first_data_transfer_element_address'],
-                         storage_element + eaa['first_storage_element_address'] - 1).result
+                         storage_element + eaa['first_storage_element_address'] - eaa['first_data_transfer_element_address']).result
     print 'Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element)
 
 
