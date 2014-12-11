@@ -18,7 +18,6 @@
 
 import scsi_enum_command
 import sgio
-import libiscsi
 
 from scsi_exception import SCSIDeviceExceptionMeta as ExMETA
 
@@ -36,16 +35,7 @@ class SCSIDevice(object):
 
         :param device: the file descriptor
         """
-        if device[:7] ==  "/dev/sg":
-            self._open = sgio.open
-            self._close = sgio.close
-            self._execute = sgio.execute
-        if device[:8] ==  "iscsi://":
-            self._open = libiscsi.open
-            self._close = libiscsi.close
-            self._execute = libiscsi.execute
-
-        self._dev = self._open(device)
+        self._fd = sgio.open(device)
 
     def execute(self, cdb, dataout, datain, sense):
         """
@@ -56,7 +46,7 @@ class SCSIDevice(object):
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
         """
-        status = self._execute(self._dev, cdb, dataout, datain, sense)
+        status = sgio.execute(self._fd, cdb, dataout, datain, sense)
         if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
             raise SCSIDevice.CheckCondition(sense)
         if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
