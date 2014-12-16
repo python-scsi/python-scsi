@@ -3,26 +3,21 @@
 
 from sgio.utils.enum import Enum
 
-enum_dict = {'a': 1,
-             'b': 2,
-             'c': 3, }
+enum_dict = {'A': 1,
+             'B': 2,
+             'C': 3, }
 
 
 def main():
     i = Enum(enum_dict)
-    dir(i)
-    print i.a
-    print i.c
+    assert i.A == 1
+    assert i.B == 2
+    assert i.C == 3
+    assert i[1] == 'A'
+    assert i[2] == 'B'
+    assert i[3] == 'C'
+    assert i[4] == ''
 
-    i = Enum({'a': 3, 'b': 2, 'c': 1, })
-    dir(i)
-    print i.a
-    print i.c
-
-    i = Enum(a=5, b=6, c=7)
-    dir(i)
-    print i.a
-    print i.c
 
 if __name__ == "__main__":
     main()
