@@ -49,6 +49,21 @@ To run the tests:
    $ make
 
 
+Tools (examples)
+================
+The tools directory contains example programs written against the python-scsi
+API. 
+
+inquiry.py
+----------
+An example tool to send INQUIRY commands to a device.
+
+mtx.py
+------
+An example tool to operate a SCSI media changer. Similar to, but not as
+advanced as, the 'mtx' utility.
+
+
 Mailinglist
 ===========
 A mailinglist for python-scsi is available at:
