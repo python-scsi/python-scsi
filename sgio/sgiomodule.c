@@ -34,12 +34,14 @@ static PyObject *
 sgio_open(PyObject *self, PyObject *args)
 {
   const char *device;
+  int readwrite;
   int s, v;
 
-  if (!PyArg_ParseTuple(args, "s", &device))
+  if (!PyArg_ParseTuple(args, "si", &device, &readwrite))
     return NULL;
 
-  s = open(device, O_RDONLY);
+  readwrite = ((readwrite ? O_RDWR : O_RDONLY) | O_NONBLOCK);
+  s = open(device, readwrite);
   if (s == -1) {
     PyErr_SetString(SGIOError, "Failed to open device.");
     return NULL;
