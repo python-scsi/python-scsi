@@ -44,16 +44,22 @@ class SCSIDevice(object):
                           read-only mode, otherwise it will be opened in
                           read/write mode.
         """
-        self._fd = sgio.open(device)
+        if _have_libiscsi and device[:8] == 'iscsi://':
+            self._iscsi = libiscsi.iscsi_create_context('iqn.2007-10.com.github:python-scsi')
+            self._iscsi_url = libiscsi.iscsi_parse_full_url(self._iscsi, device)
+            libiscsi.iscsi_set_targetname(self._iscsi, self._iscsi_url.target)
+            libiscsi.iscsi_set_session_type(self._iscsi, libiscsi.ISCSI_SESSION_NORMAL)
+            libiscsi.iscsi_set_header_digest(self._iscsi, libiscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+            libiscsi.iscsi_full_connect_sync(self._iscsi, self._iscsi_url.portal, self._iscsi_url.lun)
 
             self._is_libiscsi = True
         else:
             self._fd = sgio.open(device)
 
     def execute(self, cdb, dataout, datain, sense):
+    def execute(self, cdb, dataout, datain, sense):
         """
         execute a scsi command
-
         :param cdb: a byte array representing a command descriptor block
         :param dataout: a byte array to hold received data from the ioctl call
         :param datain: a byte array to hold data passed to the ioctl call
