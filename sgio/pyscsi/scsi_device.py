@@ -18,6 +18,11 @@
 
 import scsi_enum_command
 import sgio
+try:
+    import libiscsi
+    _have_libiscsi = True
+except:
+    _have_libiscsi = False
 
 from scsi_exception import SCSIDeviceExceptionMeta as ExMETA
 
@@ -39,8 +44,11 @@ class SCSIDevice(object):
                           read-only mode, otherwise it will be opened in
                           read/write mode.
         """
-        readwrite = bool( readwrite )
-        self._fd = sgio.open( device, readwrite )
+        self._fd = sgio.open(device)
+
+            self._is_libiscsi = True
+        else:
+            self._fd = sgio.open(device)
 
     def execute(self, cdb, dataout, datain, sense):
         """
@@ -51,9 +59,34 @@ class SCSIDevice(object):
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
         """
-        status = sgio.execute(self._fd, cdb, dataout, datain, sense)
-        if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
-            raise SCSIDevice.CheckCondition(sense)
-        if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
+        if self._is_libiscsi:
+            _dir = libiscsi.SCSI_XFER_NONE
+            _xferlen = 0
+            if len(datain):
+                _dir = libiscsi.SCSI_XFER_READ
+                _xferlen = len(datain)
+            if len(dataout):
+                _dir = libiscsi.SCSI_XFER_WRITE
+                _xferlen = len(dataout)
+            _task = libiscsi.scsi_create_task(cdb, _dir, _xferlen)
+            if len(datain):
+                libiscsi.scsi_task_add_data_in_buffer(_task, datain)
+            if len(dataout):
+                libiscsi.scsi_task_add_data_out_buffer(_task, dataout)
+
+            libiscsi.iscsi_scsi_command_sync(self._iscsi, self._iscsi_url.lun, _task, None)
+            _status = libiscsi.scsi_task_get_status(_task, None)
+            if _status == libiscsi.SCSI_STATUS_CHECK_CONDITION:
+                raise SCSIDevice.CheckCondition(sense)
+            if _status == libiscsi.SCSI_STATUS_GOOD:
+                return
+
             raise SCSIDevice.SCSISGIOError
+
+        else:
+            status = sgio.execute(self._fd, cdb, dataout, datain, sense)
+            if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+                raise SCSIDevice.CheckCondition(sense)
+            if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
+                raise SCSIDevice.SCSISGIOError
 
