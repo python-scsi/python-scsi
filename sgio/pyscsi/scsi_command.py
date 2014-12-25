@@ -16,8 +16,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from sgio.pyscsi.scsi_exception import SCSICommandExceptionMeta as ExMETA
-from sgio.pyscsi.scsi_exception import SCSIDeviceExceptionMeta as DeviceErrors
+from sgio.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
 
 class SCSICommand(object):
@@ -75,7 +74,7 @@ class SCSICommand(object):
         """
         try:
             self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
-        except (DeviceErrors.CheckCondition, DeviceErrors.SCSISGIOError) as e:
+        except (self.CheckCondition, self.SCSISGIOError) as e:
             print e
         else:
             if hasattr(self, 'unmarshall'):
