@@ -19,7 +19,7 @@
 import scsi_enum_command
 import sgio
 
-from scsi_exception import SCSIDeviceExceptionMeta as ExMETA
+from scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
 
 class SCSIDevice(object):

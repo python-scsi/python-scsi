@@ -30,6 +30,7 @@ class SCSIDeviceExceptionMeta(type):
     def __new__(mcs, cls, bases, attributes):
 
         class CheckCondition(SCSICheckCondition):
+
             pass
 
         class SCSISGIOError(Exception):
@@ -43,16 +44,12 @@ class SCSIDeviceExceptionMeta(type):
 
 class SCSIDeviceCommandExceptionMeta(SCSICommandExceptionMeta, SCSIDeviceExceptionMeta):
 
-    def __init__(cls, name, bases, attr):
-        # call both parents
-        SCSICommandExceptionMeta.__init__(cls, name, bases, attr)
-        SCSIDeviceExceptionMeta.__init__(cls, name, bases, attr)
+    def __init__(cls, name, bases, attributes):
+        SCSICommandExceptionMeta.__init__(cls, name, bases, attributes)
+        SCSIDeviceExceptionMeta.__init__(cls, name, bases, attributes)
 
-    def __new__(mcs, name, bases, attr):
-        # so, how is the new type supposed to look?
-        # maybe create the first
-        t1 = SCSICommandExceptionMeta.__new__(mcs, name, bases, attr)
-        # and pass it's data on to the next?
+    def __new__(mcs, name, bases, attributes):
+        t1 = SCSICommandExceptionMeta.__new__(mcs, name, bases, attributes)
         name = t1.__name__
         bases = tuple(t1.mro())
         attr = t1.__dict__.copy()
