@@ -2,13 +2,13 @@
 
 from distutils.core import setup, Extension
 
-setup(name='SGIO',
+setup(name='PYSCSI',
     version='1.0',
     license='LGPLv2.1',
     author='Ronnie Sahlberg',
     author_email='ronniesahlberg@gmail.com',
     description='Module for calling SCSI devices from Python',
-    packages=['sgio', 'sgio.pyscsi', 'sgio.utils'])
+    packages=['pyscsi', 'pyscsi.pyscsi', 'pyscsi.utils'])
 
 
 linux_sgio_module = Extension('linux_sgio.linux_sgio',

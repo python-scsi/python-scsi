@@ -2,16 +2,16 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from sgio.utils.converter import scsi_int_to_ba, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
 
 #
-# SCSI Write12 command and definitions
+# SCSI Write16 command and definitions
 #
 
 
-class Write12(SCSICommand):
+class Write16(SCSICommand):
     """
-    A class to send a Write(12) command to a scsi device
+    A class to send a Write(16) command to a scsi device
     """
 
     def __init__(self, scsi, lba, tl, data, **kwargs):
@@ -22,15 +22,15 @@ class Write12(SCSICommand):
 
     def build_cdb(self, lba, tl, wrprotect=0, dpo=0, fua=0, group=0):
         """
-        Build a Read12 CDB
+        Build a Write16 CDB
         """
-        cdb = SCSICommand.init_cdb(OPCODE.WRITE_12)
-        cdb[2:6] = scsi_int_to_ba(lba, 4)
-        cdb[6:10] = scsi_int_to_ba(tl, 4)
+        cdb = SCSICommand.init_cdb(OPCODE.WRITE_16)
+        cdb[2:10] = scsi_int_to_ba(lba, 8)
+        cdb[10:14] = scsi_int_to_ba(tl, 4)
         cdb[1] |= (wrprotect << 5) & 0xe0
         cdb[1] |= 0x10 if dpo else 0
         cdb[1] |= 0x08 if fua else 0
-        cdb[10] |= group & 0x1f
+        cdb[14] |= group & 0x1f
 
         return cdb
 
@@ -43,8 +43,8 @@ class Write12(SCSICommand):
                 'wrprotect': [0xe0, 1],
                 'dpo': [0x10, 1],
                 'fua': [0x08, 1],
-                'lba': [0xffffffff, 2],
-                'group': [0x1f, 10],
-                'tl': [0xffffffff, 6], }
+                'lba': [0xffffffffffffffff, 2],
+                'group': [0x1f, 14],
+                'tl': [0xffffffff, 10], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp

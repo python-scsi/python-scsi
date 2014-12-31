@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 
 
 class MockInquiryStandard(object):

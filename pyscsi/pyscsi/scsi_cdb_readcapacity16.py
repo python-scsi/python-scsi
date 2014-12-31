@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-#      Copyright (C) 2014 by Markus Rosjat<markus.rosjat@gmail.com>
+#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #
 #	   This program is free software; you can redistribute it and/or modify
 #	   it under the terms of the GNU Lesser General Public License as published by
@@ -17,20 +17,20 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
-from sgio.utils.converter import decode_bits
+from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
+from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
 
 #
-# SCSI ReadCapacity10 command and definitions
+# SCSI ReadCapacity16 command and definitions
 #
 
 
-class ReadCapacity10(SCSICommand):
+class ReadCapacity16(SCSICommand):
     """
-    A class to hold information from a ReadCapacity(10) command to a scsi device
+    A class to hold information from a ReadCapacity(16) command to a scsi device
     """
 
-    def __init__(self, scsi, alloclen=8):
+    def __init__(self, scsi, alloclen=32):
         """
         initialize a new instance
 
@@ -43,21 +43,15 @@ class ReadCapacity10(SCSICommand):
 
     def build_cdb(self, alloclen):
         """
-        Build a ReadCapacity10 CDB
+        Build a ReadCapacity16 CDB
 
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.READ_CAPACITY_10)
+        cdb = SCSICommand.init_cdb(OPCODE.SERVICE_ACTION_IN)
+        cdb[1] = SERVICE_ACTION_IN.READ_CAPACITY_16
+        cdb[10:14] = scsi_int_to_ba(alloclen, 4)
         return cdb
-
-    def unmarshall(self):
-        """
-        Unmarshall the ReadCapacity10 data.
-        """
-        _bits = {'returned_lba': [0xffffffff, 0],
-                'block_length': [0xffffffff, 4], }
-        decode_bits(self.datain, _bits, self.result)
 
     def unmarshall_cdb(self, cdb):
         """
@@ -65,12 +59,22 @@ class ReadCapacity10(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'rdprotect': [0xe0, 1],
-                'dpo': [0x10, 1],
-                'fua': [0x08, 1],
-                'rarc': [0x04, 1],
-                'lba': [0xffffffffffffffff, 2],
-                'group': [0x1f, 14],
-                'tl': [0xffffffff, 10], }
+                'service_action': [0x1f, 1],
+                'alloc_len': [0xffffffff, 10], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp
+
+    def unmarshall(self):
+        """
+        Unmarshall the ReadCapacity16 data.
+        """
+        _bits = {'returned_lba': [0xffffffffffffffff, 0],
+                'block_length': [0xffffffff, 8],
+                'p_type': [0x0e, 12],
+                'prot_en': [0x01, 12],
+                'p_i_exponent': [0xf0, 13],
+                'lbppbe': [0x0f, 13],
+                'lbpme': [0x80, 14],
+                'lbprz': [0x40, 14],
+                'lowest_aligned_lba': [0x3fff, 14], }
+        decode_bits(self.datain, _bits, self.result)

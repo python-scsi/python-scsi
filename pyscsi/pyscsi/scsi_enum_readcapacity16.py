@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from sgio.utils.enum import Enum
+from pyscsi.utils.enum import Enum
 
 #
 # P_TYPE

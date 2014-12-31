@@ -2,7 +2,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from sgio.utils.converter import scsi_int_to_ba, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
 
 #
 # SCSI Read10 command and definitions
