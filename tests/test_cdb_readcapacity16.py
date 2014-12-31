@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.utils.converter import scsi_ba_to_int
-from sgio.pyscsi.scsi_enum_command import OPCODE, SERVICE_ACTION_IN
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.utils.converter import scsi_ba_to_int
+from pyscsi.pyscsi.scsi_enum_command import OPCODE, SERVICE_ACTION_IN
 
 
 class MockReadCapacity16(object):

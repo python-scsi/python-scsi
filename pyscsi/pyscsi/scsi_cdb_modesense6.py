@@ -2,7 +2,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from sgio.utils.converter import decode_bits
+from pyscsi.utils.converter import decode_bits
 import scsi_enum_modesense6 as modesensense_enums
 
 #

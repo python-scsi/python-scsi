@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.utils.converter import scsi_ba_to_int
-from sgio.pyscsi.scsi_enum_command import OPCODE
-from sgio.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.utils.converter import scsi_ba_to_int
+from pyscsi.pyscsi.scsi_enum_command import OPCODE
+from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 
 
 class MockReadElementStatus(object):

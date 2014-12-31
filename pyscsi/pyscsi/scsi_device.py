@@ -17,7 +17,6 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import scsi_enum_command
-import sgio
 
 from scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
@@ -27,6 +26,12 @@ try:
 except:
     _have_libiscsi = False
 
+try:
+    import linux_sgio
+    _have_linux_sgio = True
+except:
+    _have_linux_sgio = False
+
 
 class SCSIDevice(object):
     """
@@ -34,7 +39,7 @@ class SCSIDevice(object):
     """
     __metaclass__ = ExMETA
 
-    def __init__(self, device):
+    def __init__(self, device, readwrite=False):
         """
         initialize a  new instance
         :param device: the file descriptor
@@ -48,8 +53,9 @@ class SCSIDevice(object):
             libiscsi.iscsi_full_connect_sync(self._iscsi, self._iscsi_url.portal, self._iscsi_url.lun)
 
             self._is_libiscsi = True
-        else:
-            self._fd = sgio.open(device)
+        elif _have_linux_sgio and device[:7] == '/dev/sg':
+            self._is_linux_sgio = True
+            self._fd = linux_sgio.open(device, bool(readwrite))
 
     def execute(self, cdb, dataout, datain, sense):
         """
@@ -59,7 +65,7 @@ class SCSIDevice(object):
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
         """
-        if self._is_libiscsi:
+        if hasattr(self, '_is_libiscsi'):
             _dir = libiscsi.SCSI_XFER_NONE
             _xferlen = 0
             if len(datain):
@@ -83,8 +89,8 @@ class SCSIDevice(object):
 
             raise self.SCSISGIOError
 
-        else:
-            status = sgio.execute(self._fd, cdb, dataout, datain, sense)
+        elif hasattr(self, '_is_linux_sgio'):
+            status = linux_sgio.execute(self._fd, cdb, dataout, datain, sense)
             if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
                 raise self.CheckCondition(sense)
             if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:

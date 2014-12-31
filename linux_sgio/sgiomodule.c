@@ -1,18 +1,18 @@
 /*
-	   Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
+  Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 
-	   This program is free software; you can redistribute it and/or modify
-	   it under the terms of the GNU Lesser General Public License as published by
-	   the Free Software Foundation; either version 2.1 of the License, or
-	   (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation; either version 2.1 of the License, or
+  (at your option) any later version.
 
-	   This program is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	   GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
 
-	   You should have received a copy of the GNU Lesser General Public License
-	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <fcntl.h>
@@ -23,10 +23,9 @@
 
 #include <Python.h>
 
-#define SCSI_STATUS_GOOD            0
-#define SCSI_STATUS_CHECK_CONDITION 2
-
-#define SCSI_STATUS_SGIO_ERROR    0xff
+#define SCSI_STATUS_GOOD             0
+#define SCSI_STATUS_CHECK_CONDITION  2
+#define SCSI_STATUS_SGIO_ERROR       0xff
 
 static PyObject *SGIOError;
 
@@ -126,22 +125,22 @@ sgio_close(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef SGIOMethods[] = {
-    {"open",  sgio_open, METH_VARARGS, "Open a SCSI device."},
+    {"open",  sgio_open, METH_VARARGS, "Open a SCSI  device."},
     {"execute",  sgio_execute, METH_VARARGS, "Execute a SCSI CDB."},
     {"close",  sgio_close, METH_VARARGS, "Close a SCSI device."},
     {NULL, NULL, 0, NULL}
 };
 
 PyMODINIT_FUNC
-initsgio(void)
+initlinux_sgio(void)
 {
     PyObject *m;
 
-    m = Py_InitModule("sgio", SGIOMethods);
+    m = Py_InitModule("linux_sgio", SGIOMethods);
     if (m == NULL)
         return;
 
-    SGIOError = PyErr_NewException("sgio.error", NULL, NULL);
+    SGIOError = PyErr_NewException("linux_sgio.error", NULL, NULL);
     Py_INCREF(SGIOError);
     PyModule_AddObject(m, "error", SGIOError);
 }

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-#      Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
+#      Copyright (C) 2014 by Markus Rosjat<markus.rosjat@gmail.com>
 #
 #	   This program is free software; you can redistribute it and/or modify
 #	   it under the terms of the GNU Lesser General Public License as published by
@@ -18,42 +18,46 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from sgio.utils.converter import scsi_int_to_ba, decode_bits
+from pyscsi.utils.converter import decode_bits
 
 #
-# SCSI MoveMedium command and definitions
+# SCSI ReadCapacity10 command and definitions
 #
 
 
-class MoveMedium(SCSICommand):
+class ReadCapacity10(SCSICommand):
     """
-    A class to hold information from a MoveMedium command to a scsi device
+    A class to hold information from a ReadCapacity(10) command to a scsi device
     """
 
-    def __init__(self, scsi, xfer, source, dest, invert=0):
+    def __init__(self, scsi, alloclen=8):
         """
         initialize a new instance
 
         :param scsi: a SCSI instance
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, 0)
-        self.cdb = self.build_cdb(xfer, source, dest, invert)
+        SCSICommand.__init__(self, scsi, 0, alloclen)
+        self.cdb = self.build_cdb(alloclen)
         self.execute()
 
-    def build_cdb(self, xfer, source, dest, invert):
+    def build_cdb(self, alloclen):
         """
-        Build a MoveMedium CDB
+        Build a ReadCapacity10 CDB
 
+        :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.MOVE_MEDIUM)
-        cdb[2:4] = scsi_int_to_ba(xfer, 2)
-        cdb[4:6] = scsi_int_to_ba(source, 2)
-        cdb[6:8] = scsi_int_to_ba(dest, 2)
-        if invert:
-            cdb[10] |= 0x01
+        cdb = SCSICommand.init_cdb(OPCODE.READ_CAPACITY_10)
         return cdb
+
+    def unmarshall(self):
+        """
+        Unmarshall the ReadCapacity10 data.
+        """
+        _bits = {'returned_lba': [0xffffffff, 0],
+                'block_length': [0xffffffff, 4], }
+        decode_bits(self.datain, _bits, self.result)
 
     def unmarshall_cdb(self, cdb):
         """
@@ -61,9 +65,12 @@ class MoveMedium(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'medium_transport_address': [0xffff, 2],
-                'source_address': [0xffff, 4],
-                'destination_address': [0xffff, 6],
-                'invert': [0x01, 10], }
+                'rdprotect': [0xe0, 1],
+                'dpo': [0x10, 1],
+                'fua': [0x08, 1],
+                'rarc': [0x04, 1],
+                'lba': [0xffffffffffffffff, 2],
+                'group': [0x1f, 14],
+                'tl': [0xffffffff, 10], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp

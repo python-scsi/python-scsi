@@ -3,9 +3,9 @@
 
 import sys
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi.scsi_device import SCSIDevice
-from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 
 
 def usage():

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from sgio.utils.enum import Enum
+from pyscsi.utils.enum import Enum
 
 opcodes = {'INQUIRY': 0x12,
            'MODE_SENSE_6': 0x1a,

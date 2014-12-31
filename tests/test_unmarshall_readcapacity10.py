@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi import SCSI
 
 
 class MockReadCapacity10(object):
