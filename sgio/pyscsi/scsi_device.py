@@ -27,7 +27,6 @@ try:
 except:
     _have_libiscsi = False
 
-
 class SCSIDevice(object):
     """
     The base class for a derived  scsi device class
@@ -59,7 +58,7 @@ class SCSIDevice(object):
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
         """
-        if self._is_libiscsi:
+        if hasattr(self, '_is_libiscsi'):
             _dir = libiscsi.SCSI_XFER_NONE
             _xferlen = 0
             if len(datain):
