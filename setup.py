@@ -2,17 +2,13 @@
 
 from distutils.core import setup, Extension
 
-module_sgio = Extension('sgio.sgio',
-                        sources=['sgio/sgiomodule.c'])
-
 setup(name='SGIO',
     version='1.0',
     license='LGPLv2.1',
     author='Ronnie Sahlberg',
     author_email='ronniesahlberg@gmail.com',
-    description='Module for calling ioctl(SG_IO)',
-    packages=['sgio', 'sgio.pyscsi', 'sgio.utils'],
-      ext_modules=[module_sgio])
+    description='Module for calling SCSI devices from Python',
+    packages=['sgio', 'sgio.pyscsi', 'sgio.utils'])
 
 
 linux_sgio_module = Extension('linux_sgio.linux_sgio',
