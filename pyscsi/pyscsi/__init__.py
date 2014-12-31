@@ -12,6 +12,8 @@ __all__ = ['scsi',
           'scsi_cdb_write10',
           'scsi_cdb_write12',
           'scsi_cdb_write16',
+          'scsi_cdb_writesame10',
+          'scsi_cdb_writesame16',
           'scsi_command',
           'scsi_device',
           'scsi_sense', ]

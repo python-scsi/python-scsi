@@ -29,6 +29,8 @@ from scsi_cdb_testunitready import TestUnitReady
 from scsi_cdb_write10 import Write10
 from scsi_cdb_write12 import Write12
 from scsi_cdb_write16 import Write16
+from scsi_cdb_writesame10 import WriteSame10
+from scsi_cdb_writesame16 import WriteSame16
 
 
 class SCSI(object):
@@ -224,4 +226,35 @@ class SCSI(object):
         :return: a Write16 instance
         """
         return Write16(self, lba, tl, data, **kwargs)
+
+    def writesame16(self, lba, nb, data, **kwargs):
+        """
+        Returns a WriteSame16 Instance
+
+        :param lba: Logical Block Address to write to
+        :param nb: Number of blocks
+        :param data: bytearray containing the block to write
+        :param wrprotect = 0: WriteProtect flags
+        :param anchor = False: Anchor flag
+        :param unmap = False: Unmap flag
+        :param ndob = False: NoDataOutBuffer flag. When set data is None.
+        :param group = 0: Group Number
+        :return: a WriteSame16 instance
+        """
+        return WriteSame16(self, lba, nb, data, **kwargs)
+
+    def writesame10(self, lba, nb, data, **kwargs):
+        """
+        Returns a WriteSame10 Instance
+
+        :param lba: Logical Block Address to write to
+        :param nb: Number of blocks
+        :param data: bytearray containing the block to write
+        :param wrprotect = 0: WriteProtect flags
+        :param anchor = False: Anchor flag
+        :param unmap = False: Unmap flag
+        :param group = 0: Group Number
+        :return: a WriteSame10 instance
+        """
+        return WriteSame10(self, lba, nb, data, **kwargs)
 
