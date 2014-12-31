@@ -4,9 +4,12 @@ python-scsi is a SCSI initiator for python.
 It contains python classes to create and send SCSI commands to devices
 accessible via:
 
-* Linux: /dev/sg* devices using ioctl(SG_IO)
+* SGIO: /dev/sg* devices using ioctl(SG_IO)
+  Only available for Linux
+
 * iSCSI: iscsi://<server>/<iqn>/<lun>
-  Requires that the libiscsi-python module is installed.
+  Available on all platforms which have libiscsi-python
+  See https://github.com/sahlberg/libiscsi-python
 
 These classes also provide interfaces to marshall/unmarshall both CDBs
 as well as DATA-IN/OUT buffers.
