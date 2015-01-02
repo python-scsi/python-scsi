@@ -16,6 +16,7 @@
 #	   You should have received a copy of the GNU Lesser General Public License
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from scsi_cdb_getlbastatus import GetLBAStatus
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6
 from scsi_cdb_movemedium import MoveMedium
@@ -58,6 +59,16 @@ class SCSI(object):
         :param: blocksize in bytes
         """
         self._blocksize = value
+
+    def getlbastatus(self, lba, **kwargs):
+        """
+        Returns a GetLBAStatus Instance
+
+        :param lba: starting lba
+        :param alloc_len = 16384: size of requested datain
+        :return: a getlbastatus instance
+        """
+        return GetLBAStatus(self, lba, **kwargs)
 
     def inquiry(self, **kwargs):
         """
