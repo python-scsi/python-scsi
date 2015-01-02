@@ -21,7 +21,8 @@ opcodes = {'INQUIRY': 0x12,
 
 OPCODE = Enum(opcodes)
 
-service_action_ins = {'READ_CAPACITY_16': 0x10, }
+service_action_ins = {'READ_CAPACITY_16': 0x10,
+                      'GET_LBA_STATUS': 0x12, }
 
 SERVICE_ACTION_IN = Enum(service_action_ins)
 
