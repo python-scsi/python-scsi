@@ -16,7 +16,7 @@
 #	   along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-from sgio.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
+from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
 
 class SCSICommand(object):
