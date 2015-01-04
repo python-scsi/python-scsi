@@ -1,20 +1,20 @@
 # coding: utf-8
 
 
-#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #
-#	   This program is free software; you can redistribute it and/or modify
-#	   it under the terms of the GNU Lesser General Public License as published by
-#	   the Free Software Foundation; either version 2.1 of the License, or
-#	   (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
 #
-#	   This program is distributed in the hope that it will be useful,
-#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	   GNU Lesser General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
 #
-#	   You should have received a copy of the GNU Lesser General Public License
-#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 import scsi_enum_command
 
@@ -23,13 +23,15 @@ from scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 try:
     import libiscsi
     _have_libiscsi = True
-except:
+except ImportError as e:
+    print 'could not import libiscsi -> %s ' % e.message
     _have_libiscsi = False
 
 try:
     import linux_sgio
     _have_linux_sgio = True
-except:
+except ImportError as e:
+    print 'could not import linux_sgio -> %s' % e.message
     _have_linux_sgio = False
 
 
@@ -56,6 +58,7 @@ class SCSIDevice(object):
         elif _have_linux_sgio and device[:7] == '/dev/sg':
             self._is_linux_sgio = True
             self._fd = linux_sgio.open(device, bool(readwrite))
+        # here we should determine  what kind of device we have with a inquiry
 
     def execute(self, cdb, dataout, datain, sense):
         """
@@ -65,7 +68,7 @@ class SCSIDevice(object):
         :param datain: a byte array to hold data passed to the ioctl call
         :param sense: a byte array to hold sense data
         """
-        if hasattr(self, '_is_libiscsi'):
+        if self.isLibSCSI:
             _dir = libiscsi.SCSI_XFER_NONE
             _xferlen = 0
             if len(datain):
@@ -89,9 +92,25 @@ class SCSIDevice(object):
 
             raise self.SCSISGIOError
 
-        elif hasattr(self, '_is_linux_sgio'):
+        elif self.isLinuxSGIO:
             status = linux_sgio.execute(self._fd, cdb, dataout, datain, sense)
             if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
                 raise self.CheckCondition(sense)
             if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
                 raise self.SCSISGIOError
+
+    @property
+    def isLibSCSI(self):
+        return self._is_libiscsi
+
+    @isLibSCSI.setter
+    def isLibSCSI(self, value):
+        self._is_libiscsi = value
+
+    @property
+    def isLinuxSGIO(self):
+        return self._is_linux_sgio
+
+    @isLinuxSGIO.setter
+    def isLinuxSGIO(self, value):
+        self._is_linux_sgio = value
