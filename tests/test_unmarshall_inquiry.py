@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.utils.converter import scsi_int_to_ba
+from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 
 
 class MockInquiryStandard(object):
@@ -68,8 +69,7 @@ class MockDevId(object):
         dd += t10
         dd[0] = 0x52 # iSCSI, ASCII
         dd[1] = 0xa1 # AssociatedWithTargetDevice, T10_VENDOR_ID
-        dd[2] = len(t10) / 256
-        dd[3] = len(t10) % 256
+        dd[2:4] = scsi_int_to_ba(len(t10), 2)
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
 
@@ -89,14 +89,11 @@ class MockDevId(object):
         dd += eui
         dd[0] = 0x01 # BINARY
         dd[1] = 0x22 # AssociatedWithTargetDevice, EUI-64 
-        dd[2] = len(t10) / 256
-        dd[3] = len(t10) % 256
+        dd[2:4] = scsi_int_to_ba(len(t10), 2)
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
 
-        page_len = pos - 4
-        datain[2] = page_len / 256
-        datain[3] = page_len % 256
+        datain[0:4] = scsi_int_to_ba(pos - 4, 4)
 
 
 class MockReferrals(object):

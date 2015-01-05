@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from sgio.utils.enum import Enum
+from pyscsi.utils.enum import Enum
 
 enum_dict = {'A': 1,
              'B': 2,

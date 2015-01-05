@@ -6,11 +6,11 @@
 
 import sys
 
-from sgio.pyscsi.scsi import SCSI
-from sgio.pyscsi.scsi_device import SCSIDevice
-from sgio.pyscsi import scsi_enum_inquiry as INQUIRY
-from sgio.pyscsi import scsi_enum_modesense6 as MODESENSE6
-from sgio.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
+from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi import scsi_enum_modesense6 as MODESENSE6
+from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 
 
 def status(scsi, eaa):
