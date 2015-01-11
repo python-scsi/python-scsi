@@ -1,19 +1,21 @@
 # coding: utf-8
 
-#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright:
+#  Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+#  Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
 #
-#	   This program is free software; you can redistribute it and/or modify
-#	   it under the terms of the GNU Lesser General Public License as published by
-#	   the Free Software Foundation; either version 2.1 of the License, or
-#	   (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
 #
-#	   This program is distributed in the hope that it will be useful,
-#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	   GNU Lesser General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
 #
-#	   You should have received a copy of the GNU Lesser General Public License
-#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
 def scsi_int_to_ba(to_convert=0, array_size=4):
@@ -46,7 +48,7 @@ def scsi_ba_to_int(ba):
     return sum(ba[i] << ((len(ba) - 1 - i) * 8) for i in range(len(ba)))
 
 
-def decode_bits(data, check_dict, dict):
+def decode_bits(data, check_dict, result_dict):
     """
     helper method to perform some simple bit operations
 
@@ -72,5 +74,4 @@ def decode_bits(data, check_dict, dict):
             bitmask >>= 1
             value >>= 1
         value &= bitmask
-        dict.update({key: value})
-
+        result_dict.update({key: value})

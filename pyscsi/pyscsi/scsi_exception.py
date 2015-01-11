@@ -1,5 +1,20 @@
 # coding: utf-8
 
+# Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 from scsi_sense import SCSICheckCondition
 
 
@@ -7,7 +22,6 @@ class SCSICommandExceptionMeta(type):
     """A meta class for class depending SCSICommand exceptions
 
     """
-
     def __new__(mcs, cls, bases, attributes):
 
         class CommandNotImplemented(Exception):
@@ -44,18 +58,13 @@ class SCSIDeviceExceptionMeta(type):
 class SCSIDeviceCommandExceptionMeta(SCSICommandExceptionMeta, SCSIDeviceExceptionMeta):
 
     def __init__(cls, name, bases, attr):
-        # call both parents
         SCSICommandExceptionMeta.__init__(cls, name, bases, attr)
         SCSIDeviceExceptionMeta.__init__(cls, name, bases, attr)
 
     def __new__(mcs, name, bases, attr):
-        # so, how is the new type supposed to look?
-        # maybe create the first
         t1 = SCSICommandExceptionMeta.__new__(mcs, name, bases, attr)
-        # and pass it's data on to the next?
         name = t1.__name__
         bases = tuple(t1.mro())
         attr = t1.__dict__.copy()
         t2 = SCSIDeviceExceptionMeta.__new__(mcs, name, bases, attr)
         return t2
-

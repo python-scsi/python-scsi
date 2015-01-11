@@ -1,20 +1,19 @@
 # coding: utf-8
 
-
-#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #
-#	   This program is free software; you can redistribute it and/or modify
-#	   it under the terms of the GNU Lesser General Public License as published by
-#	   the Free Software Foundation; either version 2.1 of the License, or
-#	   (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
 #
-#	   This program is distributed in the hope that it will be useful,
-#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	   GNU Lesser General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
 #
-#	   You should have received a copy of the GNU Lesser General Public License
-#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
@@ -61,9 +60,9 @@ class GetLBAStatus(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'service_action': [0x1f, 1],
-                'lba': [0xffffffffffffffff, 2],
-                'alloc_len': [0xffffffff, 10], }
+                 'service_action': [0x1f, 1],
+                 'lba': [0xffffffffffffffff, 2],
+                 'alloc_len': [0xffffffff, 10], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp
 
@@ -72,8 +71,8 @@ class GetLBAStatus(SCSICommand):
         Unmarshall the ReadCapacity16 data.
         """
         _bits = {'lba': [0xffffffffffffffff, 0],
-                'num_blocks': [0xffffffff, 8],
-                'p_status': [0x0f, 12], }
+                 'num_blocks': [0xffffffff, 8],
+                 'p_status': [0x0f, 12], }
 
         _data = self.datain[8:scsi_ba_to_int(self.datain[:4]) + 4]
         _lbas = []
