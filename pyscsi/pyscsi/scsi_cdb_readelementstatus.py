@@ -1,5 +1,20 @@
 # coding: utf-8
 
+# Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
@@ -54,19 +69,19 @@ class ReadElementStatus(SCSICommand):
     #
     # Unmarshall a SMC Storage Element Descriptor as per SMC 6.11.5
     #
-    def unmarshall_element_descriptor(self, type, data, pvoltag, avoltag):
+    def unmarshall_element_descriptor(self, element_type, data, pvoltag, avoltag):
         _storage = {}
         _bits = {'element_address': [0xffff, 0],
-                'access': [0x08, 2],
-                'except': [0x04, 2],
-                'full': [0x01, 2],
-                'additional_sense_code': [0xff, 4],
-                'additional_sense_code_qualifier': [0xff, 5],
-                'svalid': [0x80, 9],
-                'invert': [0x40, 9],
-                'ed': [0x08, 9],
-                'medium_type': [0x07, 9],
-                'source_storage_element_address': [0xffff, 10], }
+                 'access': [0x08, 2],
+                 'except': [0x04, 2],
+                 'full': [0x01, 2],
+                 'additional_sense_code': [0xff, 4],
+                 'additional_sense_code_qualifier': [0xff, 5],
+                 'svalid': [0x80, 9],
+                 'invert': [0x40, 9],
+                 'ed': [0x08, 9],
+                 'medium_type': [0x07, 9],
+                 'source_storage_element_address': [0xffff, 10], }
         decode_bits(data, _bits, _storage)
 
         _data = data[12:]
@@ -77,8 +92,8 @@ class ReadElementStatus(SCSICommand):
             _storage.update({'alternate_volume_tag': _data[0:36]})
             _data = _data[36:]
         _bits = {'code_set': [0x0f, 0],
-                'identifier_type': [0x0f, 1],
-                'identifier_length': [0xff, 3], }
+                 'identifier_type': [0x0f, 1],
+                 'identifier_length': [0xff, 3], }
         decode_bits(_data, _bits, _storage)
         if _storage['identifier_length']:
             _storage.update({'identifier': _data[4:4 + _storage['identifier_length']]})
@@ -117,8 +132,8 @@ class ReadElementStatus(SCSICommand):
         """
         """
         _bits = {'first_element_address': [0xffff, 0],
-                'num_elements': [0xffff, 2],
-                'byte_count': [0xffffff, 5], }
+                 'num_elements': [0xffff, 2],
+                 'byte_count': [0xffffff, 5], }
         decode_bits(self.datain, _bits, self.result)
 
         #
@@ -152,12 +167,12 @@ class ReadElementStatus(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'voltag': [0x10, 1],
-                'element_type': [0x07, 1],
-                'starting_element_address': [0xffff, 2],
-                'num_elements': [0xffff, 4],
-                'curdata': [0x02, 6],
-                'dvcid': [0x01, 6],
-                'alloc_len': [0xffffff, 7], }
+                 'voltag': [0x10, 1],
+                 'element_type': [0x07, 1],
+                 'starting_element_address': [0xffff, 2],
+                 'num_elements': [0xffff, 4],
+                 'curdata': [0x02, 6],
+                 'dvcid': [0x01, 6],
+                 'alloc_len': [0xffffff, 7], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp

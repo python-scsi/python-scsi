@@ -1,20 +1,19 @@
 # coding: utf-8
 
-
-#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #
-#	   This program is free software; you can redistribute it and/or modify
-#	   it under the terms of the GNU Lesser General Public License as published by
-#	   the Free Software Foundation; either version 2.1 of the License, or
-#	   (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
 #
-#	   This program is distributed in the hope that it will be useful,
-#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	   GNU Lesser General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
 #
-#	   You should have received a copy of the GNU Lesser General Public License
-#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
@@ -71,9 +70,9 @@ class Inquiry(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'evpd': [0x01, 1],
-                'page_code': [0xff, 2],
-                'alloc_len': [0xffff, 3], }
+                 'evpd': [0x01, 1],
+                 'page_code': [0xff, 2],
+                 'alloc_len': [0xffff, 3], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp
 
@@ -102,44 +101,32 @@ class Inquiry(SCSICommand):
         if type == inquiry_enums.DESIGNATOR.NAA:
             _d['naa'] = data[0] >> 4
             if _d['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
-                _bits = {
-                    'vendor_specific_identifier_a': [0x0fff, 0],
-                    'ieee_company_id': [0xffffff, 2],
-                    'vendor_specific_identifier_b': [0xffffff, 5],
-                }
+                _bits = {'vendor_specific_identifier_a': [0x0fff, 0],
+                         'ieee_company_id': [0xffffff, 2],
+                         'vendor_specific_identifier_b': [0xffffff, 5], }
                 decode_bits(data, _bits, _d)
             if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
                 _d['locally_administered_value'] = data[0:8]
             if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
-                _bits = {
-                    'ieee_company_id': [0x0ffffff0, 0],
-                    'vendor_specific_identifier': [0x0fffffffff, 3],
-                   }
+                _bits = {'ieee_company_id': [0x0ffffff0, 0],
+                         'vendor_specific_identifier': [0x0fffffffff, 3], }
                 decode_bits(data, _bits, _d)
             if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
-                _bits = {
-                    'ieee_company_id': [0x0ffffff0, 0],
-                    'vendor_specific_identifier': [0x0fffffffff, 3],
-                    'vendor_specific_identifier_extension': [0xffffffffffffffff, 8]
-                }
+                _bits = {'ieee_company_id': [0x0ffffff0, 0],
+                         'vendor_specific_identifier': [0x0fffffffff, 3],
+                         'vendor_specific_identifier_extension': [0xffffffffffffffff, 8], }
                 decode_bits(data, _bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
-                _bits = {
-                    'relative_port': [0xffff, 2],
-                }
+                _bits = {'relative_port': [0xffff, 2], }
                 decode_bits(data, _bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
-                _bits = {
-                    'target_portal_group': [0xffff, 2],
-                }
+                _bits = {'target_portal_group': [0xffff, 2], }
                 decode_bits(data, _bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
-                _bits = {
-                    'logical_unit_group': [0xffff, 2],
-                }
+                _bits = {'logical_unit_group': [0xffff, 2], }
                 decode_bits(data, _bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
@@ -169,8 +156,6 @@ class Inquiry(SCSICommand):
         decode_bits(data, _bits, _d)
         if _d['piv'] == 0 or (_d['association'] != 1 and _d['association'] != 2):
             del _d['protocol_identifier']
-
-
         _d['designator'] = self.unmarshall_designator(_d['designator_type'], data[4:])
         return _d
 
@@ -185,27 +170,27 @@ class Inquiry(SCSICommand):
         self.result.update({'peripheral_device_type': self.datain[0] & 0x1f})
         if self._evpd == 0:
             _bits = {'rmb': [0x80, 1],
-                    'version': [0xff, 2],
-                    'normaca': [0x20, 3],
-                    'hisup': [0x10, 3],
-                    'response_data_format': [0x0f, 3],
-                    'additional_length': [0xff, 4],
-                    'sccs': [0x80, 5],
-                    'acc': [0x40, 5],
-                    'tpgs': [0x30, 5],
-                    '3pc': [0x08, 5],
-                    'protect': [0x01, 5],
-                    'encserv': [0x40, 6],
-                    'vs': [0x20, 6],
-                    'multip': [0x10, 6],
-                    'addr16': [0x01, 6],
-                    'wbus16': [0x20, 7],
-                    'sync': [0x10, 7],
-                    'cmdque': [0x02, 7],
-                    'vs2': [0x01, 7],
-                    'clocking': [0x0c, 56],
-                    'qas': [0x02, 56],
-                    'ius': [0x01, 56], }
+                     'version': [0xff, 2],
+                     'normaca': [0x20, 3],
+                     'hisup': [0x10, 3],
+                     'response_data_format': [0x0f, 3],
+                     'additional_length': [0xff, 4],
+                     'sccs': [0x80, 5],
+                     'acc': [0x40, 5],
+                     'tpgs': [0x30, 5],
+                     '3pc': [0x08, 5],
+                     'protect': [0x01, 5],
+                     'encserv': [0x40, 6],
+                     'vs': [0x20, 6],
+                     'multip': [0x10, 6],
+                     'addr16': [0x01, 6],
+                     'wbus16': [0x20, 7],
+                     'sync': [0x10, 7],
+                     'cmdque': [0x02, 7],
+                     'vs2': [0x01, 7],
+                     'clocking': [0x0c, 56],
+                     'qas': [0x02, 56],
+                     'ius': [0x01, 56], }
             self.result.update({'t10_vendor_identification': self.datain[8:16]})
             self.result.update({'product_identification': self.datain[16:32]})
             self.result.update({'product_revision_level': self.datain[32:36]})
@@ -224,38 +209,38 @@ class Inquiry(SCSICommand):
 
         if self._page_code == inquiry_enums.VPD.BLOCK_LIMITS:
             _bits = {'wsnz': [0x01, 4],
-                    'ugavalid': [0x80, 32],
-                    'max_caw_len': [0xff, 5],
-                    'opt_xfer_len_gran': [0xffff, 6],
-                    'max_xfer_len': [0xffffffff, 8],
-                    'opt_xfer_len': [0xffffffff, 12],
-                    'max_pfetch_len': [0xffffffff, 16],
-                    'max_unmap_lba_count': [0xffffffff, 20],
-                    'max_unmap_bd_count': [0xffffffff, 24],
-                    'opt_unmap_gran': [0xffffffff, 28],
-                    'unmap_gran_alignment': [0xffffffff, 32],
-                    'max_ws_len': [0xffffffff, 36], }
+                     'ugavalid': [0x80, 32],
+                     'max_caw_len': [0xff, 5],
+                     'opt_xfer_len_gran': [0xffff, 6],
+                     'max_xfer_len': [0xffffffff, 8],
+                     'opt_xfer_len': [0xffffffff, 12],
+                     'max_pfetch_len': [0xffffffff, 16],
+                     'max_unmap_lba_count': [0xffffffff, 20],
+                     'max_unmap_bd_count': [0xffffffff, 24],
+                     'opt_unmap_gran': [0xffffffff, 28],
+                     'unmap_gran_alignment': [0xffffffff, 32],
+                     'max_ws_len': [0xffffffff, 36], }
             decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.BLOCK_DEVICE_CHARACTERISTICS:
             _bits = {'wabereq': [0xc0, 7],
-                    'wacereq': [0x30, 7],
-                    'nominal_form_factor': [0x0f, 7],
-                    'fuab': [0x02, 8],
-                    'vbuls': [0x01, 8],
-                    'medium_rotation_rate': [0xffff, 4],
-                    'product_type': [0xff, 6], }
+                     'wacereq': [0x30, 7],
+                     'nominal_form_factor': [0x0f, 7],
+                     'fuab': [0x02, 8],
+                     'vbuls': [0x01, 8],
+                     'medium_rotation_rate': [0xffff, 4],
+                     'product_type': [0xff, 6], }
             decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
             _bits = {'threshold_exponent': [0xff, 4],
-                    'lbpu': [0x80, 5],
-                    'lpbws': [0x40, 5],
-                    'lbpws10': [0x20, 5],
-                    'lbprz': [0x04, 5],
-                    'anc_sup': [0x02, 5],
-                    'dp': [0x01, 5],
-                    'provisioning_type': [0x07, 6], }
+                     'lbpu': [0x80, 5],
+                     'lpbws': [0x40, 5],
+                     'lbpws10': [0x20, 5],
+                     'lbprz': [0x04, 5],
+                     'anc_sup': [0x02, 5],
+                     'dp': [0x01, 5],
+                     'provisioning_type': [0x07, 6], }
             decode_bits(self.datain, _bits, self.result)
 
         if self._page_code == inquiry_enums.VPD.REFERRALS:

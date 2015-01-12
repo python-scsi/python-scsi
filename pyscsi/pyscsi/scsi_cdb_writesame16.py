@@ -44,12 +44,12 @@ class WriteSame16(SCSICommand):
         """
         _tmp = {}
         _bits = {'opcode': [0xff, 0],
-                'wrprotect': [0xe0, 1],
-                'anchor': [0x10, 1],
-                'unmap': [0x08, 1],
-                'ndob': [0x01, 1],
-                'lba': [0xffffffffffffffff, 2],
-                'group': [0x1f, 14],
-                'nb': [0xffffffff, 10], }
+                 'wrprotect': [0xe0, 1],
+                 'anchor': [0x10, 1],
+                 'unmap': [0x08, 1],
+                 'ndob': [0x01, 1],
+                 'lba': [0xffffffffffffffff, 2],
+                 'group': [0x1f, 14],
+                 'nb': [0xffffffff, 10], }
         decode_bits(cdb, _bits, _tmp)
         return _tmp

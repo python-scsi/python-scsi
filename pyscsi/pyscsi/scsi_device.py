@@ -46,6 +46,9 @@ class SCSIDevice(object):
         initialize a  new instance
         :param device: the file descriptor
         """
+        self._is_libiscsi = False
+        self._is_linux_sgio = False
+
         if _have_libiscsi and device[:8] == 'iscsi://':
             self._iscsi = libiscsi.iscsi_create_context('iqn.2007-10.com.github:python-scsi')
             self._iscsi_url = libiscsi.iscsi_parse_full_url(self._iscsi, device)
@@ -58,7 +61,6 @@ class SCSIDevice(object):
         elif _have_linux_sgio and device[:7] == '/dev/sg':
             self._is_linux_sgio = True
             self._fd = linux_sgio.open(device, bool(readwrite))
-        # here we should determine  what kind of device we have with a inquiry
 
     def execute(self, cdb, dataout, datain, sense):
         """
