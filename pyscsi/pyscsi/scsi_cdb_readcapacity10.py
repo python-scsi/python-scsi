@@ -47,7 +47,7 @@ class ReadCapacity10(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.READ_CAPACITY_10)
+        cdb = self.init_cdb(self.scsi.device.opcodes.READ_CAPACITY_10.value)
         return cdb
 
     def unmarshall(self):

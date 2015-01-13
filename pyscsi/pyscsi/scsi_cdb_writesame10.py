@@ -40,7 +40,7 @@ class WriteSame10(SCSICommand):
         """
         Build a WriteSame10 CDB
         """
-        cdb = SCSICommand.init_cdb(OPCODE.WRITE_SAME_10)
+        cdb = self.init_cdb(self.scsi.device.opcodes.WRITE_SAME_10.value)
         cdb[2:6] = scsi_int_to_ba(lba, 4)
         cdb[7:9] = scsi_int_to_ba(nb, 2)
         cdb[1] |= (wrprotect << 5) & 0xe0

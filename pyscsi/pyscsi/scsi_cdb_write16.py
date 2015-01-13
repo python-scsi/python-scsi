@@ -39,7 +39,7 @@ class Write16(SCSICommand):
         """
         Build a Write16 CDB
         """
-        cdb = SCSICommand.init_cdb(OPCODE.WRITE_16)
+        cdb = SCSICommand.init_cdb(self.scsi.device.opcodes.WRITE_16.value)
         cdb[2:10] = scsi_int_to_ba(lba, 8)
         cdb[10:14] = scsi_int_to_ba(tl, 4)
         cdb[1] |= (wrprotect << 5) & 0xe0

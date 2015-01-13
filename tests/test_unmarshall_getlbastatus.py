@@ -4,8 +4,11 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi.scsi_enum_getlbastatus import P_STATUS
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from mock_device import MockDevice
 
-class MockGetLBAStatus(object):
+
+class MockGetLBAStatus(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0:8] = bytearray(8)
         pos = 8
@@ -28,8 +31,10 @@ class MockGetLBAStatus(object):
 
 
 def main():
-    s = SCSI(MockGetLBAStatus())
-
+    dev = MockGetLBAStatus()
+    dev.opcodes = sbc
+    s = SCSI(dev)
+    
     i = s.getlbastatus(0).result
     assert len(i['lbas']) == 2
     assert i['lbas'][0]['lba'] == 1023

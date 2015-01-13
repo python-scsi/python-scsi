@@ -48,8 +48,8 @@ class GetLBAStatus(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.SERVICE_ACTION_IN)
-        cdb[1] = SERVICE_ACTION_IN.GET_LBA_STATUS
+        cdb = self.init_cdb(self.scsi.device.opcodes.GET_LBA_STATUS.value)
+        cdb[1] = self.scsi.device.opcodes.GET_LBA_STATUS.serviceaction.GET_LBA_STATUS
         cdb[2:10] = scsi_int_to_ba(lba, 8)
         cdb[10:14] = scsi_int_to_ba(alloclen, 4)
         return cdb

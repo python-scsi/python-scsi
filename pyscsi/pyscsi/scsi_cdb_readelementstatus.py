@@ -53,7 +53,7 @@ class ReadElementStatus(SCSICommand):
                   voltag, curdata, dvcid, alloclen):
         """
         """
-        cdb = SCSICommand.init_cdb(OPCODE.READ_ELEMENT_STATUS)
+        cdb = self.init_cdb(self.scsi.device.opcodes.READ_ELEMENT_STATUS.value)
         if voltag:
             cdb[1] |= 0x10
         cdb[1] |= element_type & 0x0f

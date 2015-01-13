@@ -52,7 +52,7 @@ class ModeSense6(SCSICommand):
     def build_cdb(self, page_code, sub_page_code, dbd, pc, alloclen):
         """
         """
-        cdb = SCSICommand.init_cdb(OPCODE.MODE_SENSE_6)
+        cdb = self.init_cdb(self.scsi.device.opcodes.MODE_SENSE_6.value)
         if dbd:
             cdb[1] |= 0x08
         cdb[2] |= (pc << 6) & 0xc0

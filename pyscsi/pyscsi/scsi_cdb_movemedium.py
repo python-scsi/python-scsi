@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
+from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
 
 #
@@ -46,7 +45,7 @@ class MoveMedium(SCSICommand):
 
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.MOVE_MEDIUM)
+        cdb = self.init_cdb(self.scsi.device.opcodes.MOVE_MEDIUM.value)
         cdb[2:4] = scsi_int_to_ba(xfer, 2)
         cdb[4:6] = scsi_int_to_ba(source, 2)
         cdb[6:8] = scsi_int_to_ba(dest, 2)

@@ -4,9 +4,11 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from mock_device import MockDevice
 
 
-class MockInquiryStandard(object):
+class MockInquiryStandard(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x25  # QUAL:1 TYPE:5
         datain[1] = 0x80  # RMB:1
@@ -26,7 +28,7 @@ class MockInquiryStandard(object):
         datain[56] = 0x09  # CLOCKING:2 QAS:0 IUS:1
 
 
-class MockLBP(object):
+class MockLBP(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
         datain[1] = 0xb2  # logical block provisioning
@@ -38,7 +40,7 @@ class MockLBP(object):
         datain[7] = 0x00  #
 
 
-class MockUSN(object):
+class MockUSN(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
         datain[1] = 0xb2  # unit serial number
@@ -47,7 +49,7 @@ class MockUSN(object):
         datain[4:8] = "ABCD"
 
 
-class MockDevId(object):
+class MockDevId(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
         datain[1] = 0x83  # device identifier
@@ -96,7 +98,7 @@ class MockDevId(object):
         datain[0:4] = scsi_int_to_ba(pos - 4, 4)
 
 
-class MockReferrals(object):
+class MockReferrals(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
         datain[1] = 0xb3  # referrals
@@ -106,7 +108,7 @@ class MockReferrals(object):
         datain[15] = 37
 
 
-class MockExtendedInquiry(object):
+class MockExtendedInquiry(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
         datain[1] = 0x86  # extended inquiry
@@ -126,7 +128,9 @@ class MockExtendedInquiry(object):
 
 
 def main():
-    s = SCSI(MockInquiryStandard())
+    dev = MockInquiryStandard()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry().result
     assert i['peripheral_qualifier'] == 1
     assert i['peripheral_device_type'] == 5
@@ -156,7 +160,9 @@ def main():
     assert i['product_identification'] == 'iiiiiiiijjjjjjjj'
     assert i['product_revision_level'] == 'revn'
 
-    s = SCSI(MockLBP())
+    dev = MockLBP()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0
@@ -169,13 +175,17 @@ def main():
     assert i['dp'] == 1
     assert i['provisioning_type'] == INQUIRY.PROVISIONING_TYPE.THIN_PROVISIONED
 
-    s = SCSI(MockUSN())
+    dev = MockUSN()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0
     assert i['unit_serial_number'] == "ABCD"
 
-    s = SCSI(MockDevId())
+    dev = MockDevId()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0
@@ -200,15 +210,18 @@ def main():
     assert dd[1]['designator']['ieee_company_id'] == 0x112233
     assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
 
-    s = SCSI(MockReferrals())
+    dev = MockReferrals()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.REFERRALS).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0
     assert i['user_data_segment_size'] == 23
     assert i['user_data_segment_multiplier'] == 37
 
-
-    s = SCSI(MockExtendedInquiry())
+    dev = MockExtendedInquiry()
+    dev.opcodes = sbc
+    s = SCSI(dev)
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.EXTENDED_INQUIRY_DATA).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0

@@ -88,27 +88,3 @@ class OpCode(object):
         :param value: a Enum object
         """
         self._serviceaction = value
-
-
-class OpCodeMapper(object):
-
-    def __init__(self, opcodes):
-        self._opcode = Enum(opcodes)
-
-    @property
-    def opcode(self):
-        """
-        getter method of the opcode property
-
-        :return: a Enum object
-        """
-        return self._opcode
-
-    @opcode.setter
-    def opcode(self, value):
-        """
-        setter method of the opcode property
-
-        :param value: a Enum object
-        """
-        self._opcode = value

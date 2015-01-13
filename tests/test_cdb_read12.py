@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.pyscsi.scsi_enum_command import OPCODE
+from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 
 
@@ -12,18 +12,20 @@ class MockRead12(object):
 
 
 def main():
-    s = SCSI(MockRead12())
+    dev = MockRead12()
+    dev.opcodes = sbc
+    s = SCSI(dev)
 
     r = s.read12(1024, 27)
     cdb = r.cdb
-    assert cdb[0] == OPCODE.READ_12
+    assert cdb[0] == s.device.opcodes.READ_12.value
     assert cdb[1] == 0
     assert scsi_ba_to_int(cdb[2:6]) == 1024
     assert scsi_ba_to_int(cdb[6:10]) == 27
     assert cdb[10] == 0
     assert cdb[11] == 0
     cdb = r.unmarshall_cdb(cdb)
-    assert cdb['opcode'] == OPCODE.READ_12
+    assert cdb['opcode'] == s.device.opcodes.READ_12.value
     assert cdb['rdprotect'] == 0
     assert cdb['dpo'] == 0
     assert cdb['fua'] == 0
@@ -34,14 +36,14 @@ def main():
 
     r = s.read12(1024, 27, rdprotect=2, dpo=1, fua=1, rarc=1, group=19)
     cdb = r.cdb
-    assert cdb[0] == OPCODE.READ_12
+    assert cdb[0] == s.device.opcodes.READ_12.value
     assert cdb[1] == 0x5c
     assert scsi_ba_to_int(cdb[2:6]) == 1024
     assert scsi_ba_to_int(cdb[6:10]) == 27
     assert cdb[10] == 0x13
     assert cdb[11] == 0
     cdb = r.unmarshall_cdb(cdb)
-    assert cdb['opcode'] == OPCODE.READ_12
+    assert cdb['opcode'] == s.device.opcodes.READ_12.value
     assert cdb['rdprotect'] == 2
     assert cdb['dpo'] == 1
     assert cdb['fua'] == 1

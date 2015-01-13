@@ -10,11 +10,11 @@ def main():
     _ssc = ssc
     _smc = smc
 
-    assert _spc.opcode.SET_DEVICE_IDENTIFIER.value == 0xa4
-    assert _sbc.opcode.READ_CAPACITY_16.value == 0x9e
-    assert _ssc.opcode.READ_ELEMENT_STATUS_ATTACHED.value == 0xb4
-    assert _smc.opcode.MAINTENANCE_IN.value == 0xa3
-    assert _smc.opcode.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION == 0x07
+    assert _spc.SET_DEVICE_IDENTIFIER.value == 0xa4
+    assert _sbc.READ_CAPACITY_16.value == 0x9e
+    assert _ssc.READ_ELEMENT_STATUS_ATTACHED.value == 0xb4
+    assert _smc.MAINTENANCE_IN.value == 0xa3
+    assert _smc.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION == 0x07
     
 if __name__ == "__main__":
     main()

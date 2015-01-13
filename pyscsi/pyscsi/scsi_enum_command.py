@@ -18,7 +18,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.utils.enum import Enum
-from pyscsi.pyscsi.scsi_opcode import OpCodeMapper, OpCode
+from pyscsi.pyscsi.scsi_opcode import OpCode
 
 sa_maintenance_in = {'REPORT_ASSIGNED_UNASSIGNED_P_EXTENT': 0x00,
                      'REPORT_COMPONENT_DEVICE': 0x01,
@@ -340,31 +340,7 @@ scsi_status = {'GOOD': 0x00,
 
 SCSI_STATUS = Enum(scsi_status)
 
-
-class SPC(OpCodeMapper):
-
-    def __init__(self):
-        OpCodeMapper.__init__(self, spc_opcodes)
-
-
-class SBC(OpCodeMapper):
-
-    def __init__(self):
-        OpCodeMapper.__init__(self, sbc_opcodes)
-
-
-class SSC(OpCodeMapper):
-
-    def __init__(self):
-        OpCodeMapper.__init__(self, ssc_opcodes)
-
-
-class SMC(OpCodeMapper):
-
-    def __init__(self):
-        OpCodeMapper.__init__(self, smc_opcodes)
-
-spc = SPC()
-sbc = SBC()
-ssc = SSC()
-smc = SMC()
+spc = Enum(spc_opcodes)
+sbc = Enum(sbc_opcodes)
+ssc = Enum(ssc_opcodes)
+smc = Enum(smc_opcodes)
