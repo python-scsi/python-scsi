@@ -17,7 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import scsi_enum_readelementstatus as readelementstatus_enums
 
 #
@@ -29,6 +29,15 @@ class ReadElementStatus(SCSICommand):
     """
     A class to hold information from a readelementstatus command
     """
+    _cdb_bits = {'opcode': [0xff, 0],
+                 'voltag': [0x10, 1],
+                 'element_type': [0x07, 1],
+                 'starting_element_address': [0xffff, 2],
+                 'num_elements': [0xffff, 4],
+                 'curdata': [0x02, 6],
+                 'dvcid': [0x01, 6],
+                 'alloc_len': [0xffffff, 7]
+    }
 
     def __init__(self, scsi, start, num, element_type=readelementstatus_enums.ELEMENT_TYPE.ALL,
                  voltag=0, curdata=1, dvcid=0, alloclen=16384):
@@ -52,19 +61,19 @@ class ReadElementStatus(SCSICommand):
     def build_cdb(self, start, num, element_type,
                   voltag, curdata, dvcid, alloclen):
         """
+        Build a ReadElementStatus CDB
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.READ_ELEMENT_STATUS.value)
-        if voltag:
-            cdb[1] |= 0x10
-        cdb[1] |= element_type & 0x0f
-        cdb[2:4] = scsi_int_to_ba(start, 2)
-        cdb[4:6] = scsi_int_to_ba(num, 2)
-        if curdata:
-            cdb[6] |= 0x02
-        if dvcid:
-            cdb[6] |= 0x01
-        cdb[7:10] = scsi_int_to_ba(alloclen, 3)
-        return cdb
+        cdb = {
+            'opcode': self.scsi.device.opcodes.READ_ELEMENT_STATUS.value,
+            'voltag': voltag,
+            'element_type': element_type,
+            'starting_element_address': start,
+            'num_elements': num,
+            'curdata': curdata,
+            'dvcid': dvcid,
+            'alloc_len': alloclen
+        }
+        return self.marshall_cdb(cdb)
 
     #
     # Unmarshall a SMC Storage Element Descriptor as per SMC 6.11.5
@@ -161,18 +170,20 @@ class ReadElementStatus(SCSICommand):
 
             _data = _data[8 + _bytes:]
 
-    def unmarshall_cdb(self, cdb):
+    @staticmethod
+    def unmarshall_cdb(cdb):
         """
-        method to unmarshall a byte array containing a cdb.
+        Unmarshall a ReadElementStatus cdb
         """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'voltag': [0x10, 1],
-                 'element_type': [0x07, 1],
-                 'starting_element_address': [0xffff, 2],
-                 'num_elements': [0xffff, 4],
-                 'curdata': [0x02, 6],
-                 'dvcid': [0x01, 6],
-                 'alloc_len': [0xffffff, 7], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+        result = {}
+        decode_bits(cdb, ReadElementStatus._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a ReadElementStatus cdb
+        """
+        result = bytearray(12)
+        encode_dict(cdb, ReadElementStatus._cdb_bits, result)
+        return result
