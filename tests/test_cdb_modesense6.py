@@ -4,6 +4,7 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi import scsi_enum_modesense6 as MODESENSE6
+from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6
 
 
 class MockModeSense6(object):
@@ -33,6 +34,9 @@ def main():
     assert cdb['sub_page_code'] == 0
     assert cdb['alloc_len'] == 96
 
+    d = ModeSense6.unmarshall_cdb(ModeSense6.marshall_cdb(cdb))
+    assert d == cdb
+
     m = s.modesense6(page_code=0, sub_page_code=3, dbd=1, pc=MODESENSE6.PC.DEFAULT, alloclen=90)
     cdb = m.cdb
     assert cdb[0] == s.device.opcodes.MODE_SENSE_6.value
@@ -48,6 +52,9 @@ def main():
     assert cdb['page_code'] == 0
     assert cdb['sub_page_code'] == 3
     assert cdb['alloc_len'] == 90
+
+    d = ModeSense6.unmarshall_cdb(ModeSense6.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()

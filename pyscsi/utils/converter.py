@@ -81,6 +81,8 @@ def encode_dict(data_dict, check_dict, result):
     encode a dict back into a bytearray
     """
     for key in data_dict.iterkeys():
+        if not key in check_dict:
+            continue
         value = data_dict[key]
         bitmask, bytepos = check_dict[key]
 
