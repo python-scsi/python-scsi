@@ -10,8 +10,8 @@ def main():
     _ssc = ssc
     _smc = smc
 
-    assert _spc.SET_DEVICE_IDENTIFIER.value == 0xa4
-    assert _sbc.READ_CAPACITY_16.value == 0x9e
+    assert _spc.SPC_OPCODE_A4.value == 0xa4
+    assert _sbc.SBC_OPCODE_9E.value == 0x9e
     assert _ssc.READ_ELEMENT_STATUS_ATTACHED.value == 0xb4
     assert _smc.MAINTENANCE_IN.value == 0xa3
     assert _smc.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION == 0x07
