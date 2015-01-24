@@ -3,6 +3,7 @@
 
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_enum_command import OPCODE
+from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 
 
 class MockReadCapacity10(object):
@@ -19,6 +20,9 @@ def main():
     assert cdb[1:10] == bytearray(9)
     cdb = r.unmarshall_cdb(cdb)
     assert cdb['opcode'] == OPCODE.READ_CAPACITY_10
+
+    d = ReadCapacity10.unmarshall_cdb(ReadCapacity10.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()

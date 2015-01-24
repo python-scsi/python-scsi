@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 
 
 class MockReadCapacity16(object):
@@ -29,6 +30,9 @@ def main():
     assert i['lbpme'] == 1
     assert i['lbprz'] == 1
     assert i['lowest_aligned_lba'] == 8193
+
+    d = ReadCapacity16.unmarshall_datain(ReadCapacity16.marshall_datain(i))
+    assert d == i
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 
 
 class MockReadCapacity10(object):
@@ -18,6 +19,9 @@ def main():
     i = s.readcapacity10().result
     assert i['returned_lba'] == 65536
     assert i['block_length'] == 4096
+
+    d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
+    assert d == i
 
 if __name__ == "__main__":
     main()
