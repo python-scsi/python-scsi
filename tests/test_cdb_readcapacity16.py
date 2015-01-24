@@ -4,6 +4,7 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import sbc
+from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 
 
 class MockReadCapacity16(object):
@@ -27,6 +28,9 @@ def main():
     assert cdb['opcode'] == s.device.opcodes.SBC_OPCODE_9E.value
     assert cdb['service_action'] == s.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16
     assert cdb['alloc_len'] == 37
+
+    d = ReadCapacity16.unmarshall_cdb(ReadCapacity16.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()
