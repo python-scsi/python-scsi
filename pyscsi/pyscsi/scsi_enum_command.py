@@ -322,6 +322,33 @@ opcodes = {'INQUIRY': 0x12,
            'WRITE_SAME_16': 0x93,
            }
 
+mmc_opcodes = {'BLANK': OpCode('BLANK', 0xa1, {}),
+               'CLOSE_TRACK_SESSION': OpCode('CLOSE_TRACK_SESSION', 0x5b, {}),
+               'FORMAT_UNIT': OpCode('FORMAT_UNIT', 0x04, {}),
+               'GET_CONFIGURATION': OpCode('GET_CONFIGURATION', 0x46, {}),
+               'GET_EVENT_STATUS_NOTIFICATION': OpCode('GET_EVENT_STATUS_NOTIFICATION', 0x4a, {}),
+               'GET_PERFORMANCE': OpCode('GET_PERFORMANCE', 0xac, {}),
+               'INQUIRY': OpCode('INQUIRY', 0x12, {}),
+               'LOAD_UNLOAD_MEDIUM': OpCode('LOAD_UNLOAD_MEDIUM', 0xa6, {}),
+               'MECHANISM_STATUS': OpCode('MECHANISM_STATUS', 0xbd, {}),
+               'MODE_SELECT_10': OpCode('MODE_SELECT_10', 0x55, {}),
+               'MODE_SENSE_10': OpCode('MODE_SENSE_10', 0xa5, {}),
+               'PREVENT_ALLOW_MEDIUM_REMOVAL': OpCode('PREVENT_ALLOW_MEDIUM_REMOVAL', 0x1e, {}),
+               'READ_10': OpCode('READ_10', 0x28, {}),
+               'READ_12': OpCode('READ_12', 0xa8, {}),
+               'READ_BUFFER': OpCode('READ_BUFFER', 0x3c, {}),
+               'READ_BUFFER_CAPACITY': OpCode('READ_BUFFER_CAPACITY', 0x5c, {}),
+               'READ_CAPACITY': OpCode('READ_CAPACITY', 0x25, {}),
+               'READ_CD': OpCode('READ_CD', 0xbe, {}),
+               'READ_CD_MSF': OpCode('READ_CD_MSF', 0xb9, {}),
+               'READ_DISC_INFORMATION': OpCode('READ_DISC_INFORMATION', 0x51, {}),
+               'READ_DISC_STRUCTURE': OpCode('READ_DISC_STRUCTURE', 0xad, {}),
+               'READ_FORMAT_CAPACITIES': OpCode('READ_FORMAT_CAPACITIES', 0x23, {}),
+               'READ_TOC_PMA_ATIP': OpCode('READ_TOC_PMA_ATIP', 0x43, {}),
+               'READ_TRACK_INFORMATION': OpCode('READ_TRACK_INFORMATION', 0x52, {}),
+               'REPAIR_TRACK': OpCode('REPAIR_TRACK', 0x58, {}),
+               }
+
 OPCODE = Enum(opcodes)
 
 service_action_ins = {'READ_CAPACITY_16': 0x10,
@@ -345,3 +372,4 @@ spc = Enum(spc_opcodes)
 sbc = Enum(sbc_opcodes)
 ssc = Enum(ssc_opcodes)
 smc = Enum(smc_opcodes)
+mmc = Enum(mmc_opcodes)

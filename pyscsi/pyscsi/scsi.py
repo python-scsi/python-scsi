@@ -33,7 +33,7 @@ from scsi_cdb_write12 import Write12
 from scsi_cdb_write16 import Write16
 from scsi_cdb_writesame10 import WriteSame10
 from scsi_cdb_writesame16 import WriteSame16
-from scsi_enum_command import spc, sbc, smc, ssc
+from scsi_enum_command import spc, sbc, smc, ssc, mmc
 
 
 class SCSI(object):
@@ -64,6 +64,8 @@ class SCSI(object):
             self.device.opcodes = spc
         elif dev_type in (0x08,):  # smc
             self.device.opcodes = smc
+        elif dev_type in (0x05,):  # mmc
+            self.device.opcodes = mmc
 
     @property
     def blocksize(self):
