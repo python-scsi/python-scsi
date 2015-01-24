@@ -75,3 +75,26 @@ def decode_bits(data, check_dict, result_dict):
             value >>= 1
         value &= bitmask
         result_dict.update({key: value})
+
+def encode_dict(data_dict, check_dict, result):
+    """
+    encode a dict back into a bytearray
+    """
+    for key in data_dict.iterkeys():
+        value = data_dict[key]
+        bitmask, bytepos = check_dict[key]
+
+        _num = 1
+        _bm = bitmask
+        while _bm > 0xff:
+            _bm >>= 8
+            _num += 1
+
+        _bm = bitmask
+        while not _bm & 0x01:
+            _bm >>= 1
+            value <<= 1
+
+        v = scsi_int_to_ba(value, _num)
+        for i in range(len(v)):
+            result[bytepos + i] ^= v[i]
