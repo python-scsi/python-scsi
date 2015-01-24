@@ -6,6 +6,7 @@ from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi.scsi_enum_getlbastatus import P_STATUS
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from mock_device import MockDevice
+from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 
 
 class MockGetLBAStatus(MockDevice):
@@ -43,6 +44,9 @@ def main():
     assert i['lbas'][1]['lba'] == 200000
     assert i['lbas'][1]['num_blocks'] == 9999
     assert i['lbas'][1]['p_status'] == P_STATUS.DEALLOCATED
+
+    d = GetLBAStatus.unmarshall_datain(GetLBAStatus.marshall_datain(i))
+    assert d == i
 
 if __name__ == "__main__":
     main()
