@@ -43,5 +43,5 @@ class TestUnitReady(SCSICommand):
 
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.TEST_UNIT_READY)
+        cdb = self.init_cdb(self.scsi.device.opcodes.TEST_UNIT_READY.value)
         return cdb

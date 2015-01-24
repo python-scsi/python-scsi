@@ -138,6 +138,7 @@ def inquiry_device_identification(s):
         for k, v in _d[idx]['designator'].iteritems():
             print '      %s: %s' % (k, v)
 
+
 def main():
     i = 1
     page_code = 0
