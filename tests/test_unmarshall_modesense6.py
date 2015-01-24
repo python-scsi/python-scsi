@@ -3,9 +3,10 @@
 
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi import scsi_enum_modesense6 as MODESENSE6
+from pyscsi.pyscsi.scsi_enum_command import spc
+from mock_device import MockDevice
 
-
-class MockModeSenseEAA(object):
+class MockModeSenseEAA(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 96  # mode data length
         datain[1] = 97  # medium type
@@ -25,7 +26,9 @@ class MockModeSenseEAA(object):
 
 
 def main():
-    s = SCSI(MockModeSenseEAA())
+    dev = MockModeSenseEAA()
+    dev.opcodes = spc
+    s = SCSI(dev)
 
     # SMC ElementAddressAssignment
     i = s.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT).result

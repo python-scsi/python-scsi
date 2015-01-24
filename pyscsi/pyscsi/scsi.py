@@ -1,20 +1,21 @@
 # coding: utf-8
 
-
-#      Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright:
+#  Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+#  Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
 #
-#	   This program is free software; you can redistribute it and/or modify
-#	   it under the terms of the GNU Lesser General Public License as published by
-#	   the Free Software Foundation; either version 2.1 of the License, or
-#	   (at your option) any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
 #
-#	   This program is distributed in the hope that it will be useful,
-#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#	   GNU Lesser General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
 #
-#	   You should have received a copy of the GNU Lesser General Public License
-#	   along with this program; if not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_cdb_getlbastatus import GetLBAStatus
 from scsi_cdb_inquiry import Inquiry
@@ -32,6 +33,7 @@ from scsi_cdb_write12 import Write12
 from scsi_cdb_write16 import Write16
 from scsi_cdb_writesame10 import WriteSame10
 from scsi_cdb_writesame16 import WriteSame16
+from scsi_enum_command import spc, sbc, smc, ssc, mmc
 
 
 class SCSI(object):
@@ -41,6 +43,29 @@ class SCSI(object):
     def __init__(self, dev):
         self.device = dev
         self._blocksize = 0
+        self.__init_opcode()
+
+    def __call__(self, dev):
+        self.device = dev
+        self.__init_opcode()
+
+    def __init_opcode(self):
+        """
+        Small helper method to terminate the type of
+        the scsi device and assigning a proper opcode
+        mapper.
+        """
+        dev_type = self.inquiry().result['peripheral_device_type']
+        if dev_type in (0x00, 0x04, 0x07, ):  # sbc
+            self.device.opcodes = sbc
+        elif dev_type in (0x01, 0x02, 0x09):  # ssc
+            self.device.opcodes = ssc
+        elif dev_type in (0x03,):  # spc
+            self.device.opcodes = spc
+        elif dev_type in (0x08,):  # smc
+            self.device.opcodes = smc
+        elif dev_type in (0x05,):  # mmc
+            self.device.opcodes = mmc
 
     @property
     def blocksize(self):
@@ -268,4 +293,3 @@ class SCSI(object):
         :return: a WriteSame10 instance
         """
         return WriteSame10(self, lba, nb, data, **kwargs)
-

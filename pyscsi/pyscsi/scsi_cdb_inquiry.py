@@ -57,7 +57,7 @@ class Inquiry(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = SCSICommand.init_cdb(OPCODE.INQUIRY)
+        cdb = self.init_cdb(self.scsi.device.opcodes.INQUIRY.value)
         if evpd:
             cdb[1] |= 0x01
             cdb[2] = page_code
@@ -144,14 +144,12 @@ class Inquiry(SCSICommand):
         return _d
 
     def unmarshall_designator_descriptor(self, data):
-        _bits = {
-            'protocol_identifier': [0xf0, 0],
-            'code_set': [0x0f, 0],
-            'piv': [0x80, 1],
-            'association': [0x30, 1],
-            'designator_type': [0x0f, 1],
-            'designator_length': [0xff, 3],
-            }
+        _bits = {'protocol_identifier': [0xf0, 0],
+                 'code_set': [0x0f, 0],
+                 'piv': [0x80, 1],
+                 'association': [0x30, 1],
+                 'designator_type': [0x0f, 1],
+                 'designator_length': [0xff, 3], }
         _d = {}
         decode_bits(data, _bits, _d)
         if _d['piv'] == 0 or (_d['association'] != 1 and _d['association'] != 2):

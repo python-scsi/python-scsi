@@ -24,14 +24,14 @@ try:
     import libiscsi
     _have_libiscsi = True
 except ImportError as e:
-    print 'could not import libiscsi -> %s ' % e.message
+    print('could not import libiscsi -> %s ' % e.message)
     _have_libiscsi = False
 
 try:
     import linux_sgio
     _have_linux_sgio = True
 except ImportError as e:
-    print 'could not import linux_sgio -> %s' % e.message
+    print('could not import linux_sgio -> %s' % e.message)
     _have_linux_sgio = False
 
 
@@ -48,6 +48,7 @@ class SCSIDevice(object):
         """
         self._is_libiscsi = False
         self._is_linux_sgio = False
+        self._opcodes = scsi_enum_command.spc
 
         if _have_libiscsi and device[:8] == 'iscsi://':
             self._iscsi = libiscsi.iscsi_create_context('iqn.2007-10.com.github:python-scsi')
@@ -116,3 +117,11 @@ class SCSIDevice(object):
     @isLinuxSGIO.setter
     def isLinuxSGIO(self, value):
         self._is_linux_sgio = value
+
+    @property
+    def opcodes(self):
+        return self._opcodes
+
+    @opcodes.setter
+    def opcodes(self, value):
+        self._opcodes = value

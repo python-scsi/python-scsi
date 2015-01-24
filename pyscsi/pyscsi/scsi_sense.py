@@ -762,7 +762,7 @@ class SCSICheckCondition(Exception):
         self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
 
-        print "Response code 0x%02x" % self.response_code
+        print("Response code 0x%02x" % self.response_code)
         if self.response_code == SENSE_FORMAT_CURRENT_FIXED:
             self.filemark = sense[2] & 0x80
             self.eom = sense[2] & 0x40

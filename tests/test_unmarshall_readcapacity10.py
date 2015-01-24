@@ -2,9 +2,11 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from mock_device import MockDevice
 
 
-class MockReadCapacity10(object):
+class MockReadCapacity10(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         # lba
         datain[0:4] = [0x00, 0x01, 0x00, 0x00]
@@ -13,7 +15,9 @@ class MockReadCapacity10(object):
 
 
 def main():
-    s = SCSI(MockReadCapacity10())
+    dev = MockReadCapacity10()
+    dev.opcodes = sbc
+    s = SCSI(dev)
 
     i = s.readcapacity10().result
     assert i['returned_lba'] == 65536

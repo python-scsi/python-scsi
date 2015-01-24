@@ -38,7 +38,7 @@ class Read12(SCSICommand):
         """
         Build a Read12 CDB
         """
-        cdb = SCSICommand.init_cdb(OPCODE.READ_12)
+        cdb = self.init_cdb(self.scsi.device.opcodes.READ_12.value)
         cdb[2:6] = scsi_int_to_ba(lba, 4)
         cdb[6:10] = scsi_int_to_ba(tl, 4)
         cdb[1] |= (rdprotect << 5) & 0xe0
