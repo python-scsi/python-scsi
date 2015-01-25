@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import scsi_enum_inquiry as inquiry_enums
 
@@ -215,12 +214,12 @@ class Inquiry(SCSICommand):
 
         if type == inquiry_enums.DESIGNATOR.EUI_64:
             if 'identifier_extension' in data:
-                return data['identifier_extension'] +            \
+                return data['identifier_extension'] + \
                     scsi_int_to_ba(data['ieee_company_id'], 3) + \
                     data['vendor_specific_extension_id']
             if 'directory_id' in data:
                 return scsi_int_to_ba(data['ieee_company_id'], 3) + \
-                    data['vendor_specific_extension_id'] +          \
+                    data['vendor_specific_extension_id'] + \
                     data['directory_id']
 
             return scsi_int_to_ba(data['ieee_company_id'], 3) + \
@@ -232,13 +231,13 @@ class Inquiry(SCSICommand):
             if data['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
                 encode_dict(data, Inquiry._naa_ieee_extended_bits, _r)
                 return _r[:8]
-            if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
+            if data['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
                 encode_dict(data, Inquiry._naa_locally_assigned_bits, _r)
                 return _r[:8]
-            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
+            if data['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
                 encode_dict(data, Inquiry._naa_ieee_registered_bits, _r)
                 return _r[:8]
-            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
+            if data['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
                 encode_dict(data, Inquiry._naa_ieee_registered_extended_bits, _r)
                 return _r[:16]
 
@@ -258,16 +257,15 @@ class Inquiry(SCSICommand):
             return _r
 
         if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
-                return data['md5_logical_identifier']
+            return data['md5_logical_identifier']
 
         if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
-                return ['scsi_name_string']
+            return ['scsi_name_string']
 
         if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
             _r = bytearray(8)
             encode_dict(data, Inquiry._pci_express_routing_id_bits, _r)
             return _r
-
 
     @staticmethod
     def marshall_designation_descriptor(data):
@@ -313,22 +311,22 @@ class Inquiry(SCSICommand):
                 decode_bits(data, Inquiry._naa_ieee_registered_extended_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
-                decode_bits(data, Inquiry._relative_port_bits, _d)
+            decode_bits(data, Inquiry._relative_port_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
-                decode_bits(data, Inquiry._target_portal_group_bits, _d)
+            decode_bits(data, Inquiry._target_portal_group_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
-                decode_bits(data, Inquiry._logical_unit_group_bits, _d)
+            decode_bits(data, Inquiry._logical_unit_group_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
-                _d['md5_logical_identifier'] = data[0:16]
+            _d['md5_logical_identifier'] = data[0:16]
 
         if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
-                _d['scsi_name_string'] = data
+            _d['scsi_name_string'] = data
 
         if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
-                decode_bits(data, Inquiry._pci_express_routing_id_bits, _d)
+            decode_bits(data, Inquiry._pci_express_routing_id_bits, _d)
 
         return _d
 
@@ -410,7 +408,7 @@ class Inquiry(SCSICommand):
         """
         Marshall the Inquiry datain.
         """
-        if not 'page_code' in  data:
+        if 'page_code' not in data:
             result = bytearray(96)
             encode_dict(data, Inquiry._datain_bits, result)
             encode_dict(data, Inquiry._standard_bits, result)
@@ -441,7 +439,6 @@ class Inquiry(SCSICommand):
 
         result[2:4] = scsi_int_to_ba(len(result) - 4, 2)
         return result
-
 
     @staticmethod
     def unmarshall_cdb(cdb):
