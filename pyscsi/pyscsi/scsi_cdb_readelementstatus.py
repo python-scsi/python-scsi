@@ -16,7 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
+from scsi_enum_command import smc_opcodes
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import scsi_enum_readelementstatus as readelementstatus_enums
 
@@ -167,7 +167,50 @@ class ReadElementStatus(SCSICommand):
 
         result.update({'element_status_pages': _esd})
         return result
+    @staticmethod
+    def marshall_datain(data):
+        """
+        Marshall the ReadCapacity16 datain.
+        """
+        result = bytearray(8)
+        encode_dict(data, ReadElementStatus._datain_bits, result)
 
+        for _esp in data['element_status_pages']:
+            _r = bytearray(8)
+            encode_dict(_esp, ReadElementStatus._element_status_page_bits, _r)
+
+            _edl = 12 + 4
+            if _esp['pvoltag']:
+                _edl += 36
+            if _esp['avoltag']:
+                _edl += 36
+
+            for _ed in _esp['element_descriptors']:
+                _rr = bytearray(12)
+                encode_dict(_ed, ReadElementStatus._element_status_descriptor_bits, _rr)
+                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.DATA_TRANSFER:
+                    encode_dict(_ed, ReadElementStatus._data_transfer_descriptor_bits, _rr)
+                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.STORAGE:
+                    encode_dict(_ed, ReadElementStatus._storage_descriptor_bits, _rr)
+                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.IMPORT_EXPORT:
+                    encode_dict(_ed, ReadElementStatus._import_export_descriptor_bits, _rr)
+
+                _r += _rr
+                if _esp['pvoltag']:
+                    _rr = bytearray(36)
+                    _r += _rr
+                if _esp['avoltag']:
+                    _rr = bytearray(36)
+                    _r += _rr
+                _rr = bytearray(4)
+                _r += _rr
+
+            _r[2:4] = scsi_int_to_ba(_edl, 2)
+            _r[5:8] = scsi_int_to_ba(len(_r) - 8, 3)
+            result += _r
+
+        result[5:8] = scsi_int_to_ba(len(result) - 8, 3)
+        return result
 
     @staticmethod
     def unmarshall_cdb(cdb):
