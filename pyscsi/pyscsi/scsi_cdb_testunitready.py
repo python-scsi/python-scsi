@@ -17,6 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI TestUnitReady command
@@ -27,6 +28,10 @@ class TestUnitReady(SCSICommand):
     """
     A class to hold information from a testunitready command to a scsi device
     """
+    _cdb_bits = {
+        'opcode': [0xff, 0]
+    }
+
     def __init__(self, scsi):
         """
         initialize a new instance
@@ -40,8 +45,26 @@ class TestUnitReady(SCSICommand):
     def build_cdb(self):
         """
         Build a TestUnitReady CDB
-
-        :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.TEST_UNIT_READY.value)
-        return cdb
+        cdb = {
+            'opcode': self.scsi.device.opcodes.TEST_UNIT_READY.value,
+        }
+        return self.marshall_cdb(cdb)
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a TestUnitReady cdb
+        """
+        result = {}
+        decode_bits(cdb, TestUnitReady._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a TestUnitReady cdb
+        """
+        result = bytearray(6)
+        encode_dict(cdb, TestUnitReady._cdb_bits, result)
+        return result

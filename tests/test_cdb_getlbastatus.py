@@ -5,6 +5,7 @@ from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from mock_device import MockDevice
+from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 
 
 class MockGetLBAStatus(MockDevice):
@@ -28,6 +29,9 @@ def main():
     assert cdb['service_action'] == s.device.opcodes.SBC_OPCODE_9E.serviceaction.GET_LBA_STATUS
     assert cdb['lba'] == 19938722
     assert cdb['alloc_len'] == 1112527
+
+    d = GetLBAStatus.unmarshall_cdb(GetLBAStatus.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()

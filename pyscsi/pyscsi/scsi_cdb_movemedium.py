@@ -16,7 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
 
 #
 # SCSI MoveMedium command and definitions
@@ -27,6 +27,12 @@ class MoveMedium(SCSICommand):
     """
     A class to hold information from a MoveMedium command to a scsi device
     """
+    _cdb_bits = {'opcode': [0xff, 0],
+                 'medium_transport_address': [0xffff, 2],
+                 'source_address': [0xffff, 4],
+                 'destination_address': [0xffff, 6],
+                 'invert': [0x01, 10]
+    }
 
     def __init__(self, scsi, xfer, source, dest, invert=0):
         """
@@ -45,23 +51,29 @@ class MoveMedium(SCSICommand):
 
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.MOVE_MEDIUM.value)
-        cdb[2:4] = scsi_int_to_ba(xfer, 2)
-        cdb[4:6] = scsi_int_to_ba(source, 2)
-        cdb[6:8] = scsi_int_to_ba(dest, 2)
-        if invert:
-            cdb[10] |= 0x01
-        return cdb
+        cdb = {
+            'opcode': self.scsi.device.opcodes.MOVE_MEDIUM.value,
+            'medium_transport_address': xfer,
+            'source_address': source,
+            'destination_address': dest,
+            'invert': invert
+        }
+        return self.marshall_cdb(cdb)
 
-    def unmarshall_cdb(self, cdb):
+    @staticmethod
+    def unmarshall_cdb(cdb):
         """
-        method to unmarshall a byte array containing a cdb.
+        Unmarshall a MoveMedium cdb
         """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'medium_transport_address': [0xffff, 2],
-                 'source_address': [0xffff, 4],
-                 'destination_address': [0xffff, 6],
-                 'invert': [0x01, 10], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+        result = {}
+        decode_bits(cdb, MoveMedium._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a MoveMedium cdb
+        """
+        result = bytearray(12)
+        encode_dict(cdb, MoveMedium._cdb_bits, result)
+        return result

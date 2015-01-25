@@ -4,6 +4,7 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
+from pyscsi.pyscsi.scsi_cdb_writesame16 import WriteSame16
 
 
 class MockWriteSame16(object):
@@ -36,6 +37,9 @@ def main():
     assert cdb['group'] == 0
     assert cdb['nb'] == 27
 
+    d = WriteSame16.unmarshall_cdb(WriteSame16.marshall_cdb(cdb))
+    assert d == cdb
+
     w = s.writesame16(65536, 27, data, wrprotect=4, anchor=1, group=19)
     cdb = w.cdb
     assert cdb[0] == s.device.opcodes.WRITE_SAME_16.value
@@ -54,6 +58,9 @@ def main():
     assert cdb['group'] == 19
     assert cdb['nb'] == 27
 
+    d = WriteSame16.unmarshall_cdb(WriteSame16.marshall_cdb(cdb))
+    assert d == cdb
+
     w = s.writesame16(65536, 27, data, wrprotect=4, unmap=1, ndob=1)
     cdb = w.cdb
     assert cdb[0] == s.device.opcodes.WRITE_SAME_16.value
@@ -71,6 +78,9 @@ def main():
     assert cdb['lba'] == 65536
     assert cdb['group'] == 0
     assert cdb['nb'] == 27
+
+    d = WriteSame16.unmarshall_cdb(WriteSame16.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()
