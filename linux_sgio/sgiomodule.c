@@ -116,7 +116,7 @@ static PyObject *SGIOError;
  * Static functions:
  */
 
-static PyObject *sgio_open( PyObject *self, PyObject *args )
+static PyObject *linux_sgio_open( PyObject *self, PyObject *args )
   /* ------------------------------------------------------------------------ **
    * Open a SCSI Generic I/O (SGIO) device.
    *
@@ -176,7 +176,7 @@ static PyObject *sgio_open( PyObject *self, PyObject *args )
   } /* sgio_open */
 
 
-static PyObject *sgio_execute( PyObject *self, PyObject *args )
+static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
   /* ------------------------------------------------------------------------ **
    * Send a SCSI command to the target.
    *
@@ -265,7 +265,7 @@ static PyObject *sgio_execute( PyObject *self, PyObject *args )
   } /* sgio_execute */
 
 
-static PyObject *sgio_close( PyObject *self, PyObject *args )
+static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
   /* ------------------------------------------------------------------------ **
    * Close a previously opened SGIO device.
    *
@@ -300,7 +300,7 @@ static PyObject *sgio_close( PyObject *self, PyObject *args )
   } /* sgio_close */
 
 
-PyMODINIT_FUNC initsgio( void )
+PyMODINIT_FUNC initlinux_sgio( void )
   /* ------------------------------------------------------------------------ **
    * Module initialization.
    * ------------------------------------------------------------------------ **
@@ -309,20 +309,20 @@ PyMODINIT_FUNC initsgio( void )
   PyObject          *module;
   static PyMethodDef SGIOMethods[] =
     {
-      { "open",    sgio_open,    METH_VARARGS, "Open a SCSI device."  },
-      { "execute", sgio_execute, METH_VARARGS, "Execute a SCSI CDB."  },
-      { "close",   sgio_close,   METH_VARARGS, "Close a SCSI device." },
+      { "open",    linux_sgio_open,    METH_VARARGS, "Open a SCSI device."  },
+      { "execute", linux_sgio_execute, METH_VARARGS, "Execute a SCSI CDB."  },
+      { "close",   linux_sgio_close,   METH_VARARGS, "Close a SCSI device." },
       { NULL, NULL, 0, NULL }
     };
 
   /* Attempt to initialize the module.  If that fails, just give up.  */
-  if( NULL == (module = Py_InitModule( "sgio", SGIOMethods )) )
+  if( NULL == (module = Py_InitModule( "linux_sgio", SGIOMethods )) )
     return;
 
   /* Module initialization succeeded, so we're good.
    *  Add our personalized SGIOError exception class to the Python world.
    */
-  SGIOError = PyErr_NewException( "sgio.error", NULL, NULL );
+  SGIOError = PyErr_NewException( "linux_sgio.error", NULL, NULL );
   Py_INCREF( SGIOError );
   PyModule_AddObject( module, "error", SGIOError );
   } /* initsgio */
