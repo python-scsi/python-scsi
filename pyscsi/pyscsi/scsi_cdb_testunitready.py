@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
 from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
@@ -35,7 +34,6 @@ class TestUnitReady(SCSICommand):
     def __init__(self, scsi):
         """
         initialize a new instance
-
         :param scsi: a SCSI instance
         """
         SCSICommand.__init__(self, scsi, 0, 0)
