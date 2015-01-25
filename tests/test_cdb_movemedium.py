@@ -5,6 +5,7 @@ from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_ba_to_int
 from mock_device import MockDevice
+from pyscsi.pyscsi.scsi_cdb_movemedium import MoveMedium
 
 
 class MockMoveMedium(MockDevice):
@@ -33,6 +34,8 @@ def main():
     assert cdb['destination_address'] == 64
     assert cdb['invert'] == 1
 
+    d = MoveMedium.unmarshall_cdb(MoveMedium.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()

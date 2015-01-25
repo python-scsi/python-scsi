@@ -17,7 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
-from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 
 #
 # SCSI GetLBAStatus command and definitions
@@ -28,6 +28,14 @@ class GetLBAStatus(SCSICommand):
     """
     A class to hold information from a GetLBAStatus command to a scsi device
     """
+    _cdb_bits = {'opcode': [0xff, 0],
+                 'service_action': [0x1f, 1],
+                 'lba': [0xffffffffffffffff, 2],
+                 'alloc_len': [0xffffffff, 10], }
+    _datain_bits = {'lba': [0xffffffffffffffff, 0],
+                    'num_blocks': [0xffffffff, 8],
+                    'p_status': [0x0f, 12], }
+
 
     def __init__(self, scsi, lba, alloclen=16384):
         """
@@ -48,38 +56,68 @@ class GetLBAStatus(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.SBC_OPCODE_9E.value)
-        cdb[1] = self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.GET_LBA_STATUS
-        cdb[2:10] = scsi_int_to_ba(lba, 8)
-        cdb[10:14] = scsi_int_to_ba(alloclen, 4)
-        return cdb
-
-    def unmarshall_cdb(self, cdb):
-        """
-        method to unmarshall a byte array containing a cdb.
-        """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'service_action': [0x1f, 1],
-                 'lba': [0xffffffffffffffff, 2],
-                 'alloc_len': [0xffffffff, 10], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+        cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
+               'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.GET_LBA_STATUS,
+               'lba': lba,
+               'alloc_len': alloclen
+        }
+        return self.marshall_cdb(cdb)
 
     def unmarshall(self):
         """
-        Unmarshall the ReadCapacity16 data.
+        Unmarshall the GetLBAStatus data.
         """
-        _bits = {'lba': [0xffffffffffffffff, 0],
-                 'num_blocks': [0xffffffff, 8],
-                 'p_status': [0x0f, 12], }
+        self.result = self.unmarshall_datain(self.datain)
 
-        _data = self.datain[8:scsi_ba_to_int(self.datain[:4]) + 4]
+    @staticmethod
+    def unmarshall_datain(data):
+        """
+        Unmarshall the ReadCapacity16 datain.
+        """
+        result = {}
+        _data = data[8:scsi_ba_to_int(data[:4]) + 4]
         _lbas = []
         while len(_data):
             _r = {}
-            decode_bits(_data[:16], _bits, _r)
+            decode_bits(_data[:16], GetLBAStatus._datain_bits, _r)
             _lbas.append(_r)
             _data = _data[16:]
 
-        self.result.update({'lbas': _lbas})
+        result.update({'lbas': _lbas})
+        return result
+
+    @staticmethod
+    def marshall_datain(data):
+        """
+        Marshall the ReadCapacity16 datain.
+        """
+        result = bytearray(8)
+        if not 'lbas' in data:
+            result[:4] = scsi_int_to_ba(len(result) - 4, 4)
+            return result
+
+        for l in data['lbas']:
+            _r = bytearray(16)
+            encode_dict(l, GetLBAStatus._datain_bits, _r)
+            result += _r
+
+        result[:4] = scsi_int_to_ba(len(result) - 4, 4)
+        return result
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a GetLBAStatus cdb
+        """
+        result = {}
+        decode_bits(cdb, GetLBAStatus._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a GetLBAStatus cdb
+        """
+        result = bytearray(16)
+        encode_dict(cdb, GetLBAStatus._cdb_bits, result)
+        return result

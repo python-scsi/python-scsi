@@ -5,6 +5,7 @@ from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
+from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 
 
 class MockReadElementStatus(object):
@@ -35,6 +36,9 @@ def main():
     assert cdb['curdata'] == 1
     assert cdb['dvcid'] == 1
     assert cdb['alloc_len'] == 16384
+
+    d = ReadElementStatus.unmarshall_cdb(ReadElementStatus.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()

@@ -17,7 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI ReadCapacity10 command and definitions
@@ -28,6 +28,9 @@ class ReadCapacity10(SCSICommand):
     """
     A class to hold information from a ReadCapacity(10) command to a scsi device
     """
+    _cdb_bits = {'opcode': [0xff, 0] }
+    _datain_bits = {'returned_lba': [0xffffffff, 0],
+                    'block_length': [0xffffffff, 4], }
 
     def __init__(self, scsi, alloclen=8):
         """
@@ -47,29 +50,47 @@ class ReadCapacity10(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.READ_CAPACITY_10.value)
-        return cdb
+        cdb = {'opcode': self.scsi.device.opcodes.READ_CAPACITY_10.value }
+        return self.marshall_cdb(cdb)
 
     def unmarshall(self):
         """
         Unmarshall the ReadCapacity10 data.
         """
-        _bits = {'returned_lba': [0xffffffff, 0],
-                 'block_length': [0xffffffff, 4], }
-        decode_bits(self.datain, _bits, self.result)
+        self.result = self.unmarshall_datain(self.datain)
 
-    def unmarshall_cdb(self, cdb):
+    @staticmethod
+    def unmarshall_datain(data):
         """
-        method to unmarshall a byte array containing a cdb.
+        Unmarshall the ReadCapacity10 datain.
         """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'rdprotect': [0xe0, 1],
-                 'dpo': [0x10, 1],
-                 'fua': [0x08, 1],
-                 'rarc': [0x04, 1],
-                 'lba': [0xffffffffffffffff, 2],
-                 'group': [0x1f, 14],
-                 'tl': [0xffffffff, 10], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+        result = {}
+        decode_bits(data, ReadCapacity10._datain_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_datain(data):
+        """
+        Marshall the ReadCapacity10 datain.
+        """
+        result = bytearray(8)
+        encode_dict(data, ReadCapacity10._datain_bits, result)
+        return result
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a ReadCapacity10 cdb
+        """
+        result = {}
+        decode_bits(cdb, ReadCapacity10._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a ReadCapacity10 cdb
+        """
+        result = bytearray(10)
+        encode_dict(cdb, ReadCapacity10._cdb_bits, result)
+        return result

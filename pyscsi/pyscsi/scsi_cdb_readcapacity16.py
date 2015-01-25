@@ -17,7 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
-from pyscsi.utils.converter import scsi_int_to_ba, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
 
 #
 # SCSI ReadCapacity16 command and definitions
@@ -28,6 +28,18 @@ class ReadCapacity16(SCSICommand):
     """
     A class to hold information from a ReadCapacity(16) command to a scsi device
     """
+    _cdb_bits = {'opcode': [0xff, 0],
+                 'service_action': [0x1f, 1],
+                 'alloc_len': [0xffffffff, 10], }
+    _datain_bits = {'returned_lba': [0xffffffffffffffff, 0],
+                    'block_length': [0xffffffff, 8],
+                    'p_type': [0x0e, 12],
+                    'prot_en': [0x01, 12],
+                    'p_i_exponent': [0xf0, 13],
+                    'lbppbe': [0x0f, 13],
+                    'lbpme': [0x80, 14],
+                    'lbprz': [0x40, 14],
+                    'lowest_aligned_lba': [0x3fff, 14], }
 
     def __init__(self, scsi, alloclen=32):
         """
@@ -47,33 +59,50 @@ class ReadCapacity16(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.SBC_OPCODE_9E.value)
-        cdb[1] = self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16
-        cdb[10:14] = scsi_int_to_ba(alloclen, 4)
-        return cdb
-
-    def unmarshall_cdb(self, cdb):
-        """
-        method to unmarshall a byte array containing a cdb.
-        """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'service_action': [0x1f, 1],
-                 'alloc_len': [0xffffffff, 10], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+        cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
+               'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16,
+               'alloc_len': alloclen
+        }
+        return self.marshall_cdb(cdb)
 
     def unmarshall(self):
         """
         Unmarshall the ReadCapacity16 data.
         """
-        _bits = {'returned_lba': [0xffffffffffffffff, 0],
-                 'block_length': [0xffffffff, 8],
-                 'p_type': [0x0e, 12],
-                 'prot_en': [0x01, 12],
-                 'p_i_exponent': [0xf0, 13],
-                 'lbppbe': [0x0f, 13],
-                 'lbpme': [0x80, 14],
-                 'lbprz': [0x40, 14],
-                 'lowest_aligned_lba': [0x3fff, 14], }
-        decode_bits(self.datain, _bits, self.result)
+        self.result = self.unmarshall_datain(self.datain)
+
+    @staticmethod
+    def unmarshall_datain(data):
+        """
+        Unmarshall the ReadCapacity16 datain.
+        """
+        result = {}
+        decode_bits(data, ReadCapacity16._datain_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_datain(data):
+        """
+        Marshall the ReadCapacity16 datain.
+        """
+        result = bytearray(32)
+        encode_dict(data, ReadCapacity16._datain_bits, result)
+        return result
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a ReadCapacity16 cdb
+        """
+        result = {}
+        decode_bits(cdb, ReadCapacity16._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a ReadCapacity16 cdb
+        """
+        result = bytearray(16)
+        encode_dict(cdb, ReadCapacity16._cdb_bits, result)
+        return result

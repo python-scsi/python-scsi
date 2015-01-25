@@ -4,6 +4,7 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
+from pyscsi.pyscsi.scsi_cdb_read10 import Read10
 
 
 class MockRead10(object):
@@ -34,6 +35,9 @@ def main():
     assert cdb['group'] == 0
     assert cdb['tl'] == 27
 
+    d = Read10.unmarshall_cdb(Read10.marshall_cdb(cdb))
+    assert d == cdb
+
     r = s.read10(1024, 27, rdprotect=2, dpo=1, fua=1, rarc=1, group=19)
     cdb = r.cdb
     assert cdb[0] == s.device.opcodes.READ_10.value
@@ -51,6 +55,9 @@ def main():
     assert cdb['lba'] == 1024
     assert cdb['group'] == 19
     assert cdb['tl'] == 27
+
+    d = Read10.unmarshall_cdb(Read10.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()
