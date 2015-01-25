@@ -2,10 +2,11 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.utils.converter import scsi_int_to_ba
-from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
-from pyscsi.pyscsi.scsi_enum_command import sbc
 from mock_device import MockDevice
+from pyscsi.utils.converter import scsi_int_to_ba
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
 
 
 class MockInquiryStandard(MockDevice):
@@ -43,7 +44,7 @@ class MockLBP(MockDevice):
 class MockUSN(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 0x00  # QUAL:0 TYPE:0
-        datain[1] = 0xb2  # unit serial number
+        datain[1] = 0x80  # unit serial number
         datain[2] = 0x00  #
         datain[3] = 0x04  # page length == 4
         datain[4:8] = "ABCD"
@@ -71,7 +72,7 @@ class MockDevId(MockDevice):
         dd += t10
         dd[0] = 0x52 # iSCSI, ASCII
         dd[1] = 0xa1 # AssociatedWithTargetDevice, T10_VENDOR_ID
-        dd[2:4] = scsi_int_to_ba(len(t10), 2)
+        dd[3] = len(t10)
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
 
@@ -95,7 +96,7 @@ class MockDevId(MockDevice):
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
 
-        datain[0:4] = scsi_int_to_ba(pos - 4, 4)
+        datain[2:4] = scsi_int_to_ba(pos - 4, 2)
 
 
 class MockReferrals(MockDevice):
@@ -160,6 +161,9 @@ def main():
     assert i['product_identification'] == 'iiiiiiiijjjjjjjj'
     assert i['product_revision_level'] == 'revn'
 
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i))
+    assert d == i
+
     dev = MockLBP()
     dev.opcodes = sbc
     s = SCSI(dev)
@@ -175,6 +179,9 @@ def main():
     assert i['dp'] == 1
     assert i['provisioning_type'] == INQUIRY.PROVISIONING_TYPE.THIN_PROVISIONED
 
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
+    assert d == i
+
     dev = MockUSN()
     dev.opcodes = sbc
     s = SCSI(dev)
@@ -183,32 +190,8 @@ def main():
     assert i['peripheral_qualifier'] == 0
     assert i['unit_serial_number'] == "ABCD"
 
-    dev = MockDevId()
-    dev.opcodes = sbc
-    s = SCSI(dev)
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION).result
-    assert i['peripheral_qualifier'] == 0
-    assert i['peripheral_qualifier'] == 0
-    dd = i['designator_descriptors']
-    assert len(dd) == 2
-    # T10 designation descriptor
-    assert dd[0]['association'] == 2
-    assert dd[0]['code_set'] == 2
-    assert dd[0]['designator_length'] == 8
-    assert dd[0]['designator_type'] == 1
-    assert dd[0]['piv'] == 1
-    assert dd[0]['protocol_identifier'] == 5
-    assert dd[0]['designator']['t10_vendor_id'] == 'Test T10'
-    assert dd[0]['designator']['vendor_specific_id'] == ''
-    # EUI-64 designation descriptor
-    assert dd[1]['association'] == 2
-    assert dd[1]['code_set'] == 1
-    assert dd[1]['designator_length'] == 8
-    assert dd[1]['designator_type'] == 2
-    assert dd[1]['piv'] == 0
-    assert not hasattr(dd[1], 'protocol_identifier')
-    assert dd[1]['designator']['ieee_company_id'] == 0x112233
-    assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
+    assert d == i
 
     dev = MockReferrals()
     dev.opcodes = sbc
@@ -218,6 +201,9 @@ def main():
     assert i['peripheral_qualifier'] == 0
     assert i['user_data_segment_size'] == 23
     assert i['user_data_segment_multiplier'] == 37
+
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
+    assert d == i
 
     dev = MockExtendedInquiry()
     dev.opcodes = sbc
@@ -250,6 +236,39 @@ def main():
     assert i['hra_sup'] == 1
     assert i['vsa_sup'] == 1
     assert i['maximum_supported_sense_data_length'] == 5
+
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
+    assert d == i
+
+    dev = MockDevId()
+    dev.opcodes = sbc
+    s = SCSI(dev)
+    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION).result
+    assert i['peripheral_qualifier'] == 0
+    assert i['peripheral_qualifier'] == 0
+    dd = i['designator_descriptors']
+    assert len(dd) == 2
+    # T10 designation descriptor
+    assert dd[0]['association'] == 2
+    assert dd[0]['code_set'] == 2
+    assert dd[0]['designator_length'] == 8
+    assert dd[0]['designator_type'] == 1
+    assert dd[0]['piv'] == 1
+    assert dd[0]['protocol_identifier'] == 5
+    assert dd[0]['designator']['t10_vendor_id'] == 'Test T10'
+    assert dd[0]['designator']['vendor_specific_id'] == ''
+    # EUI-64 designation descriptor
+    assert dd[1]['association'] == 2
+    assert dd[1]['code_set'] == 1
+    assert dd[1]['designator_length'] == 8
+    assert dd[1]['designator_type'] == 2
+    assert dd[1]['piv'] == 0
+    assert not hasattr(dd[1], 'protocol_identifier')
+    assert dd[1]['designator']['ieee_company_id'] == 0x112233
+    assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
+
+    d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
+    assert d == i
 
 if __name__ == "__main__":
     main()

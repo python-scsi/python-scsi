@@ -17,7 +17,7 @@
 
 from scsi_command import SCSICommand
 from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, decode_bits
+from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import scsi_enum_inquiry as inquiry_enums
 
 #
@@ -29,6 +29,147 @@ class Inquiry(SCSICommand):
     """
     A class to hold information from a inquiry command to a scsi device
     """
+    _cdb_bits = {
+        'opcode': [0xff, 0],
+        'evpd': [0x01, 1],
+        'page_code': [0xff, 2],
+        'alloc_len': [0xffff, 3]
+    }
+    _datain_bits = {
+        'peripheral_qualifier': [0xe0, 0],
+        'peripheral_device_type': [0x1f, 0]
+    }
+    _standard_bits = {
+        'rmb': [0x80, 1],
+        'version': [0xff, 2],
+        'normaca': [0x20, 3],
+        'hisup': [0x10, 3],
+        'response_data_format': [0x0f, 3],
+        'additional_length': [0xff, 4],
+        'sccs': [0x80, 5],
+        'acc': [0x40, 5],
+        'tpgs': [0x30, 5],
+        '3pc': [0x08, 5],
+        'protect': [0x01, 5],
+        'encserv': [0x40, 6],
+        'vs': [0x20, 6],
+        'multip': [0x10, 6],
+        'addr16': [0x01, 6],
+        'wbus16': [0x20, 7],
+        'sync': [0x10, 7],
+        'cmdque': [0x02, 7],
+        'vs2': [0x01, 7],
+        'clocking': [0x0c, 56],
+        'qas': [0x02, 56],
+        'ius': [0x01, 56]
+    }
+    _pagecode_bits = {
+        'page_code': [0xff, 1],
+    }
+    _block_limits_bits = {
+        'wsnz': [0x01, 4],
+        'ugavalid': [0x80, 32],
+        'max_caw_len': [0xff, 5],
+        'opt_xfer_len_gran': [0xffff, 6],
+        'max_xfer_len': [0xffffffff, 8],
+        'opt_xfer_len': [0xffffffff, 12],
+        'max_pfetch_len': [0xffffffff, 16],
+        'max_unmap_lba_count': [0xffffffff, 20],
+        'max_unmap_bd_count': [0xffffffff, 24],
+        'opt_unmap_gran': [0xffffffff, 28],
+        'unmap_gran_alignment': [0xffffffff, 32],
+        'max_ws_len': [0xffffffff, 36]
+    }
+    _block_dev_char_bits = {
+        'medium_rotation_rate': [0xffff, 4],
+        'product_type': [0xff, 6],
+        'wabereq': [0xc0, 7],
+        'wacereq': [0x30, 7],
+        'nominal_form_factor': [0x0f, 7],
+        'fuab': [0x02, 8],
+        'vbuls': [0x01, 8]
+    }
+    _logical_block_provisioning_bits = {
+        'threshold_exponent': [0xff, 4],
+        'lbpu': [0x80, 5],
+        'lpbws': [0x40, 5],
+        'lbpws10': [0x20, 5],
+        'lbprz': [0x04, 5],
+        'anc_sup': [0x02, 5],
+        'dp': [0x01, 5],
+        'provisioning_type': [0x07, 6]
+    }
+    _referrals_bits = {
+        'user_data_segment_size': [0xffffffff, 8],
+        'user_data_segment_multiplier': [0xffffffff, 12]
+    }
+    _extended_bits = {
+        'activate_microcode': [0xc0, 4],
+        'spt': [0x38, 4],
+        'grd_chk': [0x04, 4],
+        'app_chk': [0x02, 4],
+        'ref_chk': [0x01, 4],
+        'uask_sup': [0x20, 5],
+        'group_sup': [0x10, 5],
+        'prior_sup': [0x08, 5],
+        'headsup': [0x04, 5],
+        'ordsup': [0x02, 5],
+        'simpsup': [0x01, 5],
+        'wu_sup': [0x08, 6],
+        'crd_sup': [0x04, 6],
+        'nv_sup': [0x02, 6],
+        'v_sup': [0x01, 6],
+        'p_i_i_sup': [0x10, 7],
+        'luiclr': [0x01, 7],
+        'r_sup': [0x10, 8],
+        'cbcs': [0x01, 8],
+        'multi_it_nexus_microcode_download': [0x0f, 9],
+        'extended_self_test_completion_minutes': [0xffff, 10],
+        'poa_sup': [0x80, 12],
+        'hra_sup': [0x40, 12],
+        'vsa_sup': [0x20, 12],
+        'maximum_supported_sense_data_length': [0xff, 13]
+    }
+    _designator_bits = {
+        'protocol_identifier': [0xf0, 0],
+        'code_set': [0x0f, 0],
+        'piv': [0x80, 1],
+        'association': [0x30, 1],
+        'designator_type': [0x0f, 1],
+        'designator_length': [0xff, 3]
+    }
+    _naa_type_bits = {
+        'naa': [0xf0, 0]
+    }
+    _naa_ieee_extended_bits = {
+        'vendor_specific_identifier_a': [0x0fff, 0],
+        'ieee_company_id': [0xffffff, 2],
+        'vendor_specific_identifier_b': [0xffffff, 5]
+    }
+    _naa_locally_assigned_bits = {
+        'locally_administered_value': [0x0fffffffffffffff, 0]
+    }
+    _naa_ieee_registered_bits = {
+        'ieee_company_id': [0x0ffffff0, 0],
+        'vendor_specific_identifier': [0x0fffffffff, 3]
+    }
+    _naa_ieee_registered_extended_bits = {
+        'ieee_company_id': [0x0ffffff0, 0],
+        'vendor_specific_identifier': [0x0fffffffff, 3],
+        'vendor_specific_identifier_extension': [0xffffffffffffffff, 8]
+    }
+    _relative_port_bits = {
+        'relative_port': [0xffff, 2]
+    }
+    _target_portal_group_bits = {
+        'target_portal_group': [0xffff, 2]
+    }
+    _logical_unit_group_bits = {
+        'logical_unit_group': [0xffff, 2]
+    }
+    _pci_express_routing_id_bits = {
+        'pci_express_routing_id': [0xffff, 0],
+    }
 
     def __init__(self, scsi, evpd=0, page_code=0, alloclen=96):
         """
@@ -41,8 +182,7 @@ class Inquiry(SCSICommand):
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
         self._evpd = evpd
-        self.pagecode = page_code
-        self.cdb = self.build_cdb(evpd, self.pagecode, alloclen)
+        self.cdb = self.build_cdb(evpd, page_code, alloclen)
         self.execute()
 
     def build_cdb(self, evpd, page_code, alloclen):
@@ -57,26 +197,89 @@ class Inquiry(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = self.init_cdb(self.scsi.device.opcodes.INQUIRY.value)
-        if evpd:
-            cdb[1] |= 0x01
-            cdb[2] = page_code
-        cdb[3:5] = scsi_int_to_ba(alloclen, 2)
-        return cdb
+        cdb = {
+            'opcode': self.scsi.device.opcodes.INQUIRY.value,
+            'evpd': evpd,
+            'page_code': page_code,
+            'alloc_len': alloclen
+        }
+        return self.marshall_cdb(cdb)
 
-    def unmarshall_cdb(self, cdb):
-        """
-        method to unmarshall a byte array containing a cdb.
-        """
-        _tmp = {}
-        _bits = {'opcode': [0xff, 0],
-                 'evpd': [0x01, 1],
-                 'page_code': [0xff, 2],
-                 'alloc_len': [0xffff, 3], }
-        decode_bits(cdb, _bits, _tmp)
-        return _tmp
+    @staticmethod
+    def marshall_designator(type, data):
+        if type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+            return data['vendor_specific']
 
-    def unmarshall_designator(self, type, data):
+        if type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+            return data['t10_vendor_id'] + data['vendor_specific_id']
+
+        if type == inquiry_enums.DESIGNATOR.EUI_64:
+            if 'identifier_extension' in data:
+                return data['identifier_extension'] +            \
+                    scsi_int_to_ba(data['ieee_company_id'], 3) + \
+                    data['vendor_specific_extension_id']
+            if 'directory_id' in data:
+                return scsi_int_to_ba(data['ieee_company_id'], 3) + \
+                    data['vendor_specific_extension_id'] +          \
+                    data['directory_id']
+
+            return scsi_int_to_ba(data['ieee_company_id'], 3) + \
+                data['vendor_specific_extension_id']
+
+        if type == inquiry_enums.DESIGNATOR.NAA:
+            _r = bytearray(16)
+            decode_bits(data, Inquiry._naa_type_bits, _r)
+            if data['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
+                encode_dict(data, Inquiry._naa_ieee_extended_bits, _r)
+                return _r[:8]
+            if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
+                encode_dict(data, Inquiry._naa_locally_assigned_bits, _r)
+                return _r[:8]
+            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
+                encode_dict(data, Inquiry._naa_ieee_registered_bits, _r)
+                return _r[:8]
+            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
+                encode_dict(data, Inquiry._naa_ieee_registered_extended_bits, _r)
+                return _r[:16]
+
+        if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+            _r = bytearray(4)
+            encode_dict(data, Inquiry._relative_port_bits, _r)
+            return _r
+
+        if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
+            _r = bytearray(4)
+            encode_dict(data, Inquiry._target_portal_group_bits, _r)
+            return _r
+
+        if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
+            _r = bytearray(4)
+            encode_dict(data, Inquiry._logical_unit_group_bits, _r)
+            return _r
+
+        if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+                return data['md5_logical_identifier']
+
+        if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+                return ['scsi_name_string']
+
+        if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+            _r = bytearray(8)
+            encode_dict(data, Inquiry._pci_express_routing_id_bits, _r)
+            return _r
+
+
+    @staticmethod
+    def marshall_designation_descriptor(data):
+        _r = bytearray(4)
+        encode_dict(data, Inquiry._designator_bits, _r)
+
+        _r += Inquiry.marshall_designator(data['designator_type'], data['designator'])
+        _r[3] = len(_r) - 4
+        return _r
+
+    @staticmethod
+    def unmarshall_designator(type, data):
         _d = {}
         if type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
             _d['vendor_specific'] = data
@@ -99,35 +302,24 @@ class Inquiry(SCSICommand):
                 _d['vendor_specific_extension_id'] = data[11:]
 
         if type == inquiry_enums.DESIGNATOR.NAA:
-            _d['naa'] = data[0] >> 4
+            decode_bits(data, Inquiry._naa_type_bits, _d)
             if _d['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
-                _bits = {'vendor_specific_identifier_a': [0x0fff, 0],
-                         'ieee_company_id': [0xffffff, 2],
-                         'vendor_specific_identifier_b': [0xffffff, 5], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._naa_ieee_extended_bits, _d)
             if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
-                _d['locally_administered_value'] = data[0:8]
+                decode_bits(data, Inquiry._naa_locally_assigned_bits, _d)
             if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
-                _bits = {'ieee_company_id': [0x0ffffff0, 0],
-                         'vendor_specific_identifier': [0x0fffffffff, 3], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._naa_ieee_registered_bits, _d)
             if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
-                _bits = {'ieee_company_id': [0x0ffffff0, 0],
-                         'vendor_specific_identifier': [0x0fffffffff, 3],
-                         'vendor_specific_identifier_extension': [0xffffffffffffffff, 8], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._naa_ieee_registered_extended_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
-                _bits = {'relative_port': [0xffff, 2], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._relative_port_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
-                _bits = {'target_portal_group': [0xffff, 2], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._target_portal_group_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
-                _bits = {'logical_unit_group': [0xffff, 2], }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._logical_unit_group_bits, _d)
 
         if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
                 _d['md5_logical_identifier'] = data[0:16]
@@ -136,153 +328,135 @@ class Inquiry(SCSICommand):
                 _d['scsi_name_string'] = data
 
         if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
-                _bits = {
-                    'pci_express_routing_id': [0xffff, 0],
-                }
-                decode_bits(data, _bits, _d)
+                decode_bits(data, Inquiry._pci_express_routing_id_bits, _d)
 
-        return _d
-
-    def unmarshall_designator_descriptor(self, data):
-        _bits = {'protocol_identifier': [0xf0, 0],
-                 'code_set': [0x0f, 0],
-                 'piv': [0x80, 1],
-                 'association': [0x30, 1],
-                 'designator_type': [0x0f, 1],
-                 'designator_length': [0xff, 3], }
-        _d = {}
-        decode_bits(data, _bits, _d)
-        if _d['piv'] == 0 or (_d['association'] != 1 and _d['association'] != 2):
-            del _d['protocol_identifier']
-        _d['designator'] = self.unmarshall_designator(_d['designator_type'], data[4:])
         return _d
 
     def unmarshall(self):
         """
-        method to extract relevant data from the byte array that the inquiry command returns
-
-        the content of the result dict depends if vital product data is enabled or not. if vpd is
-        enabled we create a list with the received vpd.
+        Unmarshall the Inquiry data.
         """
-        self.result.update({'peripheral_qualifier': self.datain[0] >> 5})
-        self.result.update({'peripheral_device_type': self.datain[0] & 0x1f})
-        if self._evpd == 0:
-            _bits = {'rmb': [0x80, 1],
-                     'version': [0xff, 2],
-                     'normaca': [0x20, 3],
-                     'hisup': [0x10, 3],
-                     'response_data_format': [0x0f, 3],
-                     'additional_length': [0xff, 4],
-                     'sccs': [0x80, 5],
-                     'acc': [0x40, 5],
-                     'tpgs': [0x30, 5],
-                     '3pc': [0x08, 5],
-                     'protect': [0x01, 5],
-                     'encserv': [0x40, 6],
-                     'vs': [0x20, 6],
-                     'multip': [0x10, 6],
-                     'addr16': [0x01, 6],
-                     'wbus16': [0x20, 7],
-                     'sync': [0x10, 7],
-                     'cmdque': [0x02, 7],
-                     'vs2': [0x01, 7],
-                     'clocking': [0x0c, 56],
-                     'qas': [0x02, 56],
-                     'ius': [0x01, 56], }
-            self.result.update({'t10_vendor_identification': self.datain[8:16]})
-            self.result.update({'product_identification': self.datain[16:32]})
-            self.result.update({'product_revision_level': self.datain[32:36]})
-            decode_bits(self.datain, _bits, self.result)
-            return
+        self.result = self.unmarshall_datain(self.datain, self._evpd)
 
-        self.result.update({'page_code': self.datain[1]})
-        page_length = scsi_ba_to_int(self.datain[2:4])
-        self.result.update({'page_length': page_length})
+    @staticmethod
+    def unmarshall_datain(data, evpd=0):
+        """
+        Unmarshall the Inquiry datain
+        """
+        result = {}
+        decode_bits(data, Inquiry._datain_bits, result)
 
-        if self._page_code == inquiry_enums.VPD.SUPPORTED_VPD_PAGES:
+        if evpd == 0:
+            decode_bits(data, Inquiry._standard_bits, result)
+            result.update({'t10_vendor_identification': data[8:16]})
+            result.update({'product_identification': data[16:32]})
+            result.update({'product_revision_level': data[32:36]})
+            return result
+
+        decode_bits(data, Inquiry._pagecode_bits, result)
+        data = data[:4 + scsi_ba_to_int(data[2:4])]
+
+        if result['page_code'] == inquiry_enums.VPD.SUPPORTED_VPD_PAGES:
             vpd_pages = []
-            for i in range(page_length):
-                vpd_pages.append(self.datain[i + 4])
-                self.result.update({'vpd_pages': vpd_pages})
+            for i in data[4:]:
+                vpd_pages.append(i)
+            result.update({'vpd_pages': vpd_pages})
+            return result
 
-        if self._page_code == inquiry_enums.VPD.BLOCK_LIMITS:
-            _bits = {'wsnz': [0x01, 4],
-                     'ugavalid': [0x80, 32],
-                     'max_caw_len': [0xff, 5],
-                     'opt_xfer_len_gran': [0xffff, 6],
-                     'max_xfer_len': [0xffffffff, 8],
-                     'opt_xfer_len': [0xffffffff, 12],
-                     'max_pfetch_len': [0xffffffff, 16],
-                     'max_unmap_lba_count': [0xffffffff, 20],
-                     'max_unmap_bd_count': [0xffffffff, 24],
-                     'opt_unmap_gran': [0xffffffff, 28],
-                     'unmap_gran_alignment': [0xffffffff, 32],
-                     'max_ws_len': [0xffffffff, 36], }
-            decode_bits(self.datain, _bits, self.result)
+        if result['page_code'] == inquiry_enums.VPD.BLOCK_LIMITS:
+            decode_bits(data, Inquiry._block_limits_bits, result)
+            return result
 
-        if self._page_code == inquiry_enums.VPD.BLOCK_DEVICE_CHARACTERISTICS:
-            _bits = {'wabereq': [0xc0, 7],
-                     'wacereq': [0x30, 7],
-                     'nominal_form_factor': [0x0f, 7],
-                     'fuab': [0x02, 8],
-                     'vbuls': [0x01, 8],
-                     'medium_rotation_rate': [0xffff, 4],
-                     'product_type': [0xff, 6], }
-            decode_bits(self.datain, _bits, self.result)
+        if result['page_code'] == inquiry_enums.VPD.BLOCK_DEVICE_CHARACTERISTICS:
+            decode_bits(data, Inquiry._block_dev_char_bits, result)
+            return result
 
-        if self._page_code == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
-            _bits = {'threshold_exponent': [0xff, 4],
-                     'lbpu': [0x80, 5],
-                     'lpbws': [0x40, 5],
-                     'lbpws10': [0x20, 5],
-                     'lbprz': [0x04, 5],
-                     'anc_sup': [0x02, 5],
-                     'dp': [0x01, 5],
-                     'provisioning_type': [0x07, 6], }
-            decode_bits(self.datain, _bits, self.result)
+        if result['page_code'] == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
+            decode_bits(data, Inquiry._logical_block_provisioning_bits, result)
+            return result
 
-        if self._page_code == inquiry_enums.VPD.REFERRALS:
-            _bits = {'user_data_segment_size': [0xffffffff, 8],
-                     'user_data_segment_multiplier': [0xffffffff, 12], }
-            decode_bits(self.datain, _bits, self.result)
+        if result['page_code'] == inquiry_enums.VPD.REFERRALS:
+            decode_bits(data, Inquiry._referrals_bits, result)
+            return result
 
-        if self._page_code == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
-            self.result.update({'unit_serial_number': self.datain[4:4 + page_length]})
+        if result['page_code'] == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
+            result.update({'unit_serial_number': data[4:]})
+            return result
 
-        if self._page_code == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
-            _bits = {'activate_microcode': [0xc0, 4],
-                     'spt': [0x38, 4],
-                     'grd_chk': [0x04, 4],
-                     'app_chk': [0x02, 4],
-                     'ref_chk': [0x01, 4],
-                     'uask_sup': [0x20, 5],
-                     'group_sup': [0x10, 5],
-                     'prior_sup': [0x08, 5],
-                     'headsup': [0x04, 5],
-                     'ordsup': [0x02, 5],
-                     'simpsup': [0x01, 5],
-                     'wu_sup': [0x08, 6],
-                     'crd_sup': [0x04, 6],
-                     'nv_sup': [0x02, 6],
-                     'v_sup': [0x01, 6],
-                     'p_i_i_sup': [0x10, 7],
-                     'luiclr': [0x01, 7],
-                     'r_sup': [0x10, 8],
-                     'cbcs': [0x01, 8],
-                     'multi_it_nexus_microcode_download': [0x0f, 9],
-                     'extended_self_test_completion_minutes': [0xffff, 10],
-                     'poa_sup': [0x80, 12],
-                     'hra_sup': [0x40, 12],
-                     'vsa_sup': [0x20, 12],
-                     'maximum_supported_sense_data_length': [0xff, 13], }
-            decode_bits(self.datain, _bits, self.result)
+        if result['page_code'] == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
+            decode_bits(data, Inquiry._extended_bits, result)
+            return result
 
-        if self._page_code == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
-            _data = self.datain[4:4 + page_length]
+        if result['page_code'] == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
+            data = data[4:]
             _d = []
-            while len(_data):
-                _bytes = _data[3] + 4
-                _d.append(self.unmarshall_designator_descriptor(_data[:_bytes]))
-                _data = _data[_bytes:]
+            while len(data):
+                _bc = data[3] + 4
 
-            self.result.update({'designator_descriptors': _d})
+                _dd = {}
+                decode_bits(data, Inquiry._designator_bits, _dd)
+                if _dd['piv'] == 0 or (_dd['association'] != 1 and _dd['association'] != 2):
+                    del _dd['protocol_identifier']
+                _dd['designator'] = Inquiry.unmarshall_designator(_dd['designator_type'], data[4:4 + data[3]])
+
+                _d.append(_dd)
+                data = data[_bc:]
+
+            result.update({'designator_descriptors': _d})
+            return result
+
+    @staticmethod
+    def marshall_datain(data):
+        """
+        Marshall the Inquiry datain.
+        """
+        if not 'page_code' in  data:
+            result = bytearray(96)
+            encode_dict(data, Inquiry._datain_bits, result)
+            encode_dict(data, Inquiry._standard_bits, result)
+            result[8:16] = data['t10_vendor_identification']
+            result[16:32] = data['product_identification']
+            result[32:36] = data['product_revision_level']
+            return result
+
+        result = bytearray(4)
+        encode_dict(data, Inquiry._datain_bits, result)
+        encode_dict(data, Inquiry._pagecode_bits, result)
+
+        if data['page_code'] == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
+            result += bytearray(4)
+            encode_dict(data, Inquiry._logical_block_provisioning_bits, result)
+        if data['page_code'] == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
+            result += data['unit_serial_number']
+        if data['page_code'] == inquiry_enums.VPD.REFERRALS:
+            result += bytearray(12)
+            encode_dict(data, Inquiry._referrals_bits, result)
+        if data['page_code'] == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
+            result += bytearray(60)
+            encode_dict(data, Inquiry._extended_bits, result)
+        if data['page_code'] == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
+            for _dd in data['designator_descriptors']:
+                _r = Inquiry.marshall_designation_descriptor(_dd)
+                result += _r
+
+        result[2:4] = scsi_int_to_ba(len(result) - 4, 2)
+        return result
+
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall an Inquiry cdb
+        """
+        result = {}
+        decode_bits(cdb, Inquiry._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall an Inquiry cdb
+        """
+        result = bytearray(12)
+        encode_dict(cdb, Inquiry._cdb_bits, result)
+        return result

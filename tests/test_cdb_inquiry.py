@@ -4,6 +4,7 @@
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import spc
+from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
 
 
 class MockInquiry(object):
@@ -29,6 +30,9 @@ def main():
     assert cdb['page_code'] == 0
     assert cdb['alloc_len'] == 128
 
+    d = Inquiry.unmarshall_cdb(Inquiry.marshall_cdb(cdb))
+    assert d == cdb
+
     # supported vpd pages
     i = s.inquiry(evpd=1, page_code=0x88, alloclen=300)
     cdb = i.cdb
@@ -42,6 +46,9 @@ def main():
     assert cdb['evpd'] == 1
     assert cdb['page_code'] == 0x88
     assert cdb['alloc_len'] == 300
+
+    d = Inquiry.unmarshall_cdb(Inquiry.marshall_cdb(cdb))
+    assert d == cdb
 
 if __name__ == "__main__":
     main()
