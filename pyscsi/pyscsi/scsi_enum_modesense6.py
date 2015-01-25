@@ -31,6 +31,9 @@ PC = Enum(_pc)
 # Page Codes
 #
 
-_page_code = {'ELEMENT_ADDRESS_ASSIGNMENT': 0x1d, }
+_page_code = {
+    'CONTROL': 0x0a,
+    'ELEMENT_ADDRESS_ASSIGNMENT': 0x1d
+}
 
 PAGE_CODE = Enum(_page_code)

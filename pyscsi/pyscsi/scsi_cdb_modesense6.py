@@ -62,6 +62,28 @@ class ModeSense6(SCSICommand):
         'first_data_transfer_element_address': [0xffff, 12],
         'num_data_transfer_elements': [0xffff, 14],
     }
+    _control_bits = {
+        'tst': [0xe0, 0],
+        'tmf_only': [0x10, 0],
+        'dpicz': [0x08, 0],
+        'd_sense': [0x04, 0],
+        'gltsd': [0x02, 0],
+        'rlec': [0x01, 0],
+        'queue_algorithm_modifier': [0xf0, 1],
+        'nuar': [0x08, 1],
+        'qerr': [0x06, 1],
+        'vs': [0x80, 2],
+        'rac': [0x40, 2],
+        'ua_intlck_ctrl': [0x30, 2],
+        'swp': [0x08, 2],
+        'ato': [0x80, 3],
+        'tas': [0x40, 3],
+        'atmpe': [0x20, 3],
+        'rwwp': [0x10, 3],
+        'autoload_mode': [0x07, 3],
+        'busy_timeout_period': [0xffff, 6],
+        'extended_self_test_completion_time': [0xffff, 8],
+    }
 
     def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0,
                  alloclen=96):
@@ -124,6 +146,8 @@ class ModeSense6(SCSICommand):
 
         if _r['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
             decode_bits(data, ModeSense6._element_address_bits, _r)
+        if _r['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
+            decode_bits(data, ModeSense6._control_bits, _r)
         _mps.append(_r)
 
         result.update({'mode_pages': _mps})
@@ -140,8 +164,11 @@ class ModeSense6(SCSICommand):
         # mode page header
         for mp in data['mode_pages']:
             if mp['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-                _mpd = bytearray(16)
+                _mpd = bytearray(18)
                 encode_dict(mp, ModeSense6._element_address_bits, _mpd)
+            if mp['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
+                _mpd = bytearray(10)
+                encode_dict(mp, ModeSense6._control_bits, _mpd)
 
             if not mp['spf']:
                 _d = bytearray(2)
