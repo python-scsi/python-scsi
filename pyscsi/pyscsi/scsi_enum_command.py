@@ -347,6 +347,7 @@ mmc_opcodes = {'BLANK': OpCode('BLANK', 0xa1, {}),
                'READ_TOC_PMA_ATIP': OpCode('READ_TOC_PMA_ATIP', 0x43, {}),
                'READ_TRACK_INFORMATION': OpCode('READ_TRACK_INFORMATION', 0x52, {}),
                'REPAIR_TRACK': OpCode('REPAIR_TRACK', 0x58, {}),
+               'TEST_UNIT_READY': OpCode('TEST_UNIT_READY', 0x00, {}),
                }
 
 OPCODE = Enum(opcodes)
