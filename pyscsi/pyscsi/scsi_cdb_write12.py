@@ -38,8 +38,8 @@ class Write12(SCSICommand):
     }
 
     def __init__(self, scsi, lba, tl, data, **kwargs):
-        self.dataout = data
         SCSICommand.__init__(self, scsi, scsi.blocksize * tl, 0)
+        self.dataout = data
         self.cdb = self.build_cdb(lba, tl, **kwargs)
         self.execute()
 
