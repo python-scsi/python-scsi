@@ -84,6 +84,13 @@ class ModeSense6(SCSICommand):
         'busy_timeout_period': [0xffff, 6],
         'extended_self_test_completion_time': [0xffff, 8],
     }
+    _control_extension_1_bits = {
+        'tcmos': [0x04, 0],
+        'scsip': [0x02, 0],
+        'ialuae': [0x01, 0],
+        'initial_command_priority': [0x0f, 1],
+        'maximum_sense_data_length': [0xff, 2]
+    }
 
     def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0,
                  alloclen=96):
@@ -145,7 +152,11 @@ class ModeSense6(SCSICommand):
         if _r['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
             decode_bits(data, ModeSense6._element_address_bits, _r)
         if _r['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
-            decode_bits(data, ModeSense6._control_bits, _r)
+            if not 'sub_page_code' in _r:
+                decode_bits(data, ModeSense6._control_bits, _r)
+            elif _r['sub_page_code'] == 1:
+                decode_bits(data, ModeSense6._control_extension_1_bits, _r)
+
         _mps.append(_r)
 
         result.update({'mode_pages': _mps})
@@ -161,20 +172,27 @@ class ModeSense6(SCSICommand):
 
         # mode page header
         for mp in data['mode_pages']:
+            if not mp['spf']:
+                _d = bytearray(2)
+                encode_dict(mp, ModeSense6._page_zero_bits, _d)
+            else:
+                _d = bytearray(4)
+                encode_dict(mp, ModeSense6._sub_page_bits, _d)
+
             if mp['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
                 _mpd = bytearray(18)
                 encode_dict(mp, ModeSense6._element_address_bits, _mpd)
             if mp['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
-                _mpd = bytearray(10)
-                encode_dict(mp, ModeSense6._control_bits, _mpd)
+                if not mp['spf']:
+                    _mpd = bytearray(10)
+                    encode_dict(mp, ModeSense6._control_bits, _mpd)
+                elif mp['sub_page_code'] == 1:
+                    _mpd = bytearray(28)
+                    encode_dict(mp, ModeSense6._control_extension_1_bits, _mpd)
 
             if not mp['spf']:
-                _d = bytearray(2)
-                encode_dict(mp, ModeSense6._page_zero_bits, _d)
                 _d[1] = len(_mpd)
             else:
-                _d = bytearray(4)
-                encode_dict(mp, ModeSense6._sub_page_bits, _d)
                 _d[2:4] = scsi_int_to_ba(len(_mpd), 2)
 
             result += _d

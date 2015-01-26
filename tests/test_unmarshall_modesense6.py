@@ -45,6 +45,21 @@ class MockModeSenseControl(MockDevice):
         datain[12:14] = scsi_int_to_ba(500, 2)  # busy timeout:500
         datain[14:16] = scsi_int_to_ba(700, 2)  # ext:700
 
+class MockModeSenseControlExt1(MockDevice):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 15   # mode data length
+        datain[1] = 0    # medium type: BLOCK_DEVICE
+        datain[2] = 0x90 # device specific parameter
+        datain[3] = 0    # block descriptor length
+
+        datain[4] = 0xca  # PS=1 SPF=1 PAGECODE=0x0a
+        datain[5] = 1     # subpage:1
+        datain[6:8] = scsi_int_to_ba(0x1c, 2) # page length
+
+        datain[8] = 0x07  # tcmod:1 scsip:1 ialuae:1
+        datain[9] = 0x0f  # icp:15
+        datain[10] = 29    # msdl:29
+
 def main():
     # SMC ElementAddressAssignment
     dev = MockModeSenseEAA()
@@ -104,6 +119,29 @@ def main():
     assert i['mode_pages'][0]['autoload_mode'] == 7
     assert i['mode_pages'][0]['busy_timeout_period'] == 500
     assert i['mode_pages'][0]['extended_self_test_completion_time'] == 700
+
+    d = ModeSense6.unmarshall_datain(ModeSense6.marshall_datain(i))
+    assert d == i
+
+    # SPC Control Ext 1
+    dev = MockModeSenseControlExt1()
+    dev.opcodes = spc
+    s = SCSI(dev)
+    i = s.modesense6(page_code=MODESENSE6.PAGE_CODE.CONTROL, sub_page_code=1).result
+    assert i['medium_type'] == 0
+    assert i['device_specific_parameter'] == 0x90
+
+    assert len(i['mode_pages']) == 1
+
+    assert i['mode_pages'][0]['ps'] == 1
+    assert i['mode_pages'][0]['spf'] == 1
+    assert i['mode_pages'][0]['page_code'] == MODESENSE6.PAGE_CODE.CONTROL
+    assert i['mode_pages'][0]['sub_page_code'] == 1
+    assert i['mode_pages'][0]['tcmos'] == 1
+    assert i['mode_pages'][0]['scsip'] == 1
+    assert i['mode_pages'][0]['ialuae'] == 1
+    assert i['mode_pages'][0]['initial_command_priority'] == 15
+    assert i['mode_pages'][0]['maximum_sense_data_length'] == 29
 
     d = ModeSense6.unmarshall_datain(ModeSense6.marshall_datain(i))
     assert d == i
