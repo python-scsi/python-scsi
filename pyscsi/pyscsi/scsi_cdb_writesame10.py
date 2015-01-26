@@ -39,8 +39,8 @@ class WriteSame10(SCSICommand):
 
     def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
                  unmap=False, group=0):
-        self.dataout = data
         SCSICommand.__init__(self, scsi, scsi.blocksize, 0)
+        self.dataout = data
         self.cdb = self.build_cdb(lba, nb, wrprotect, anchor, unmap, group)
         self.execute()
 

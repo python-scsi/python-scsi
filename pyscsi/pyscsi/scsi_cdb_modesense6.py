@@ -27,7 +27,7 @@ import scsi_enum_modesense6 as modesensense_enums
 
 class ModeSense6(SCSICommand):
     """
-    A class to hold information from a moesense6 command
+    A class to hold information from a modesense6 command
     """
     _cdb_bits = {
         'opcode': [0xff, 0],
@@ -62,6 +62,48 @@ class ModeSense6(SCSICommand):
         'first_data_transfer_element_address': [0xffff, 12],
         'num_data_transfer_elements': [0xffff, 14],
     }
+    _control_bits = {
+        'tst': [0xe0, 0],
+        'tmf_only': [0x10, 0],
+        'dpicz': [0x08, 0],
+        'd_sense': [0x04, 0],
+        'gltsd': [0x02, 0],
+        'rlec': [0x01, 0],
+        'queue_algorithm_modifier': [0xf0, 1],
+        'nuar': [0x08, 1],
+        'qerr': [0x06, 1],
+        'vs': [0x80, 2],
+        'rac': [0x40, 2],
+        'ua_intlck_ctrl': [0x30, 2],
+        'swp': [0x08, 2],
+        'ato': [0x80, 3],
+        'tas': [0x40, 3],
+        'atmpe': [0x20, 3],
+        'rwwp': [0x10, 3],
+        'autoload_mode': [0x07, 3],
+        'busy_timeout_period': [0xffff, 6],
+        'extended_self_test_completion_time': [0xffff, 8],
+    }
+    _control_extension_1_bits = {
+        'tcmos': [0x04, 0],
+        'scsip': [0x02, 0],
+        'ialuae': [0x01, 0],
+        'initial_command_priority': [0x0f, 1],
+        'maximum_sense_data_length': [0xff, 2]
+    }
+    _disconnect_reconnect_bits = {
+        'buffer_full_ratio': [0xff, 0],
+        'buffer_empty_ratio': [0xff, 1],
+        'bus_inactivity_limit': [0xffff, 2],
+        'disconnect_time_limit': [0xffff, 4],
+        'connect_time_limit': [0xffff, 6],
+        'maximum_burst_size': [0xffff, 8],
+        'emdp': [0x80, 10],
+        'fair_arbitration': [0x70, 10],
+        'dimm': [0x08, 10],
+        'dtdc': [0x07, 10],
+        'first_burst_size': [0xffff, 12],
+    }
 
     def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0,
                  alloclen=96):
@@ -76,9 +118,7 @@ class ModeSense6(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.page_code = page_code
-        self.sub_page_code = sub_page_code
-        self.cdb = self.build_cdb(self.page_code, self.sub_page_code, dbd, pc,
+        self.cdb = self.build_cdb(page_code, sub_page_code, dbd, pc,
                                   alloclen)
         self.execute()
 
@@ -124,6 +164,15 @@ class ModeSense6(SCSICommand):
 
         if _r['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
             decode_bits(data, ModeSense6._element_address_bits, _r)
+        if _r['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
+            if not 'sub_page_code' in _r:
+                decode_bits(data, ModeSense6._control_bits, _r)
+            elif _r['sub_page_code'] == 1:
+                decode_bits(data, ModeSense6._control_extension_1_bits, _r)
+        if _r['page_code'] == modesensense_enums.PAGE_CODE.DISCONNECT_RECONNECT:
+            if not 'sub_page_code' in _r:
+                decode_bits(data, ModeSense6._disconnect_reconnect_bits, _r)
+
         _mps.append(_r)
 
         result.update({'mode_pages': _mps})
@@ -139,17 +188,31 @@ class ModeSense6(SCSICommand):
 
         # mode page header
         for mp in data['mode_pages']:
-            if mp['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-                _mpd = bytearray(16)
-                encode_dict(mp, ModeSense6._element_address_bits, _mpd)
-
             if not mp['spf']:
                 _d = bytearray(2)
                 encode_dict(mp, ModeSense6._page_zero_bits, _d)
-                _d[1] = len(_mpd)
             else:
                 _d = bytearray(4)
                 encode_dict(mp, ModeSense6._sub_page_bits, _d)
+
+            if mp['page_code'] == modesensense_enums.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
+                _mpd = bytearray(18)
+                encode_dict(mp, ModeSense6._element_address_bits, _mpd)
+            if mp['page_code'] == modesensense_enums.PAGE_CODE.CONTROL:
+                if not mp['spf']:
+                    _mpd = bytearray(10)
+                    encode_dict(mp, ModeSense6._control_bits, _mpd)
+                elif mp['sub_page_code'] == 1:
+                    _mpd = bytearray(28)
+                    encode_dict(mp, ModeSense6._control_extension_1_bits, _mpd)
+            if mp['page_code'] == modesensense_enums.PAGE_CODE.DISCONNECT_RECONNECT:
+                if not mp['spf']:
+                    _mpd = bytearray(14)
+                    encode_dict(mp, ModeSense6._disconnect_reconnect_bits, _mpd)
+
+            if not mp['spf']:
+                _d[1] = len(_mpd)
+            else:
                 _d[2:4] = scsi_int_to_ba(len(_mpd), 2)
 
             result += _d
@@ -174,4 +237,73 @@ class ModeSense6(SCSICommand):
         """
         result = bytearray(6)
         encode_dict(cdb, ModeSense6._cdb_bits, result)
+        return result
+
+class ModeSelect6(SCSICommand):
+    """
+    A class to hold information from a modeselect6 command
+    """
+    _cdb_bits = {
+        'opcode': [0xff, 0],
+        'pf': [0x10, 1],
+        'sp': [0x01, 1],
+        'parameter_list_length': [0xff, 4]
+    }
+
+    def __init__(self, scsi, data, pf=1, sp=0):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI instance
+        :param data: a dict holding mode page to set
+        :param pf:
+        :param sp:
+        """
+        _d = ModeSense6.marshall_datain(data)
+
+        SCSICommand.__init__(self, scsi, len(_d), 0)
+        self.dataout = _d
+        self.cdb = self.build_cdb(pf, sp, len(_d))
+        self.execute()
+
+    def build_cdb(self, pf, sp, alloclen):
+        """
+        """
+        cdb = {'opcode': self.scsi.device.opcodes.MODE_SELECT_6.value,
+               'pf': pf,
+               'sp': sp,
+               'parameter_list_length': alloclen
+        }
+        return self.marshall_cdb(cdb)
+
+    @staticmethod
+    def unmarshall_datain(data):
+        """
+        Unmarshall the ModeSelect6 dataout.
+        """
+        return ModeSense6.unmarshall_dataout(data)
+
+    @staticmethod
+    def marshall_dataout(data):
+        """
+        Marshall the ModeSelect6 dataout.
+        """
+        return ModeSense6.marshall_datain(data)
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a ModeSelect6 cdb
+        """
+        result = {}
+        decode_bits(cdb, ModeSelect6._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a ModeSelect6 cdb
+        """
+        result = bytearray(6)
+        encode_dict(cdb, ModeSelect6._cdb_bits, result)
         return result

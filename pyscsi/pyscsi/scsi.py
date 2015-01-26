@@ -19,7 +19,7 @@
 
 from scsi_cdb_getlbastatus import GetLBAStatus
 from scsi_cdb_inquiry import Inquiry
-from scsi_cdb_modesense6 import ModeSense6
+from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
 from scsi_cdb_movemedium import MoveMedium
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
@@ -105,6 +105,17 @@ class SCSI(object):
         :return: a Inquiry instance
         """
         return Inquiry(self, **kwargs)
+
+    def modeselect6(self, data, **kwargs):
+        """
+        Returns a ModeSelect6 Instance
+
+        :param data: a dict containing the mode page to set
+        :param pf = 0: Page Format flag
+        :param sp = 0: Save Pages flag
+        :return: a ModeSelect6 instance
+        """
+        return ModeSelect6(self, data, **kwargs)
 
     def modesense6(self, page_code, **kwargs):
         """
