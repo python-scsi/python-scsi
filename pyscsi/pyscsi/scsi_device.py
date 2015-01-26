@@ -24,14 +24,12 @@ try:
     import libiscsi
     _have_libiscsi = True
 except ImportError as e:
-    print('could not import libiscsi -> %s ' % e.message)
     _have_libiscsi = False
 
 try:
     import linux_sgio
     _have_linux_sgio = True
 except ImportError as e:
-    print('could not import linux_sgio -> %s' % e.message)
     _have_linux_sgio = False
 
 
