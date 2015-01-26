@@ -243,7 +243,7 @@ class ModeSelect6(SCSICommand):
         """
         Unmarshall the ModeSelect6 dataout.
         """
-        return ModeSense6.unmarshall_datain(data)
+        return ModeSense6.unmarshall_dataout(data)
 
     @staticmethod
     def marshall_dataout(data):
