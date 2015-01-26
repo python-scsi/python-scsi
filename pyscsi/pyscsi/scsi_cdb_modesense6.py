@@ -27,7 +27,7 @@ import scsi_enum_modesense6 as modesensense_enums
 
 class ModeSense6(SCSICommand):
     """
-    A class to hold information from a moesense6 command
+    A class to hold information from a modesense6 command
     """
     _cdb_bits = {
         'opcode': [0xff, 0],
@@ -98,9 +98,7 @@ class ModeSense6(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.page_code = page_code
-        self.sub_page_code = sub_page_code
-        self.cdb = self.build_cdb(self.page_code, self.sub_page_code, dbd, pc,
+        self.cdb = self.build_cdb(page_code, sub_page_code, dbd, pc,
                                   alloclen)
         self.execute()
 
@@ -201,4 +199,73 @@ class ModeSense6(SCSICommand):
         """
         result = bytearray(6)
         encode_dict(cdb, ModeSense6._cdb_bits, result)
+        return result
+
+class ModeSelect6(SCSICommand):
+    """
+    A class to hold information from a modeselect6 command
+    """
+    _cdb_bits = {
+        'opcode': [0xff, 0],
+        'pf': [0x10, 1],
+        'sp': [0x01, 1],
+        'parameter_list_length': [0xff, 4]
+    }
+
+    def __init__(self, scsi, data, pf=1, sp=0):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI instance
+        :param data: a dict holding mode page to set
+        :param pf:
+        :param sp:
+        """
+        _d = ModeSense6.marshall_datain(data)
+
+        SCSICommand.__init__(self, scsi, len(_d), 0)
+        self.dataout = _d
+        self.cdb = self.build_cdb(pf, sp, len(_d))
+        self.execute()
+
+    def build_cdb(self, pf, sp, alloclen):
+        """
+        """
+        cdb = {'opcode': self.scsi.device.opcodes.MODE_SELECT_6.value,
+               'pf': pf,
+               'sp': sp,
+               'parameter_list_length': alloclen
+        }
+        return self.marshall_cdb(cdb)
+
+    @staticmethod
+    def unmarshall_datain(data):
+        """
+        Unmarshall the ModeSelect6 dataout.
+        """
+        return ModeSense6.unmarshall_datain(data)
+
+    @staticmethod
+    def marshall_dataout(data):
+        """
+        Marshall the ModeSelect6 dataout.
+        """
+        return ModeSense6.marshall_datain(data)
+
+    @staticmethod
+    def unmarshall_cdb(cdb):
+        """
+        Unmarshall a ModeSelect6 cdb
+        """
+        result = {}
+        decode_bits(cdb, ModeSelect6._cdb_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_cdb(cdb):
+        """
+        Marshall a ModeSelect6 cdb
+        """
+        result = bytearray(6)
+        encode_dict(cdb, ModeSelect6._cdb_bits, result)
         return result
