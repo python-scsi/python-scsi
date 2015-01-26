@@ -91,6 +91,19 @@ class ModeSense6(SCSICommand):
         'initial_command_priority': [0x0f, 1],
         'maximum_sense_data_length': [0xff, 2]
     }
+    _disconnect_reconnect_bits = {
+        'buffer_full_ratio': [0xff, 0],
+        'buffer_empty_ratio': [0xff, 1],
+        'bus_inactivity_limit': [0xffff, 2],
+        'disconnect_time_limit': [0xffff, 4],
+        'connect_time_limit': [0xffff, 6],
+        'maximum_burst_size': [0xffff, 8],
+        'emdp': [0x80, 10],
+        'fair_arbitration': [0x70, 10],
+        'dimm': [0x08, 10],
+        'dtdc': [0x07, 10],
+        'first_burst_size': [0xffff, 12],
+    }
 
     def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0,
                  alloclen=96):
@@ -156,6 +169,9 @@ class ModeSense6(SCSICommand):
                 decode_bits(data, ModeSense6._control_bits, _r)
             elif _r['sub_page_code'] == 1:
                 decode_bits(data, ModeSense6._control_extension_1_bits, _r)
+        if _r['page_code'] == modesensense_enums.PAGE_CODE.DISCONNECT_RECONNECT:
+            if not 'sub_page_code' in _r:
+                decode_bits(data, ModeSense6._disconnect_reconnect_bits, _r)
 
         _mps.append(_r)
 
@@ -189,6 +205,10 @@ class ModeSense6(SCSICommand):
                 elif mp['sub_page_code'] == 1:
                     _mpd = bytearray(28)
                     encode_dict(mp, ModeSense6._control_extension_1_bits, _mpd)
+            if mp['page_code'] == modesensense_enums.PAGE_CODE.DISCONNECT_RECONNECT:
+                if not mp['spf']:
+                    _mpd = bytearray(14)
+                    encode_dict(mp, ModeSense6._disconnect_reconnect_bits, _mpd)
 
             if not mp['spf']:
                 _d[1] = len(_mpd)

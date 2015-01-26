@@ -60,6 +60,26 @@ class MockModeSenseControlExt1(MockDevice):
         datain[9] = 0x0f  # icp:15
         datain[10] = 29    # msdl:29
 
+class MockModeSenseDisconnect(MockDevice):
+    def execute(self, cdb, dataout, datain, sense):
+        datain[0] = 15   # mode data length
+        datain[1] = 0    # medium type: BLOCK_DEVICE
+        datain[2] = 0x90 # device specific parameter
+        datain[3] = 0    # block descriptor length
+
+        datain[4] = 0x82  # PS=1 SPF=0 PAGECODE=0x02
+        datain[5] = 0x0e
+
+        datain[6] = 122                        # bfr:122
+        datain[7] = 123                        # ber:123
+        datain[8:10] = scsi_int_to_ba(2371,2)  # bil
+        datain[10:12] = scsi_int_to_ba(2372,2) # dtl
+        datain[12:14] = scsi_int_to_ba(2373,2) # ctl
+        datain[14:16] = scsi_int_to_ba(2374,2) # mbs
+        datain[16] = 0xff                      # emdp:1 fa:7 dimm:1 dtdc:7
+        datain[18:20] = scsi_int_to_ba(2375,2) # fbs
+
+
 def main():
     # SMC ElementAddressAssignment
     dev = MockModeSenseEAA()
@@ -142,6 +162,34 @@ def main():
     assert i['mode_pages'][0]['ialuae'] == 1
     assert i['mode_pages'][0]['initial_command_priority'] == 15
     assert i['mode_pages'][0]['maximum_sense_data_length'] == 29
+
+    d = ModeSense6.unmarshall_datain(ModeSense6.marshall_datain(i))
+    assert d == i
+
+    # SPC Disconnect
+    dev = MockModeSenseDisconnect()
+    dev.opcodes = spc
+    s = SCSI(dev)
+    i = s.modesense6(page_code=MODESENSE6.PAGE_CODE.DISCONNECT_RECONNECT).result
+    assert i['medium_type'] == 0
+    assert i['device_specific_parameter'] == 0x90
+
+    assert len(i['mode_pages']) == 1
+
+    assert i['mode_pages'][0]['ps'] == 1
+    assert i['mode_pages'][0]['spf'] == 0
+    assert i['mode_pages'][0]['page_code'] == MODESENSE6.PAGE_CODE.DISCONNECT_RECONNECT
+    assert i['mode_pages'][0]['buffer_full_ratio'] == 122
+    assert i['mode_pages'][0]['buffer_empty_ratio'] == 123
+    assert i['mode_pages'][0]['bus_inactivity_limit'] == 2371
+    assert i['mode_pages'][0]['disconnect_time_limit'] == 2372
+    assert i['mode_pages'][0]['connect_time_limit'] == 2373
+    assert i['mode_pages'][0]['maximum_burst_size'] == 2374
+    assert i['mode_pages'][0]['emdp'] == 1
+    assert i['mode_pages'][0]['fair_arbitration'] == 7
+    assert i['mode_pages'][0]['dimm'] == 1
+    assert i['mode_pages'][0]['dtdc'] == 7
+    assert i['mode_pages'][0]['first_burst_size'] == 2375
 
     d = ModeSense6.unmarshall_datain(ModeSense6.marshall_datain(i))
     assert d == i

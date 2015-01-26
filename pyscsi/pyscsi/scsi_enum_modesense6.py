@@ -32,6 +32,7 @@ PC = Enum(_pc)
 #
 
 _page_code = {
+    'DISCONNECT_RECONNECT': 0x02,
     'CONTROL': 0x0a,
     'ELEMENT_ADDRESS_ASSIGNMENT': 0x1d
 }
