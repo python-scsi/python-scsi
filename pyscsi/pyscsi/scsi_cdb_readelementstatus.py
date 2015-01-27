@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import smc_opcodes
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import scsi_enum_readelementstatus as readelementstatus_enums
 
@@ -36,43 +35,30 @@ class ReadElementStatus(SCSICommand):
                  'num_elements': [0xffff, 4],
                  'curdata': [0x02, 6],
                  'dvcid': [0x01, 6],
-                 'alloc_len': [0xffffff, 7]
-    }
-    _datain_bits = {
-        'first_element_address': [0xffff, 0],
-        'num_elements': [0xffff, 2]
-    }
-    _element_status_page_bits = {
-        'element_type': [0x0f, 0],
-        'pvoltag': [0x80, 1],
-        'avoltag': [0x40, 1]
-    }
-    _element_status_descriptor_bits = {
-        'element_address': [0xffff, 0],
-        'except': [0x04, 2],
-        'full': [0x01, 2],
-        'additional_sense_code': [0xff, 4],
-        'additional_sense_code_qualifier': [0xff, 5],
-        'svalid': [0x80, 9],
-        'invert': [0x40, 9],
-        'ed': [0x08, 9],
-        'medium_type': [0x07, 9],
-        'source_storage_element_address': [0xffff, 10]
-    }
-    _data_transfer_descriptor_bits = {
-        'access': [0x08, 2]
-    }
-    _storage_descriptor_bits = {
-        'access': [0x08, 2]
-    }
-    _import_export_descriptor_bits = {
-        'oir': [0x80, 2],
-        'cmc': [0x40, 2],
-        'inenab': [0x20, 2],
-        'exenab': [0x10, 2],
-        'access': [0x08, 2],
-        'impexp': [0x02, 2]
-    }
+                 'alloc_len': [0xffffff, 7], }
+    _datain_bits = {'first_element_address': [0xffff, 0],
+                    'num_elements': [0xffff, 2], }
+    _element_status_page_bits = {'element_type': [0x0f, 0],
+                                 'pvoltag': [0x80, 1],
+                                 'avoltag': [0x40, 1], }
+    _element_status_descriptor_bits = {'element_address': [0xffff, 0],
+                                       'except': [0x04, 2],
+                                       'full': [0x01, 2],
+                                       'additional_sense_code': [0xff, 4],
+                                       'additional_sense_code_qualifier': [0xff, 5],
+                                       'svalid': [0x80, 9],
+                                       'invert': [0x40, 9],
+                                       'ed': [0x08, 9],
+                                       'medium_type': [0x07, 9],
+                                       'source_storage_element_address': [0xffff, 10], }
+    _data_transfer_descriptor_bits = {'access': [0x08, 2], }
+    _storage_descriptor_bits = {'access': [0x08, 2], }
+    _import_export_descriptor_bits = {'oir': [0x80, 2],
+                                      'cmc': [0x40, 2],
+                                      'inenab': [0x20, 2],
+                                      'exenab': [0x10, 2],
+                                      'access': [0x08, 2],
+                                      'impexp': [0x02, 2], }
 
     def __init__(self, scsi, start, num, element_type=readelementstatus_enums.ELEMENT_TYPE.ALL,
                  voltag=0, curdata=1, dvcid=0, alloclen=16384):
@@ -167,6 +153,7 @@ class ReadElementStatus(SCSICommand):
 
         result.update({'element_status_pages': _esd})
         return result
+
     @staticmethod
     def marshall_datain(data):
         """

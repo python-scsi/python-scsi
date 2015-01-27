@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 
 #
@@ -35,7 +34,6 @@ class GetLBAStatus(SCSICommand):
     _datain_bits = {'lba': [0xffffffffffffffff, 0],
                     'num_blocks': [0xffffffff, 8],
                     'p_status': [0x0f, 12], }
-
 
     def __init__(self, scsi, lba, alloclen=16384):
         """
@@ -59,8 +57,7 @@ class GetLBAStatus(SCSICommand):
         cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
                'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.GET_LBA_STATUS,
                'lba': lba,
-               'alloc_len': alloclen
-        }
+               'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):

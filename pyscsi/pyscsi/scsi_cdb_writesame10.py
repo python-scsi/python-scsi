@@ -16,8 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI WriteSame10 command and definitions
@@ -34,8 +33,7 @@ class WriteSame10(SCSICommand):
                  'unmap': [0x08, 1],
                  'lba': [0xffffffff, 2],
                  'group': [0x1f, 6],
-                 'nb': [0xffff, 7]
-    }
+                 'nb': [0xffff, 7], }
 
     def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
                  unmap=False, group=0):

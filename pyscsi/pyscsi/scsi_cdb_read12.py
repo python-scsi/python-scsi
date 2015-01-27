@@ -16,8 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI Read12 command and definitions
@@ -35,8 +34,7 @@ class Read12(SCSICommand):
                  'rarc': [0x04, 1],
                  'lba': [0xffffffff, 2],
                  'tl': [0xffffffff, 6],
-                 'group': [0x1f, 10]
-    }
+                 'group': [0x1f, 10], }
 
     def __init__(self, scsi, lba, tl, **kwargs):
         SCSICommand.__init__(self, scsi, 0, scsi.blocksize * tl)

@@ -16,8 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE, SERVICE_ACTION_IN
-from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI ReadCapacity16 command and definitions
@@ -61,8 +60,7 @@ class ReadCapacity16(SCSICommand):
         """
         cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
                'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16,
-               'alloc_len': alloclen
-        }
+               'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):

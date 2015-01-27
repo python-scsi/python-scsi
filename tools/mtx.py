@@ -43,6 +43,7 @@ def status(scsi, dte, se):
             print '      Storage Element: %d:Empty' % (
                 element['element_address'] - _fse + len(dte))
 
+
 def load(scsi, mte, dte, se, storage_element, data_transfer_element):
     _fmte = 99999999
     for element in mte:
@@ -78,7 +79,7 @@ def unload(scsi, mte, dte, se, storage_element, data_transfer_element):
             _fse = element['element_address']
 
     res = scsi.movemedium(_fmte,
-                         data_transfer_element + _fdte,
+                          data_transfer_element + _fdte,
                           storage_element + _fse - _fdte).result
     print 'Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element)
 

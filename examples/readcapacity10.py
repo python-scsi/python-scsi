@@ -16,7 +16,7 @@ def main(device):
         for k, v in r.iteritems():
             print '%s - %s' % (k, v)
     except Exception as e:
-        print (e)
+        print (e.message)
 
 if __name__ == "__main__":
     main(sys.argv[1])

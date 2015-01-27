@@ -4,12 +4,12 @@ from sys import platform
 from distutils.core import setup, Extension
 
 setup(name='PYSCSI',
-    version='1.0',
-    license='LGPLv2.1',
-    author='Ronnie Sahlberg',
-    author_email='ronniesahlberg@gmail.com',
-    description='Module for calling SCSI devices from Python',
-    packages=['pyscsi', 'pyscsi.pyscsi', 'pyscsi.utils'])
+      version='1.0',
+      license='LGPLv2.1',
+      author='Ronnie Sahlberg',
+      author_email='ronniesahlberg@gmail.com',
+      description='Module for calling SCSI devices from Python',
+      packages=['pyscsi', 'pyscsi.pyscsi', 'pyscsi.utils'])
 
 
 #

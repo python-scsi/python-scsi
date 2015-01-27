@@ -6,7 +6,9 @@ from mock_device import MockDevice
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 
+
 class MockReadCapacity16(MockDevice):
+
     def execute(self, cdb, dataout, datain, sense):
         # lba
         datain[0:8] = [0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
@@ -20,7 +22,7 @@ class MockReadCapacity16(MockDevice):
 
 def main():
     dev = MockReadCapacity16()
-    dev.opcodes =sbc
+    dev.opcodes = sbc
     s = SCSI(dev)
 
     i = s.readcapacity16().result

@@ -29,7 +29,7 @@ class SCSICommand(object):
         """
         initialize a new instance
 
-        :param dev: a SCSIDevice instance
+        :param scsi: a SCSI instance
         :param dataout_alloclen: integer representing the size of the data_out buffer
         :param datain_alloclen: integer representing the size of the data_in buffer
         """

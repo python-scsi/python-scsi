@@ -16,7 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI MoveMedium command and definitions
@@ -31,15 +31,17 @@ class MoveMedium(SCSICommand):
                  'medium_transport_address': [0xffff, 2],
                  'source_address': [0xffff, 4],
                  'destination_address': [0xffff, 6],
-                 'invert': [0x01, 10]
-    }
+                 'invert': [0x01, 10], }
 
     def __init__(self, scsi, xfer, source, dest, invert=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
-        :param alloclen: the max number of bytes allocated for the data_in buffer
+        :param scsi:
+        :param xfer:
+        :param source:
+        :param dest:
+        :param invert:
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(xfer, source, dest, invert)

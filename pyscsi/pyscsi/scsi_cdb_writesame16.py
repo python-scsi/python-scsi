@@ -1,8 +1,7 @@
 # coding: utf-8
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
-from pyscsi.utils.converter import scsi_int_to_ba, encode_dict ,decode_bits
+from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI WriteSame16 command and definitions
@@ -20,8 +19,7 @@ class WriteSame16(SCSICommand):
                  'ndob': [0x01, 1],
                  'lba': [0xffffffffffffffff, 2],
                  'group': [0x1f, 14],
-                 'nb': [0xffffffff, 10]
-    }
+                 'nb': [0xffffffff, 10], }
 
     def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
                  unmap=False, ndob=False, group=0):

@@ -70,8 +70,8 @@ class MockDevId(MockDevice):
         t10[7] = '0'
         dd = bytearray(4)
         dd += t10
-        dd[0] = 0x52 # iSCSI, ASCII
-        dd[1] = 0xa1 # AssociatedWithTargetDevice, T10_VENDOR_ID
+        dd[0] = 0x52  # iSCSI, ASCII
+        dd[1] = 0xa1  # AssociatedWithTargetDevice, T10_VENDOR_ID
         dd[3] = len(t10)
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
@@ -90,8 +90,8 @@ class MockDevId(MockDevice):
         eui[7] = 'e'
         dd = bytearray(4)
         dd += eui
-        dd[0] = 0x01 # BINARY
-        dd[1] = 0x22 # AssociatedWithTargetDevice, EUI-64 
+        dd[0] = 0x01  # BINARY
+        dd[1] = 0x22  # AssociatedWithTargetDevice, EUI-64
         dd[2:4] = scsi_int_to_ba(len(t10), 2)
         datain[pos:pos + len(dd)] = dd
         pos += len(dd)
@@ -111,21 +111,21 @@ class MockReferrals(MockDevice):
 
 class MockExtendedInquiry(MockDevice):
     def execute(self, cdb, dataout, datain, sense):
-        datain[0] = 0x00  # QUAL:0 TYPE:0
-        datain[1] = 0x86  # extended inquiry
-        datain[2] = 0x00  #
-        datain[3] = 0x3c  # page length: 60
-        datain[4] = 0x57  # activate microcode:1 spt:2 grd_chk:1
-                          # app_chk:1 ref_chk:1
-        datain[5] = 0x33  # uask_sup:1 group_sup:1 prior_sup:0 headsup:0
-                          # ordsup:1 simpsup:1
-        datain[6] = 0x05  # wu_sup:0 crd_sup:1 nv_sup:0 v_sup:1
-        datain[7] = 0x11  # p_i_i_sup:1 luiclr:1
-        datain[8] = 0x11  # r_sup:1 cbcs:1
-        datain[9] = 0x03  # multi...:3
-        datain[11] = 0x0f # extended...:15
-        datain[12] = 0xe0 # poa_sup:1 hra_sup:1 vsa_sup:1
-        datain[13] = 0x05 # maximum...:5
+        datain[0] = 0x00   # QUAL:0 TYPE:0
+        datain[1] = 0x86   # extended inquiry
+        datain[2] = 0x00   #
+        datain[3] = 0x3c   # page length: 60
+        datain[4] = 0x57   # activate microcode:1 spt:2 grd_chk:1
+                           # app_chk:1 ref_chk:1
+        datain[5] = 0x33   # uask_sup:1 group_sup:1 prior_sup:0 headsup:0
+                           # ordsup:1 simpsup:1
+        datain[6] = 0x05   # wu_sup:0 crd_sup:1 nv_sup:0 v_sup:1
+        datain[7] = 0x11   # p_i_i_sup:1 luiclr:1
+        datain[8] = 0x11   # r_sup:1 cbcs:1
+        datain[9] = 0x03   # multi...:3
+        datain[11] = 0x0f  # extended...:15
+        datain[12] = 0xe0  # poa_sup:1 hra_sup:1 vsa_sup:1
+        datain[13] = 0x05  # maximum...:5
 
 
 def main():

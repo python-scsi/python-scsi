@@ -18,6 +18,7 @@
 
 class MockDevice(object):
     _opcodes = None
+
     @property
     def opcodes(self):
         return self._opcodes

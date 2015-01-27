@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from scsi_command import SCSICommand
-from scsi_enum_command import OPCODE
 from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
@@ -28,7 +27,7 @@ class ReadCapacity10(SCSICommand):
     """
     A class to hold information from a ReadCapacity(10) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0] }
+    _cdb_bits = {'opcode': [0xff, 0], }
     _datain_bits = {'returned_lba': [0xffffffff, 0],
                     'block_length': [0xffffffff, 4], }
 
@@ -50,7 +49,7 @@ class ReadCapacity10(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.READ_CAPACITY_10.value }
+        cdb = {'opcode': self.scsi.device.opcodes.READ_CAPACITY_10.value, }
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):

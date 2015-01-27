@@ -76,6 +76,7 @@ def decode_bits(data, check_dict, result_dict):
         value &= bitmask
         result_dict.update({key: value})
 
+
 def encode_dict(data_dict, check_dict, result):
     """
     encode a dict back into a bytearray
