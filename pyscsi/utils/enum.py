@@ -71,7 +71,7 @@ class Enum(type):
     def add(self, key, value):
         try:
             getattr(self, key)
-            print "key %s already exist" % key
+            print("key %s already exist" % key)
         except:
             self._enums.append(key)
             setattr(self, key, value)
@@ -81,4 +81,4 @@ class Enum(type):
             delattr(self, key)
             self._enums.remove(key)
         except (AttributeError, KeyError) as e:
-            print "Key %s not found" % e
+            print ("Key %s not found" % e)
