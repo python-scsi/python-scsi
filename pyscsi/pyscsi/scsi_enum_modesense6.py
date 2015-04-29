@@ -141,12 +141,34 @@ disconnect_reconnect_bits = {'buffer_full_ratio': [0xff, 0],
                              'dtdc': [0x07, 10],
                              'first_burst_size': [0xffff, 12], }
 
+power_condition_bits = {'pm_bg_precedence': [0xc0, 2],
+                        'standby_y': [0x01, 1],
+                        'idle_c': [0x08, 3],
+                        'idle_b': [0x04, 3],
+                        'idle_a': [0x02, 3],
+                        'standby_z': [0x01, 2],
+                        'idle_a_condition_timer': [0xffffffff, 4],      # byte 4 to 7
+                        'idle_b_condition_timer': [0xffffffff, 12],     # byte 12 to 15
+                        'idle_c_condition_timer': [0xffffffff, 16],     # byte 16 to 19
+                        'standby_y_condition_timer': [0xffffffff, 20],  # byte 20 to 23
+                        'standby_z_condition_timer': [0xffffffff, 8],   # byte 8 to 11
+                        'ccf_idle': [0xc0, 39],
+                        'ccf_standby': [0x30, 39],
+                        'ccf_stopped': [0x0c, 39], }
+
+power_consumption_bits = {'POWER_CONSUMPTION_IDENTIFIER': [0xff, 7], }
+
+protocol_specific_logical_unit_bits = {'protocol_specific_mode_parameters': [0xf0, 2],
+                                       'protocol_identifier': [0x0f, 2], }
+
 modepagebits = {'cdb_bits': cdb_bits,
                 'mode_parameter_header_bits': mode_parameter_header_bits,
                 'page_zero_bits': page_zero_bits,
                 'sub_page_bits': sub_page_bits,
                 'element_address_bits': element_address_bits,
-                'control_bits': control_bits, }
+                'control_bits': control_bits,
+                'power_condition_bits': power_condition_bits,
+                'power_consumption_bits': power_consumption_bits, }
 
 modeselectbits = {'modeselect6_cdb_bits': modeselect6_cdb_bits, }
 
