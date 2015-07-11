@@ -8,7 +8,7 @@ import sys
 
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
-from pyscsi.pyscsi import scsi_enum_modesense6 as MODESENSE6
+from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 
 
 def usage():

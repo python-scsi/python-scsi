@@ -5,7 +5,7 @@ from pyscsi.pyscsi.scsi import SCSI
 from mock_device import MockDevice
 from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi.scsi_enum_command import spc
-from pyscsi.pyscsi import scsi_enum_modesense6 as MODESENSE6
+from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6
 
 

@@ -17,7 +17,7 @@
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.utils.converter import scsi_int_to_ba, encode_dict, decode_bits
-from pyscsi.pyscsi.scsi_enum_modesense6 import PAGE_CODE, MODESENSE6, MODESELECT6
+from pyscsi.pyscsi.scsi_enum_modesense import PAGE_CODE, MODESENSE6, MODESELECT6
 
 #
 # SCSI ModeSense6 command and definitions

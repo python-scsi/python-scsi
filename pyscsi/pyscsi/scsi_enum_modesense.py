@@ -69,21 +69,42 @@ from pyscsi.utils.enum import Enum
 # ------------------------------------------------------------------------------
 # Mode page bits dictionaries
 #------------------------------------------------------------------------------
-cdb_bits = {'opcode': [0xff, 0],
-            'dbd': [0x08, 1],
-            'pc': [0xc0, 2],
-            'page_code': [0x3f, 2],
-            'sub_page_code': [0xff, 3],
-            'alloc_len': [0xff, 4], }
+
+# cdb definition for mode
+modesense6_cdb_bits = {'opcode': [0xff, 0],
+                        'dbd': [0x08, 1],
+                        'pc': [0xc0, 2],
+                        'page_code': [0x3f, 2],
+                        'sub_page_code': [0xff, 3],
+                        'alloc_len': [0xff, 4], }
+
+modesense10_cdb_bits = {'opcode': [0xff, 0],
+                        'dbd': [0x08, 1],
+                        'pc': [0xc0, 2],
+                        'page_code': [0x3f, 2],
+                        'sub_page_code': [0xff, 3],
+                        'alloc_len': [0xffff, 7],
+                        'llbaa': [0x0f, 2]}
 
 modeselect6_cdb_bits = {'opcode': [0xff, 0],
                         'pf': [0x10, 1],
                         'sp': [0x01, 1],
                         'parameter_list_length': [0xff, 4], }
 
-mode_parameter_header_bits = {'medium_type': [0xff, 1],
+modeselect10_cdb_bits = {'opcode': [0xff, 0],
+                        'pf': [0x10, 1],
+                        'sp': [0x01, 1],
+                        'parameter_list_length': [0xffff, 7], }
+
+# mode parameter header definition
+mode_parameter_header6_bits = {'medium_type': [0xff, 1],
                               'device_specific_parameter': [0xff, 2], }
 
+mode_parameter_header10_bits = {'medium_type': [0xff, 2],
+                              'device_specific_parameter': [0xff, 3],
+                              'longlba': [0x01, 4], }
+
+# other mode page bit definitions
 page_zero_bits = {'ps': [0x80, 0],
                   'spf': [0x40, 0],
                   'page_code': [0x3f, 0], }
@@ -161,8 +182,12 @@ power_consumption_bits = {'POWER_CONSUMPTION_IDENTIFIER': [0xff, 7], }
 protocol_specific_logical_unit_bits = {'protocol_specific_mode_parameters': [0xf0, 2],
                                        'protocol_identifier': [0x0f, 2], }
 
-modepagebits = {'cdb_bits': cdb_bits,
-                'mode_parameter_header_bits': mode_parameter_header_bits,
+modeselect6bits = {'modeselect6_cdb_bits': modeselect6_cdb_bits, }
+modeselect10bits = {'modeselect10_cdb_bits': modeselect10_cdb_bits, }
+
+# mode page definitions
+modepage6bits = {'cdb_bits': modeselect6_cdb_bits,
+                'mode_parameter_header_bits': mode_parameter_header6_bits,
                 'page_zero_bits': page_zero_bits,
                 'sub_page_bits': sub_page_bits,
                 'element_address_bits': element_address_bits,
@@ -170,7 +195,14 @@ modepagebits = {'cdb_bits': cdb_bits,
                 'power_condition_bits': power_condition_bits,
                 'power_consumption_bits': power_consumption_bits, }
 
-modeselectbits = {'modeselect6_cdb_bits': modeselect6_cdb_bits, }
+modepage10bits = {'cdb_bits': modeselect10_cdb_bits,
+                'mode_parameter_header_bits': mode_parameter_header10_bits,
+                'page_zero_bits': page_zero_bits,
+                'sub_page_bits': sub_page_bits,
+                'element_address_bits': element_address_bits,
+                'control_bits': control_bits,
+                'power_condition_bits': power_condition_bits,
+                'power_consumption_bits': power_consumption_bits, }
 
 #------------------------------------------------------------------------------
 # Page Control
@@ -195,5 +227,7 @@ page_code = {'DISCONNECT_RECONNECT': 0x02,
 
 PC = Enum(pc)
 PAGE_CODE = Enum(page_code)
-MODESENSE6 = Enum(modepagebits)
-MODESELECT6 = Enum(modeselectbits)
+MODESENSE6 = Enum(modepage6bits)
+MODESELECT6 = Enum(modeselect6bits)
+MODESENSE10 = Enum(modepage10bits)
+MODESELECT10 = Enum(modeselect10bits)
