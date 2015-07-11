@@ -84,7 +84,7 @@ modesense10_cdb_bits = {'opcode': [0xff, 0],
                         'page_code': [0x3f, 2],
                         'sub_page_code': [0xff, 3],
                         'alloc_len': [0xffff, 7],
-                        'llbaa': [0x0f, 2]}
+                        'llbaa': [0x10, 1]}
 
 modeselect6_cdb_bits = {'opcode': [0xff, 0],
                         'pf': [0x10, 1],
@@ -186,23 +186,27 @@ modeselect6bits = {'modeselect6_cdb_bits': modeselect6_cdb_bits, }
 modeselect10bits = {'modeselect10_cdb_bits': modeselect10_cdb_bits, }
 
 # mode page definitions
-modepage6bits = {'cdb_bits': modeselect6_cdb_bits,
-                'mode_parameter_header_bits': mode_parameter_header6_bits,
-                'page_zero_bits': page_zero_bits,
-                'sub_page_bits': sub_page_bits,
-                'element_address_bits': element_address_bits,
-                'control_bits': control_bits,
-                'power_condition_bits': power_condition_bits,
-                'power_consumption_bits': power_consumption_bits, }
+modepage6bits = {'cdb_bits': modesense6_cdb_bits,
+                 'mode_parameter_header_bits': mode_parameter_header6_bits,
+                 'page_zero_bits': page_zero_bits,
+                 'sub_page_bits': sub_page_bits,
+                 'element_address_bits': element_address_bits,
+                 'control_bits': control_bits,
+                 'control_extension_1_bits': control_extension_1_bits,
+                 'power_condition_bits': power_condition_bits,
+                 'power_consumption_bits': power_consumption_bits,
+                 'disconnect_reconnect_bits': disconnect_reconnect_bits, }
 
-modepage10bits = {'cdb_bits': modeselect10_cdb_bits,
-                'mode_parameter_header_bits': mode_parameter_header10_bits,
-                'page_zero_bits': page_zero_bits,
-                'sub_page_bits': sub_page_bits,
-                'element_address_bits': element_address_bits,
-                'control_bits': control_bits,
-                'power_condition_bits': power_condition_bits,
-                'power_consumption_bits': power_consumption_bits, }
+modepage10bits = {'cdb_bits': modesense10_cdb_bits,
+                  'mode_parameter_header_bits': mode_parameter_header10_bits,
+                  'page_zero_bits': page_zero_bits,
+                  'sub_page_bits': sub_page_bits,
+                  'element_address_bits': element_address_bits,
+                  'control_bits': control_bits,
+                  'control_extension_1_bits': control_extension_1_bits,
+                  'power_condition_bits': power_condition_bits,
+                  'power_consumption_bits': power_consumption_bits,
+                  'disconnect_reconnect_bits': disconnect_reconnect_bits, }
 
 #------------------------------------------------------------------------------
 # Page Control
