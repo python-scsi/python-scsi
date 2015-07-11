@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from scsi_cdb_exchangemedium import ExchangeMedium
 from scsi_cdb_getlbastatus import GetLBAStatus
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
@@ -85,6 +86,18 @@ class SCSI(object):
         :param: blocksize in bytes
         """
         self._blocksize = value
+
+    def exchangemedium(self, xfer, source, dest1, dest2, **kwargs):
+        """
+        Returns a MoveMedium Instance
+
+        :param xfer: medium transport element to use
+        :param source: source element
+        :param dest: destination element
+        :param invert=0: invert/rotate the medium before loading
+        :return: an MoveMedium instance
+        """
+        return ExchangeMedium(self, xfer, source, dest1, dest2, **kwargs)
 
     def getlbastatus(self, lba, **kwargs):
         """
