@@ -19,6 +19,7 @@
 
 from scsi_cdb_exchangemedium import ExchangeMedium
 from scsi_cdb_getlbastatus import GetLBAStatus
+from scsi_cdb_initelementstatus import InitializeElementStatus
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
 from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
@@ -124,6 +125,14 @@ class SCSI(object):
         :return: a Inquiry instance
         """
         return Inquiry(self, **kwargs)
+
+    def initializeelementstatus(self):
+        """
+        Returns a InitializeElementStatus Instance
+
+        :return: a InitializeElementStatus instance
+        """
+        return InitializeElementStatus(self)
 
     def modeselect6(self, data, **kwargs):
         """

@@ -1,6 +1,7 @@
 __all__ = ['scsi',
            'scsi_cdb_exchangemedium',
            'scsi_cdb_getlbastatus',
+           'scsi_cdb_initelementstatus',
            'scsi_cdb_inquiry',
            'scsi_cdb_modesense6',
            'scsi_cdb_modesense10',
