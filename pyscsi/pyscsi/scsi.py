@@ -20,6 +20,7 @@
 from scsi_cdb_exchangemedium import ExchangeMedium
 from scsi_cdb_getlbastatus import GetLBAStatus
 from scsi_cdb_initelementstatus import InitializeElementStatus
+from scsi_cdb_initelementstatuswithrange import InitializeElementStatusWithRange
 from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
 from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
@@ -133,6 +134,18 @@ class SCSI(object):
         :return: a InitializeElementStatus instance
         """
         return InitializeElementStatus(self)
+
+    def initializeelementstatuswithrange(self, xfer, elements, **kwargs):
+        """
+        Returns a InitializeElementStatusWithRange Instance
+
+        :param xfer: two byte indicating the address of the starting element
+        :param elements: two byte representing a range of elements that should be initialized
+        :param range = 0: a integer indicating if elements should be ignored
+        :param fast = 0: a integer indicating if  elements should be scanned for media presence
+        :return: a InitializeElementStatusWithRange instance
+        """
+        return InitializeElementStatusWithRange(self, xfer, elements, **kwargs)
 
     def modeselect6(self, data, **kwargs):
         """
