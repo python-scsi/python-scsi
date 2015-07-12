@@ -23,6 +23,7 @@ from scsi_cdb_inquiry import Inquiry
 from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
 from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
 from scsi_cdb_movemedium import MoveMedium
+from scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
@@ -89,13 +90,15 @@ class SCSI(object):
 
     def exchangemedium(self, xfer, source, dest1, dest2, **kwargs):
         """
-        Returns a MoveMedium Instance
+        Returns a ExchangeMedium Instance
 
         :param xfer: medium transport element to use
         :param source: source element
-        :param dest: destination element
-        :param invert=0: invert/rotate the medium before loading
-        :return: an MoveMedium instance
+        :param dest1: destination 1 element
+        :param dest2: destination 2 element
+        :param inv1=0: invert/rotate the medium before loading
+        :param inv2=0: invert/rotate the medium before loading
+        :return: an ExchangeMedium instance
         """
         return ExchangeMedium(self, xfer, source, dest1, dest2, **kwargs)
 
@@ -150,10 +153,11 @@ class SCSI(object):
 
         :param page_code:  The page requested
         :param sub_page_code = 0: Requested subpage
+        :param llbaa = 0:
         :param dbd = 0: Disable Block Descriptors flag
         :param pc = 0: Page Control flag
         :param alloclen = 96
-        :return: a ModeSense6 instance
+        :return: a ModeSense10 instance
         """
         return ModeSense10(self, page_code, **kwargs)
 
@@ -164,9 +168,20 @@ class SCSI(object):
         :param data: a dict containing the mode page to set
         :param pf = 0: Page Format flag
         :param sp = 0: Save Pages flag
-        :return: a ModeSelect6 instance
+        :return: a ModeSelect10 instance
         """
         return ModeSelect10(self, data, **kwargs)
+
+    def opencloseimportexportelement(self, xfer, acode):
+        """
+        Returns a OpenCloseImportExportElement Instance
+
+        :param data: a dict containing the mode page to set
+        :param pf = 0: Page Format flag
+        :param sp = 0: Save Pages flag
+        :return: a OpenCloseImportExportElement instance
+        """
+        return OpenCloseImportExportElement(self, xfer, acode)
 
     def read10(self, lba, tl, **kwargs):
         """

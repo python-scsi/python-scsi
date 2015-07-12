@@ -135,6 +135,13 @@ sbc_opcode_9e = {'GET_LBA_STATUS': 0x12,
                  'REPORT_REFERRALS': 0x13, }
 
 #------------------------------------------------------------------------------
+# Service Actions Dictionaries for the 1B opcode
+#------------------------------------------------------------------------------
+
+smc_opcode_1b = {'OPEN_IMPORTEXPORT_ELEMENT': 0x00,
+                 'CLOSE_IMPORTEXPORT_ELEMENT': 0x01, }
+
+#------------------------------------------------------------------------------
 # opcode Dictionaries
 #------------------------------------------------------------------------------
 
@@ -309,7 +316,7 @@ smc_opcodes = {'SMC_OPCODE_A4': OpCode('SMC_OPCODE_A4', 0xa4, smc_opcode_a4),
                'MODE_SENSE_6': OpCode('MODE_SENSE_6', 0x1a, {}),
                'MODE_SENSE_10': OpCode('MODE_SENSE_10', 0x5a, {}),
                'MOVE_MEDIUM': OpCode('MOVE_MEDIUM', 0xa5, {}),
-               'OPEN_CLOSE_IMPORT_EXPORT_ELEMENT': OpCode('OPEN_CLOSE_IMPORT_EXPORT_ELEMENT', 0x1b, {}),
+               'OPEN_CLOSE_IMPORT_EXPORT_ELEMENT': OpCode('SMC_OPCODE_1B', 0x1b, smc_opcode_1b),
                'PERSISTENT_RESERVE_IN': OpCode('PERSISTENT_RESERVE_IN', 0x5e, {}),
                'PERSISTENT_RESERVE_OUT': OpCode('PERSISTENT_RESERVE_OUT', 0x5f, {}),
                'PREVENT_ALLOW_MEDIUM_REMOVAL': OpCode('PREVENT_ALLOW_MEDIUM_REMOVAL', 0x1e, {}),
@@ -399,6 +406,11 @@ scsi_status = {'GOOD': 0x00,
                'TASK_ABORTED': 0x40,
                'SGIO_ERROR': 0xff, }
 
+#------------------------------------------------------------------------------
+# open/close
+#------------------------------------------------------------------------------
+
+action_codes = {''}
 #------------------------------------------------------------------------------
 # Instantiate the Enum Objects
 #------------------------------------------------------------------------------
