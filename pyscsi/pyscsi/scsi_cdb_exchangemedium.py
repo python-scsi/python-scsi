@@ -20,7 +20,7 @@ from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
-# SCSI MoveMedium command and definitions
+# SCSI ExchangeMedium command and definitions
 #
 
 

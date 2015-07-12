@@ -31,14 +31,14 @@ class ModeSense10(SCSICommand):
     A class to hold information from a modesense10 command
     """
 
-    def __init__(self, scsi, page_code, sub_page_code=0, llbaa=0, dbd=0, pc=0,
-                 alloclen=96):
+    def __init__(self, scsi, page_code, sub_page_code=0, llbaa=0, dbd=0, pc=0, alloclen=96):
         """
         initialize a new instance
 
         :param scsi: a SCSI instance
         :param page_code: the page code for the vpd page
         :param sub_page_code:
+        :param llbaa:
         :param dbd:
         :param pc:
         :param alloclen: the max number of bytes allocated for the data_in buffer
@@ -166,9 +166,10 @@ class ModeSense10(SCSICommand):
         encode_dict(cdb, MODESENSE10.cdb_bits, result)
         return result
 
+
 class ModeSelect10(SCSICommand):
     """
-    A class to hold information from a modeselect10 command
+    A class to hold information from a ModeSelect10 command
     """
     def __init__(self, scsi, data, pf=1, sp=0):
         """
