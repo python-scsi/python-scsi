@@ -74,6 +74,6 @@ class OpenCloseImportExportElement(SCSICommand):
         """
         Marshall a OpenCloseImportExportElement cdb
         """
-        result = bytearray(12)
+        result = bytearray(6)
         encode_dict(cdb, OpenCloseImportExportElement._cdb_bits, result)
         return result

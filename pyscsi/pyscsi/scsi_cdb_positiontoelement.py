@@ -76,7 +76,7 @@ class PositionToElement(SCSICommand):
         """
         Marshall a PositionToElement cdb
         """
-        result = bytearray(12)
+        result = bytearray(10)
         encode_dict(cdb, PositionToElement._cdb_bits, result)
         return result
 

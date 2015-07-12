@@ -68,6 +68,6 @@ class PreventAllowMediumRemoval(SCSICommand):
         """
         Marshall a PreventAllowMediumRemoval cdb
         """
-        result = bytearray(12)
+        result = bytearray(10)
         encode_dict(cdb, PreventAllowMediumRemoval._cdb_bits, result)
         return result
