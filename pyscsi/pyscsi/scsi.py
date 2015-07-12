@@ -24,6 +24,7 @@ from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
 from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
 from scsi_cdb_movemedium import MoveMedium
 from scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
+from scsi_cdb_positiontoelement import PositionToElement
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
@@ -182,6 +183,17 @@ class SCSI(object):
         :return: a OpenCloseImportExportElement instance
         """
         return OpenCloseImportExportElement(self, xfer, acode)
+
+    def positiontoelement(self, xfer, dest, **kwargs):
+        """
+        Returns a PositionToElement Instance
+
+        :param xfer: medium transport element to use
+        :param dest: destination element
+        :param invert=0: invert/rotate the medium before loading
+        :return: an PositionToElement instance
+        """
+        return PositionToElement(self, xfer, dest, **kwargs)
 
     def read10(self, lba, tl, **kwargs):
         """
