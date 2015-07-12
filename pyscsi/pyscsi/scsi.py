@@ -25,6 +25,7 @@ from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
 from scsi_cdb_movemedium import MoveMedium
 from scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
 from scsi_cdb_positiontoelement import PositionToElement
+from scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
 from scsi_cdb_read10 import Read10
 from scsi_cdb_read12 import Read12
 from scsi_cdb_read16 import Read16
@@ -194,6 +195,15 @@ class SCSI(object):
         :return: an PositionToElement instance
         """
         return PositionToElement(self, xfer, dest, **kwargs)
+
+    def preventallowmediumremoval(self, **kwargs):
+        """
+        Returns a PreventAllowMediumRemoval Instance
+
+        :param prevent=0: prevent/allow the medium to be removed
+        :return: an PreventAllowMediumRemoval instance
+        """
+        return PreventAllowMediumRemoval(self, **kwargs)
 
     def read10(self, lba, tl, **kwargs):
         """
