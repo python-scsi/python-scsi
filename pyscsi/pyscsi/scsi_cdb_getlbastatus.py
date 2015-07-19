@@ -69,7 +69,7 @@ class GetLBAStatus(SCSICommand):
     @staticmethod
     def unmarshall_datain(data):
         """
-        Unmarshall the ReadCapacity16 datain.
+        Unmarshall the GetLBAStatus datain.
         """
         result = {}
         _data = data[8:scsi_ba_to_int(data[:4]) + 4]
@@ -86,7 +86,7 @@ class GetLBAStatus(SCSICommand):
     @staticmethod
     def marshall_datain(data):
         """
-        Marshall the ReadCapacity16 datain.
+        Marshall the GetLBAStatus datain.
         """
         result = bytearray(8)
         if not 'lbas' in data:
