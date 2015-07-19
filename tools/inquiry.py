@@ -6,6 +6,7 @@ import sys
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi_sense import  SCSICheckCondition
 
 
 def usage():
@@ -162,41 +163,44 @@ def main():
     sd = SCSIDevice(device)
     s = SCSI(sd)
 
-    i = s.testunitready()
+    try:
+        i = s.testunitready()
 
-    if not evpd:
-        inquiry_standard(s)
-        return
+        if not evpd:
+            inquiry_standard(s)
+            return
 
-    if page_code == INQUIRY.VPD.SUPPORTED_VPD_PAGES:
-        inquiry_supported_vpd_pages(s)
-        return
+        if page_code == INQUIRY.VPD.SUPPORTED_VPD_PAGES:
+            inquiry_supported_vpd_pages(s)
+            return
 
-    if page_code == INQUIRY.VPD.BLOCK_LIMITS:
-        inquiry_block_limits(s)
-        return
+        if page_code == INQUIRY.VPD.BLOCK_LIMITS:
+            inquiry_block_limits(s)
+            return
 
-    if page_code == INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS:
-        inquiry_block_dev_char(s)
-        return
+        if page_code == INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS:
+            inquiry_block_dev_char(s)
+            return
 
-    if page_code == INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING:
-        inquiry_logical_block_prov(s)
-        return
+        if page_code == INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING:
+            inquiry_logical_block_prov(s)
+            return
 
-    if page_code == INQUIRY.VPD.UNIT_SERIAL_NUMBER:
-        inquiry_unit_serial_number(s)
-        return
+        if page_code == INQUIRY.VPD.UNIT_SERIAL_NUMBER:
+            inquiry_unit_serial_number(s)
+            return
 
-    if page_code == INQUIRY.VPD.DEVICE_IDENTIFICATION:
-        inquiry_device_identification(s)
-        return
+        if page_code == INQUIRY.VPD.DEVICE_IDENTIFICATION:
+            inquiry_device_identification(s)
+            return
 
-    print 'No pretty print for this page, page_code=0x%02x' % page_code
-    print '=============================================\n'
-    i = s.inquiry(evpd=1, page_code=page_code).result
-    for k, v in i.iteritems():
-        print '%s - %s' % (k, v)
+        print 'No pretty print for this page, page_code=0x%02x' % page_code
+        print '=============================================\n'
+        i = s.inquiry(evpd=1, page_code=page_code).result
+        for k, v in i.iteritems():
+            print '%s - %s' % (k, v)
+    except SCSICheckCondition, ex:
+        print ex
 
 
 if __name__ == "__main__":
