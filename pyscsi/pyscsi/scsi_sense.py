@@ -750,6 +750,21 @@ sense_ascq_dict = {0x0001: 'FILEMARK DETECTED',
                    0x7471: 'LOGICAL UNIT ACCESS NOT AUTHORIZED',
                    0x7479: 'SECURITY CONFLICT IN TRANSLATED DEVICE', }
 
+descriptor_type_dict = {0x00: 'INFORMATION',
+                        0x01: 'COMMAND_SPECIFIC_INFORMATION',
+                        0x02: 'SENSE_KEY_SPECIFIC',
+                        0x03: 'FIELD_REPLACEABLE_UNIT',
+                        0x04: 'STREAM_COMMANDS',
+                        0x05: 'BLOCK_COMMANDS',
+                        0x06: 'OSD_OBJECT_IDENTIFICATION',
+                        0x07: 'OSD_RESPONSE_INTEGRITY_CHECK_VALUE',
+                        0x08: 'OSD_ATTRIBUTE_IDENTIFICATION',
+                        0x09: 'ATA_STATUS_RETURN',
+                        0x0a: 'ANOTHER_PROGRESS_INDICATOR',
+                        0x0b: 'USER_DATA_SEGMENT_REFERRAL',
+                        0x0c: 'FORWARDED_SENSE_DATA',
+                        0x0d: 'DIRECT_ACCESS_BLOCK_DEVICE', }
+
 
 # Exception Class for a SCSI REQUEST SENSE command
 class SCSICheckCondition(Exception):
@@ -758,6 +773,78 @@ class SCSICheckCondition(Exception):
     Attributes:
         sense -- byte array with additional data
     """
+
+    # sense data descriptor
+    _sdata_desc_bits = {'desc_type': [0xff, 0],
+                        'additional_len': [0xff, 1], }
+
+    # information sense data descriptor
+    _info_sdata_desc_bits = {'desc_type': [0xff, 0],
+                             'additional_len': [0xff, 1],
+                             'valid': [0x80, 2],
+                             'information': [0xffffffffffffffff, 4], }
+
+    # command-specific information sense data descriptor
+    _cmd_info_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                 'additional_len': [0xff, 1],
+                                 'cmd_specific_information': [0xffffffffffffffff, 4], }
+
+    # sense key specific sense data descriptor
+    _skey_sdata_desc_bits = {'desc_type': [0xff, 0],
+                             'additional_len': [0xff, 1],
+                             'sksv': [0x80, 4],
+                             'skey_specific_information': [0x7fffff, 4], }
+
+    # field pointer sense key specific information
+    _fptr_skey_sdata_desc_bits = {'sksv': [0x80, 0],
+                                  'cd': [0x40, 0],
+                                  'bpv': [0x08, 0],
+                                  'bit_pointer': [0x07, 0],
+                                  'field_pointer': [0xffff, 1], }
+
+    # actual retry count sense key specific information
+    _retry_count_skey_sdata_desc_bits = {'sksv': [0x80, 0],
+                                         'actual_retry_counter': [0xffff, 1], }
+
+    # progress indication sense key specific information
+    _progress_skey_sdata_desc_bits = {'sksv': [0x80, 0],
+                                      'progress_indication': [0xffff, 1], }
+
+    # segment pointer sense key specific information
+    _segptr_skey_sdata_desc_bits = {'sksv': [0x80, 0],
+                                    'sd': [0x40, 0],
+                                    'bpv': [0x20, 0],
+                                    'bit_pointer': [0x07, 0],
+                                    'field_pointer': [0xffff, 1], }
+
+    # unit attention condition queue overflow sense key specific info
+    _uacqo_skey_sdata_desc_bits = {'sksv': [0x80, 0],
+                                   'overflow': [0x01, 0], }
+
+    # field replaceable unit sense data descriptor
+    _fld_replace_unit_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                         'additional_len': [0xff, 1],
+                                         'field_replaceable_unit_code': [0xff, 3], }
+
+    # another progress indication sense data descriptor
+    _aprogress_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                  'additional_len': [0xff, 1],
+                                  'another_sense_key': [0xff, 2],
+                                  'another_additional_sense_code': [0xff, 3],
+                                  'another_additional_sense_code_qualifier': [0xff, 4],
+                                  'another_progress_indication': [0xffff, 6], }
+
+    # forwarded sense data descriptor
+    _fwd_sdata_desc_bits = {'desc_type': [0xff, 0],
+                            'additional_len': [0xff, 1],
+                            'fsdt': [0x80, 2],
+                            'sense_data_source': [0x0f, 2],
+                            'forwarded_status': [0xff, 3], }
+
+    # vendor specific sense data descriptors
+    _vendor_sdata_desc_bits = {'desc_type': [0xff, 0],
+                               'additional_len': [0xff, 1], }
+
     def __init__(self, sense):
         self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
