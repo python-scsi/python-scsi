@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+from pyscsi.utils.converter import decode_bits
+
 #
-# SPC4 4.6 Sense Data
+# SPC4 4.5 Sense Data
 #
 SENSE_FORMAT_CURRENT_FIXED = 0x70
 SENSE_FORMAT_DEFERRED_FIXED = 0x71
@@ -845,27 +847,46 @@ class SCSICheckCondition(Exception):
     _vendor_sdata_desc_bits = {'desc_type': [0xff, 0],
                                'additional_len': [0xff, 1], }
 
-    def __init__(self, sense):
+    # fixed format sense data
+    _fixed_format_sdata_bits = {'valid': [0x80, 0],
+                                'response_code': [0x7f, 0],
+                                'filemark': [0x80, 2],
+                                'eom': [0x40, 2],
+                                'ili': [0x20, 2],
+                                'sdat_ovfl': [0x10, 2],
+                                'sense_key': [0x0f, 2],
+                                'information': [0xffffffff, 3],
+                                'additional_sense_len': [0xff, 7],
+                                'command_specific_information': [0xffffffff, 8],
+                                'additional_sense_code': [0xff, 12],
+                                'additional_sense_code_qualifier': [0xff, 13],
+                                'field_replaceable_unit_code': [0xff, 14],
+                                'sksv': [0x80, 15],
+                                'sense_key_specific_information': [0x7fffff, 15], }
+
+    def __init__(self, sense, print_data=False):
         self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
+        self.data = {}
+        self.show_data = print_data
 
-        print("Response code 0x%02x" % self.response_code)
         if self.response_code == SENSE_FORMAT_CURRENT_FIXED:
-            self.filemark = sense[2] & 0x80
-            self.eom = sense[2] & 0x40
-            self.ili = sense[2] & 0x20
-            self.sdat_ovfl = sense[2] & 0x10
-            self.sense_key = sense[2] & 0x0f
-            self.information = sense[3:7]
-            self.additional_sense_length = sense[7]
-            self.command_specific_information = sense[8:12]
-            self.additional_sense_code = sense[12]
-            self.additional_sense_code_qualifier = sense[13]
-            self.field_replaceable_unit_code = sense[14]
-
-            self.ascq = self.additional_sense_code << 8 + self.additional_sense_code_qualifier
+            self.data = self.unmarshall_fixed_format_sense_data(sense)
+            self.ascq = self.data['additional_sense_code'] << 8 + self.data['additional_sense_code_qualifier']
 
     def __str__(self):
+        if self.show_data:
+            self.print_data()
         return "Check Condition: %s(0x%02x) ASC+Q:%s(0x%04x)" % (
-            sense_key_dict[self.sense_key], self.sense_key,
+            sense_key_dict[self.data['sense_key']], self.data['sense_key'],
             sense_ascq_dict[self.ascq], self.ascq)
+
+    def print_data(self):
+        for k, v in self.data.iteritems():
+            print '%s -> %s' % (k, v)
+
+    @staticmethod
+    def unmarshall_fixed_format_sense_data(data):
+        result = {}
+        decode_bits(data, SCSICheckCondition._fixed_format_sdata_bits, result)
+        return result
