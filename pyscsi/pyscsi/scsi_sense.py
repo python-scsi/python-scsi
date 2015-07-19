@@ -883,7 +883,7 @@ class SCSICheckCondition(Exception):
 
     def print_data(self):
         for k, v in self.data.iteritems():
-            print '%s -> %s' % (k, v)
+            print '%s -> %x' % (k, v)
 
     @staticmethod
     def unmarshall_fixed_format_sense_data(data):
