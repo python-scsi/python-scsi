@@ -752,21 +752,6 @@ sense_ascq_dict = {0x0001: 'FILEMARK DETECTED',
                    0x7471: 'LOGICAL UNIT ACCESS NOT AUTHORIZED',
                    0x7479: 'SECURITY CONFLICT IN TRANSLATED DEVICE', }
 
-descriptor_type_dict = {0x00: 'INFORMATION',
-                        0x01: 'COMMAND_SPECIFIC_INFORMATION',
-                        0x02: 'SENSE_KEY_SPECIFIC',
-                        0x03: 'FIELD_REPLACEABLE_UNIT',
-                        0x04: 'STREAM_COMMANDS',
-                        0x05: 'BLOCK_COMMANDS',
-                        0x06: 'OSD_OBJECT_IDENTIFICATION',
-                        0x07: 'OSD_RESPONSE_INTEGRITY_CHECK_VALUE',
-                        0x08: 'OSD_ATTRIBUTE_IDENTIFICATION',
-                        0x09: 'ATA_STATUS_RETURN',
-                        0x0a: 'ANOTHER_PROGRESS_INDICATOR',
-                        0x0b: 'USER_DATA_SEGMENT_REFERRAL',
-                        0x0c: 'FORWARDED_SENSE_DATA',
-                        0x0d: 'DIRECT_ACCESS_BLOCK_DEVICE', }
-
 
 # Exception Class for a SCSI REQUEST SENSE command
 class SCSICheckCondition(Exception):
@@ -863,6 +848,29 @@ class SCSICheckCondition(Exception):
                                 'field_replaceable_unit_code': [0xff, 14],
                                 'sksv': [0x80, 15],
                                 'sense_key_specific_information': [0x7fffff, 15], }
+
+    # descriptor format sense data
+    _desc_format_sdata_bits = {'response_code': [0x7f, 0],
+                               'sdat_ovfl': [0x80, 4],
+                               'sense_key': [0x0f, 1],
+                               'additional_sense_code': [0xff, 2],
+                               'additional_sense_code_qualifier': [0xff, 3],
+                               'additional_sense_len': [0xff, 7], }
+
+    _descriptor_type_dict = {0x00: _info_sdata_desc_bits,
+                             0x01: _cmd_info_sdata_desc_bits,
+                             0x02: _skey_sdata_desc_bits,
+                             0x03: _fld_replace_unit_sdata_desc_bits,
+                             0x04: {},  # 'STREAM_COMMANDS'
+                             0x05: {},  # 'BLOCK_COMMANDS'
+                             0x06: {},  # 'OSD_OBJECT_IDENTIFICATION'
+                             0x07: {},  # 'OSD_RESPONSE_INTEGRITY_CHECK_VALUE'
+                             0x08: {},  # 'OSD_ATTRIBUTE_IDENTIFICATION'
+                             0x09: {},  # 'ATA_STATUS_RETURN'
+                             0x0a: _aprogress_sdata_desc_bits,
+                             0x0b: {},  # 'USER_DATA_SEGMENT_REFERRAL'
+                             0x0c: _fwd_sdata_desc_bits,
+                             0x80: _vendor_sdata_desc_bits, }
 
     def __init__(self, sense, print_data=False):
         self.valid = sense[0] & 0x80
