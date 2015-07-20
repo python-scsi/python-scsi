@@ -813,6 +813,50 @@ class SCSICheckCondition(Exception):
                                          'additional_len': [0xff, 1],
                                          'field_replaceable_unit_code': [0xff, 3], }
 
+    # stream commands sense data descriptor
+    _stream_cmd_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                   'additional_len': [0xff, 1],
+                                   'filemark': [0x80, 3],
+                                   'eom': [0x40, 3],
+                                   'ili': [0x20, 3], }
+
+    # block commands sense data descriptor
+    _blk_cmd_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                'additional_len': [0xff, 1],
+                                'ili': [0x20, 3], }
+
+    # OSD object identification sense data descriptor
+    _osd_obj_ident_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                      'additional_len': [0xff, 1],
+                                      'not_initiated_command_function': [0xffffff, 8],
+                                      'completed_command_functions': [0xffffffff, 12],
+                                      'partition_id': [0xffffffffffffff, 16],
+                                      'object_id': [0xffffffffffffff, 24], }
+
+    # OSD response integrity check value sense data descriptor
+    _osd_respnd_integrity_ckval_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'response_integrity_check_value':
+                                                       [0xffffffffffffffffffffffffffffffffffffff, 2], }
+    # OSD attribute identification sense data descriptor
+    _osd_attr_ident_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                       'additional_len': [0xff, 1], }
+    # ATA status return descriptor
+    _ata_status_return_desc_bits = {'desc_type': [0xff, 0],
+                                    'additional_len': [0xff, 1],
+                                    'extend': [0x01, 2],
+                                    'error': [0xff, 3],
+                                    'count_15_8': [0xff, 4],
+                                    'count_7_0': [0xff, 5],
+                                    'lba_31_24': [0xff, 6],
+                                    'lba_7_0': [0xff, 7],
+                                    'lba_39_32': [0xff, 8],
+                                    'lba_15_8': [0xff, 9],
+                                    'lba_47_40': [0xff, 10],
+                                    'lba_23_16': [0xff, 11],
+                                    'device': [0xff, 12],
+                                    'status': [0xff, 13], }
+
     # another progress indication sense data descriptor
     _aprogress_sdata_desc_bits = {'desc_type': [0xff, 0],
                                   'additional_len': [0xff, 1],
@@ -820,6 +864,20 @@ class SCSICheckCondition(Exception):
                                   'another_additional_sense_code': [0xff, 3],
                                   'another_additional_sense_code_qualifier': [0xff, 4],
                                   'another_progress_indication': [0xffff, 6], }
+
+    # user data segment referral sense data descriptor
+    _udata_segref_sdata_desc_bits = {'desc_type': [0xff, 0],
+                                     'additional_len': [0xff, 1],
+                                     'not_all_r': [0x01, 2], }
+
+    # user data segment referral descriptor
+    _udata_segref_desc_bits = {'number_of_trarget_port_group_descriptors': [0xff, 3],
+                               'first_user_data_segment_lba': [0xffffffffffffffff, 4],
+                               'last_user_data_segment_lba': [0xffffffffffffffff, 12], }
+
+    # target port group descriptor
+    _tgt_pgroup_desc_bits = {'asymmetric_access_state': [0x0f, 0],
+                             'target_port_group': [0xffff, 2], }
 
     # forwarded sense data descriptor
     _fwd_sdata_desc_bits = {'desc_type': [0xff, 0],
@@ -861,14 +919,14 @@ class SCSICheckCondition(Exception):
                              0x01: _cmd_info_sdata_desc_bits,
                              0x02: _skey_sdata_desc_bits,
                              0x03: _fld_replace_unit_sdata_desc_bits,
-                             0x04: {},  # 'STREAM_COMMANDS'
-                             0x05: {},  # 'BLOCK_COMMANDS'
-                             0x06: {},  # 'OSD_OBJECT_IDENTIFICATION'
-                             0x07: {},  # 'OSD_RESPONSE_INTEGRITY_CHECK_VALUE'
-                             0x08: {},  # 'OSD_ATTRIBUTE_IDENTIFICATION'
-                             0x09: {},  # 'ATA_STATUS_RETURN'
+                             0x04: _stream_cmd_sdata_desc_bits,
+                             0x05: _blk_cmd_sdata_desc_bits,
+                             0x06: _osd_obj_ident_sdata_desc_bits,
+                             0x07: _osd_respnd_integrity_ckval_sdata_desc_bits,
+                             0x08: _osd_attr_ident_sdata_desc_bits,
+                             0x09: _ata_status_return_desc_bits,
                              0x0a: _aprogress_sdata_desc_bits,
-                             0x0b: {},  # 'USER_DATA_SEGMENT_REFERRAL'
+                             0x0b: _udata_segref_sdata_desc_bits,
                              0x0c: _fwd_sdata_desc_bits,
                              0x80: _vendor_sdata_desc_bits, }
 
