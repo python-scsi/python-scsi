@@ -101,3 +101,26 @@ def encode_dict(data_dict, check_dict, result):
         v = scsi_int_to_ba(value, _num)
         for i in range(len(v)):
             result[bytepos + i] ^= v[i]
+
+
+def print_data(data_dict):
+    """
+    A small method to print out data we generate in this package.
+
+    It's not really a converter but in a way we convert a dict of
+    key - value pairs into strings ...
+
+    :param data_dict: a dictionary
+    :return: a few strings
+    """
+    for k, v in data_dict.iteritems():
+        if isinstance(v, dict):
+            print k
+            print_data(v)
+        else:
+            if isinstance(v, basestring):
+                print '%s -> %s' % (k, v)
+            elif isinstance(v, float):
+                print '%s -> %.02d' % (k, v)
+            else:
+                print '%s -> 0x%02X' % (k, v)
