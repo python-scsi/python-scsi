@@ -833,6 +833,16 @@ class SCSICheckCondition(Exception):
                                       'partition_id': [0xffffffffffffff, 16],
                                       'object_id': [0xffffffffffffff, 24], }
 
+    # bits contained in the not_initiated_command_function field
+    _osd_cmd_func_bits = {'validation': [0x80, 0],
+                          'cmd_cap_v': [0x20, 0],
+                          'command': [0x10, 0],
+                          'imp_st_att': [0x10, 1],
+                          'sa_cap_v': [0x20, 2],
+                          'set_att': [0x10, 2],
+                          'ga_cap_v': [0x20, 3],
+                          'get_att': [0x10, 3], }
+
     # OSD response integrity check value sense data descriptor
     _osd_respnd_integrity_ckval_sdata_desc_bits = {'desc_type': [0xff, 0],
                                                    'additional_len': [0xff, 1],
@@ -841,6 +851,11 @@ class SCSICheckCondition(Exception):
     # OSD attribute identification sense data descriptor
     _osd_attr_ident_sdata_desc_bits = {'desc_type': [0xff, 0],
                                        'additional_len': [0xff, 1], }
+
+    # OSD sense data attribute descriptor
+    _osd_sdata_attr_desc_bits = {'attribute_page': [0xffffffff, 0],
+                                 'attribute_number': [0xffffffff, 4], }
+
     # ATA status return descriptor
     _ata_status_return_desc_bits = {'desc_type': [0xff, 0],
                                     'additional_len': [0xff, 1],
