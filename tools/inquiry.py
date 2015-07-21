@@ -200,6 +200,8 @@ def main():
         for k, v in i.iteritems():
             print '%s - %s' % (k, v)
     except SCSICheckCondition, ex:
+        # if you want a print out of the sense data dict uncomment the next line
+        #ex.show_data = True
         print ex
 
 
