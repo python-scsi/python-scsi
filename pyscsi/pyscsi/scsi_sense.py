@@ -979,7 +979,7 @@ class SCSICheckCondition(Exception):
     @staticmethod
     def unmarshall_descriptor_sense_data(data):
         result = {}
-        decode_bits(data, SCSICheckCondition._desc_format_sdata_bits, result)
+        decode_bits(data[:8], SCSICheckCondition._desc_format_sdata_bits, result)
         _data = data[8:result['additional_sense_len']]
         _descs = []
         while len(_data):
