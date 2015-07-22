@@ -946,14 +946,18 @@ class SCSICheckCondition(Exception):
                              0x80: _vendor_sdata_desc_bits, }
 
     def __init__(self, sense, print_data=False):
-        self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
         self.data = {}
         self.show_data = print_data
 
         if self.response_code == SENSE_FORMAT_CURRENT_FIXED:
+            self.valid = sense[0] & 0x80
             self.data = self.unmarshall_fixed_format_sense_data(sense)
-            self.ascq = self.data['additional_sense_code'] << 8 + self.data['additional_sense_code_qualifier']
+
+        if self.response_code == SENSE_FORMAT_CURRENT_DESCRIPTOR:
+            self.data = self.unmarshall_descriptor_sense_data(sense)
+
+        self.ascq = self.data['additional_sense_code'] << 8 + self.data['additional_sense_code_qualifier']
 
     def __str__(self):
         if self.show_data:
@@ -970,4 +974,21 @@ class SCSICheckCondition(Exception):
     def unmarshall_fixed_format_sense_data(data):
         result = {}
         decode_bits(data, SCSICheckCondition._fixed_format_sdata_bits, result)
+        return result
+
+    @staticmethod
+    def unmarshall_descriptor_sense_data(data):
+        result = {}
+        decode_bits(data, SCSICheckCondition._desc_format_sdata_bits, result)
+        _data = data[8:result['additional_sense_len']]
+        _descs = []
+        while len(_data):
+            _r = {}
+            _r2 = {}
+            decode_bits(_data[:2], SCSICheckCondition._sdata_desc_bits, _r)
+            _d = _data[2:_r['additional_len']]
+            decode_bits(_d, SCSICheckCondition._descriptor_type_dict[_r['desc_type']], _r2)
+            _descs.append(_r2)
+            _data = _data[_r['additional_len'] + 2:]
+        result.update({'descs': _descs})
         return result
