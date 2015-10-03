@@ -17,30 +17,30 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_cdb_exchangemedium import ExchangeMedium
-from scsi_cdb_getlbastatus import GetLBAStatus
-from scsi_cdb_initelementstatus import InitializeElementStatus
-from scsi_cdb_initelementstatuswithrange import InitializeElementStatusWithRange
-from scsi_cdb_inquiry import Inquiry
-from scsi_cdb_modesense6 import ModeSense6, ModeSelect6
-from scsi_cdb_modesense10 import ModeSense10, ModeSelect10
-from scsi_cdb_movemedium import MoveMedium
-from scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
-from scsi_cdb_positiontoelement import PositionToElement
-from scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
-from scsi_cdb_read10 import Read10
-from scsi_cdb_read12 import Read12
-from scsi_cdb_read16 import Read16
-from scsi_cdb_readcapacity10 import ReadCapacity10
-from scsi_cdb_readcapacity16 import ReadCapacity16
-from scsi_cdb_readelementstatus import ReadElementStatus
-from scsi_cdb_testunitready import TestUnitReady
-from scsi_cdb_write10 import Write10
-from scsi_cdb_write12 import Write12
-from scsi_cdb_write16 import Write16
-from scsi_cdb_writesame10 import WriteSame10
-from scsi_cdb_writesame16 import WriteSame16
-from scsi_enum_command import spc, sbc, smc, ssc, mmc
+from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
+from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
+from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
+from pyscsi.pyscsi.scsi_cdb_initelementstatuswithrange import InitializeElementStatusWithRange
+from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
+from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6, ModeSelect6
+from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSense10, ModeSelect10
+from pyscsi.pyscsi.scsi_cdb_movemedium import MoveMedium
+from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
+from pyscsi.pyscsi.scsi_cdb_positiontoelement import PositionToElement
+from pyscsi.pyscsi.scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
+from pyscsi.pyscsi.scsi_cdb_read10 import Read10
+from pyscsi.pyscsi.scsi_cdb_read12 import Read12
+from pyscsi.pyscsi.scsi_cdb_read16 import Read16
+from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
+from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
+from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
+from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
+from pyscsi.pyscsi.scsi_cdb_write10 import Write10
+from pyscsi.pyscsi.scsi_cdb_write12 import Write12
+from pyscsi.pyscsi.scsi_cdb_write16 import Write16
+from pyscsi.pyscsi.scsi_cdb_writesame10 import WriteSame10
+from pyscsi.pyscsi.scsi_cdb_writesame16 import WriteSame16
+from pyscsi.pyscsi.scsi_enum_command import spc, sbc, smc, ssc, mmc
 
 
 class SCSI(object):

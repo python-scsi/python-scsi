@@ -1,2 +1,2 @@
-from enum import *
-from converter import *
+from .enum import *
+from .converter import *

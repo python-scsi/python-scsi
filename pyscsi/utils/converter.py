@@ -18,6 +18,9 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import print_function
+
+
 def scsi_int_to_ba(to_convert=0, array_size=4):
     """
     This function converts a  integer of (8 *array_size)-bit to a bytearray(array_size) in
@@ -61,7 +64,7 @@ def decode_bits(data, check_dict, result_dict):
     :data: a buffer containing the bits to decode
     :check_dict: a dict with a list as value in each key:value pair
     """
-    for key in check_dict.iterkeys():
+    for key in check_dict.keys():
         # get the values from dict
         bitmask, byte_pos = check_dict[key]
         _num = 1
@@ -81,7 +84,7 @@ def encode_dict(data_dict, check_dict, result):
     """
     encode a dict back into a bytearray
     """
-    for key in data_dict.iterkeys():
+    for key in data_dict.keys():
         if not key in check_dict:
             continue
         value = data_dict[key]
@@ -113,14 +116,14 @@ def print_data(data_dict):
     :param data_dict: a dictionary
     :return: a few strings
     """
-    for k, v in data_dict.iteritems():
+    for k, v in data_dict.items():
         if isinstance(v, dict):
-            print k
+            print(k)
             print_data(v)
         else:
             if isinstance(v, basestring):
-                print '%s -> %s' % (k, v)
+                print('%s -> %s' % (k, v))
             elif isinstance(v, float):
-                print '%s -> %.02d' % (k, v)
+                print('%s -> %.02d' % (k, v))
             else:
-                print '%s -> 0x%02X' % (k, v)
+                print('%s -> 0x%02X' % (k, v))

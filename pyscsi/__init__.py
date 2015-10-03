@@ -1,2 +1,2 @@
-from pyscsi import *
-from utils import *
+from .pyscsi import *
+from .utils import *

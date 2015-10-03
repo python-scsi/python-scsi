@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_command import SCSICommand
+from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
-import scsi_enum_readelementstatus as readelementstatus_enums
+import pyscsi.pyscsi.scsi_enum_readelementstatus as readelementstatus_enums
 
 #
 # SCSI ReadElementStatus command and definitions

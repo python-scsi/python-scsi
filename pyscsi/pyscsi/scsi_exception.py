@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from scsi_sense import SCSICheckCondition
+from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
 
 
 class SCSICommandExceptionMeta(type):
