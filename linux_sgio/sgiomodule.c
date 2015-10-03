@@ -111,6 +111,19 @@
 char             bufr[bSIZE];
 static PyObject *SGIOError;
 
+/* adding some stuff from the Python Docs to make this module ready for
+ * Python 3. This should be reviewed by the C Guys in the Project
+ */
+struct module_state {
+    PyObject *SGIOError;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
 
 /* -------------------------------------------------------------------------- **
  * Static functions:
@@ -299,15 +312,11 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
   return( Py_BuildValue( "i", 0 ) );
   } /* sgio_close */
 
+/* We going to add some checking for Python 3 and additional code for the
+ * 'new' way to define a module
+ */
 
-PyMODINIT_FUNC initlinux_sgio( void )
-  /* ------------------------------------------------------------------------ **
-   * Module initialization.
-   * ------------------------------------------------------------------------ **
-   */
-  {
-  PyObject          *module;
-  static PyMethodDef SGIOMethods[] =
+ static PyMethodDef SGIOMethods[] =
     {
       { "open",    linux_sgio_open,    METH_VARARGS, "Open a SCSI device."  },
       { "execute", linux_sgio_execute, METH_VARARGS, "Execute a SCSI CDB."  },
@@ -315,16 +324,66 @@ PyMODINIT_FUNC initlinux_sgio( void )
       { NULL, NULL, 0, NULL }
     };
 
-  /* Attempt to initialize the module.  If that fails, just give up.  */
-  if( NULL == (module = Py_InitModule( "linux_sgio", SGIOMethods )) )
-    return;
+#if PY_MAJOR_VERSION >= 3
 
-  /* Module initialization succeeded, so we're good.
-   *  Add our personalized SGIOError exception class to the Python world.
+  static int linux_sgio_traverse(PyObject *m, visitproc visit, void *arg)
+  {
+    Py_VISIT(GETSTATE(m)->SGIOError);
+    return 0;
+  }
+
+  static int linux_sgio_clear(PyObject *m)
+  {
+    Py_CLEAR(GETSTATE(m)->SGIOError);
+    return 0;
+  }
+
+  static struct PyModuleDef moduledef =
+    {
+        PyModuleDef_HEAD_INIT,
+        "linux_sgio",
+        NULL,
+        sizeof(struct module_state),
+        SGIOMethods,
+        NULL,
+        linux_sgio_traverse,
+        linux_sgio_clear,
+        NULL
+    };
+
+#define INITERROR return NULL
+
+  PyObject *PyInit_linux_sgio(void)
+
+#else
+#define INITERROR return
+
+void initlinux_sgio(void)
+#endif
+  /* ------------------------------------------------------------------------ **
+   * Module initialization.
+   * ------------------------------------------------------------------------ **
    */
-  SGIOError = PyErr_NewException( "linux_sgio.error", NULL, NULL );
-  Py_INCREF( SGIOError );
-  PyModule_AddObject( module, "error", SGIOError );
+  {
+#if PY_MAJOR_VERSION >= 3
+    PyObject *module = PyModule_Create(&moduledef);
+#else
+    PyObject *module = Py_InitModule("linux_sgio", SGIOMethods);
+#endif
+      if( module == NULL)
+        INITERROR;
+      struct module_state *st = GETSTATE(module);
+
+      st->SGIOError = PyErr_NewException( "linux_sgio.error", NULL, NULL );
+    if (st->SGIOError == NULL)
+    {
+        Py_DECREF(module);
+        INITERROR;
+    }
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
+
   } /* initsgio */
 
 /* ========================================================================== */
