@@ -351,14 +351,16 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
         NULL
     };
 
-#define INITERROR return NULL
+  #define INITERROR return NULL
 
   PyObject *PyInit_linux_sgio(void)
 
 #else
-#define INITERROR return
 
-void initlinux_sgio(void)
+  #define INITERROR return
+
+  void initlinux_sgio(void)
+
 #endif
   /* ------------------------------------------------------------------------ **
    * Module initialization.
