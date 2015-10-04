@@ -20,12 +20,12 @@ class MockInquiryStandard(MockDevice):
         datain[6] = 0x71  # ENCSERV:1 VS:1 MULTIP:1 ADDR16:1
         datain[7] = 0x33  # WBUS16:1 SYNC:1 CMDQUE:1 VS2:1
         # t10 vendor id
-        datain[8:16] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        datain[8:16] = bytearray(ord(c) for c in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'])
         # product id
-        datain[16:32] = ['i', 'i', 'i', 'i', 'i', 'i', 'i', 'i',
-                         'j', 'j', 'j', 'j', 'j', 'j', 'j', 'j']
+        datain[16:32] = bytearray(ord(c) for c in ['i', 'i', 'i', 'i', 'i', 'i', 'i', 'i',
+                         'j', 'j', 'j', 'j', 'j', 'j', 'j', 'j'])
         # product revision level
-        datain[32:36] = ['r', 'e', 'v', 'n']
+        datain[32:36] = bytearray(ord(c) for c in ['r', 'e', 'v', 'n'])
         datain[56] = 0x09  # CLOCKING:2 QAS:0 IUS:1
 
 
@@ -47,7 +47,7 @@ class MockUSN(MockDevice):
         datain[1] = 0x80  # unit serial number
         datain[2] = 0x00  #
         datain[3] = 0x04  # page length == 4
-        datain[4:8] = "ABCD"
+        datain[4:8] = "ABCD".encode()
 
 
 class MockDevId(MockDevice):
@@ -60,14 +60,14 @@ class MockDevId(MockDevice):
         
         # Designation Descriptor: T10_VENDOR_ID
         t10 = bytearray(8)
-        t10[0] = 'T'
-        t10[1] = 'e'
-        t10[2] = 's'
-        t10[3] = 't'
-        t10[4] = ' '
-        t10[5] = 'T'
-        t10[6] = '1'
-        t10[7] = '0'
+        t10[0] = ord('T')
+        t10[1] = ord('e')
+        t10[2] = ord('s')
+        t10[3] = ord('t')
+        t10[4] = ord(' ')
+        t10[5] = ord('T')
+        t10[6] = ord('1')
+        t10[7] = ord('0')
         dd = bytearray(4)
         dd += t10
         dd[0] = 0x52  # iSCSI, ASCII
@@ -83,11 +83,11 @@ class MockDevId(MockDevice):
         eui[1] = 0x22
         eui[2] = 0x33
         # vendor specific
-        eui[3] = 'a'
-        eui[4] = 'b'
-        eui[5] = 'c'
-        eui[6] = 'd'
-        eui[7] = 'e'
+        eui[3] = ord('a')
+        eui[4] = ord('b')
+        eui[5] = ord('c')
+        eui[6] = ord('d')
+        eui[7] = ord('e')
         dd = bytearray(4)
         dd += eui
         dd[0] = 0x01  # BINARY
@@ -157,9 +157,9 @@ def main():
     assert i['clocking'] == 2
     assert i['qas'] == 0
     assert i['ius'] == 1
-    assert i['t10_vendor_identification'] == 'abcdefgh'
-    assert i['product_identification'] == 'iiiiiiiijjjjjjjj'
-    assert i['product_revision_level'] == 'revn'
+    assert i['t10_vendor_identification'].decode("utf-8") == 'abcdefgh'
+    assert i['product_identification'].decode("utf-8") == 'iiiiiiiijjjjjjjj'
+    assert i['product_revision_level'].decode("utf-8") == 'revn'
 
     d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i))
     assert d == i
@@ -188,7 +188,7 @@ def main():
     i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
     assert i['peripheral_qualifier'] == 0
     assert i['peripheral_qualifier'] == 0
-    assert i['unit_serial_number'] == "ABCD"
+    assert i['unit_serial_number'].decode("utf-8") == "ABCD"
 
     d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
     assert d == i
@@ -255,8 +255,8 @@ def main():
     assert dd[0]['designator_type'] == 1
     assert dd[0]['piv'] == 1
     assert dd[0]['protocol_identifier'] == 5
-    assert dd[0]['designator']['t10_vendor_id'] == 'Test T10'
-    assert dd[0]['designator']['vendor_specific_id'] == ''
+    assert dd[0]['designator']['t10_vendor_id'].decode("utf-8") == 'Test T10'
+    assert dd[0]['designator']['vendor_specific_id'].decode("utf-8") == ''
     # EUI-64 designation descriptor
     assert dd[1]['association'] == 2
     assert dd[1]['code_set'] == 1
@@ -265,7 +265,7 @@ def main():
     assert dd[1]['piv'] == 0
     assert not hasattr(dd[1], 'protocol_identifier')
     assert dd[1]['designator']['ieee_company_id'] == 0x112233
-    assert dd[1]['designator']['vendor_specific_extension_id'] == 'abcde'
+    assert dd[1]['designator']['vendor_specific_extension_id'].decode("utf-8") == 'abcde'
 
     d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
     assert d == i
