@@ -62,17 +62,19 @@ class SCSI(object):
         the scsi device and assigning a proper opcode
         mapper.
         """
-        dev_type = self.inquiry().result['peripheral_device_type']
-        if dev_type in (0x00, 0x04, 0x07, ):  # sbc
-            self.device.opcodes = sbc
-        elif dev_type in (0x01, 0x02, 0x09):  # ssc
-            self.device.opcodes = ssc
-        elif dev_type in (0x03,):  # spc
-            self.device.opcodes = spc
-        elif dev_type in (0x08,):  # smc
-            self.device.opcodes = smc
-        elif dev_type in (0x05,):  # mmc
-            self.device.opcodes = mmc
+        if self.device is not None:
+            dev_type = self.inquiry().result['peripheral_device_type']
+            if dev_type in (0x00, 0x04, 0x07, ):  # sbc
+                self.device.opcodes = sbc
+            elif dev_type in (0x01, 0x02, 0x09):  # ssc
+                self.device.opcodes = ssc
+            elif dev_type in (0x03,):  # spc
+                self.device.opcodes = spc
+            elif dev_type in (0x08,):  # smc
+                self.device.opcodes = smc
+            elif dev_type in (0x05,):  # mmc
+                self.device.opcodes = mmc
+
 
     @property
     def blocksize(self):
