@@ -18,12 +18,15 @@
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
+# make a new base class with the metaclass this should solve the problem with the
+# python 2 and python 3 metaclass definitions
+_new_base_class = ExMETA('NewBaseClass', (object,), {})
 
-class SCSICommand(object):
+
+class SCSICommand(_new_base_class):
     """
     The base class for a derived scsi command class
     """
-    __metaclass__ = ExMETA
 
     def __init__(self, scsi, dataout_alloclen, datain_alloclen):
         """

@@ -15,7 +15,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
@@ -32,12 +31,15 @@ try:
 except ImportError as e:
     _have_linux_sgio = False
 
+# make a new base class with the metaclass this should solve the problem with the
+# python 2 and python 3 metaclass definitions
+_new_base_class = ExMETA('NewBaseClass', (object,), {})
 
-class SCSIDevice(object):
+
+class SCSIDevice(_new_base_class):
     """
     The base class for a derived  scsi device class
     """
-    __metaclass__ = ExMETA
 
     def __init__(self, device, readwrite=False):
         """
