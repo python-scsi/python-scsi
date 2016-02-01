@@ -34,6 +34,7 @@ from pyscsi.pyscsi.scsi_cdb_read16 import Read16
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
+from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -403,3 +404,13 @@ class SCSI(object):
         :return: a WriteSame10 instance
         """
         return WriteSame10(self, lba, nb, data, **kwargs)
+
+    def reportluns(self, **kwargs):
+        """
+        Return a ReportLuns Instance
+
+        :param report=0x00: type of logical unit addresses that shall be reported
+        :param alloclen=96: size of requested datain
+        :return: a ReportLuns instance
+        """
+        return ReportLuns(self, **kwargs)

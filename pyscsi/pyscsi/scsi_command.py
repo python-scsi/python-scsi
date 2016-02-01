@@ -191,3 +191,7 @@ class SCSICommand(_new_base_class):
         :return:
         """
         self._page_code = value
+
+    def print_cdb(self):
+        for b in self._cdb:
+            print('0x%02X ' % b)
