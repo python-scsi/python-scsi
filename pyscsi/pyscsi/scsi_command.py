@@ -20,7 +20,7 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 
 # make a new base class with the metaclass this should solve the problem with the
 # python 2 and python 3 metaclass definitions
-_new_base_class = ExMETA('NewBaseClass', (object,), {})
+_new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
 
 class SCSICommand(_new_base_class):
@@ -78,9 +78,9 @@ class SCSICommand(_new_base_class):
         try:
             self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
         except Exception as e:
-            print(e)
+            raise e
         else:
-            if hasattr(self, 'unmarshall'):
+            if getattr(self, 'unmarshall'):
                 self.unmarshall()
 
     @property
