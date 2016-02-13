@@ -238,6 +238,11 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
     io_hdr.dxfer_len       = datain_buf.len;
     io_hdr.dxferp          = datain_buf.buf;
     }
+  else
+    {
+    PyErr_SetString( SGIOError, "No input or output buffer provided." );
+    return( NULL );
+    }
 
   io_hdr.sbp       = sense_buf.buf;
   io_hdr.mx_sb_len = sense_buf.len;
