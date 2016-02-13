@@ -77,7 +77,7 @@ class SCSICommand(_new_base_class):
         """
         try:
             self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
-        except (self.CheckCondition, self.SCSISGIOError) as e:
+        except Exception as e:
             print(e)
         else:
             if hasattr(self, 'unmarshall'):
