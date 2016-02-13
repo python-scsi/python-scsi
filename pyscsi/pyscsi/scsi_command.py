@@ -80,8 +80,11 @@ class SCSICommand(_new_base_class):
         except Exception as e:
             raise e
         else:
-            if getattr(self, 'unmarshall'):
-                self.unmarshall()
+            try:
+                if getattr(self, 'unmarshall'):
+                    self.unmarshall()
+            except:
+                pass
 
     @property
     def result(self):
