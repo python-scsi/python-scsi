@@ -111,20 +111,6 @@
 char             bufr[bSIZE];
 static PyObject *SGIOError;
 
-/* adding some stuff from the Python Docs to make this module ready for
- * Python 3. This should be reviewed by the C Guys in the Project
- */
-struct module_state {
-    PyObject *SGIOError;
-};
-
-#if PY_MAJOR_VERSION >= 3
-#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
-
 /* -------------------------------------------------------------------------- **
  * Static functions:
  */
@@ -326,29 +312,13 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
 
 #if PY_MAJOR_VERSION >= 3
 
-  static int linux_sgio_traverse(PyObject *m, visitproc visit, void *arg)
-  {
-    Py_VISIT(GETSTATE(m)->SGIOError);
-    return 0;
-  }
-
-  static int linux_sgio_clear(PyObject *m)
-  {
-    Py_CLEAR(GETSTATE(m)->SGIOError);
-    return 0;
-  }
-
   static struct PyModuleDef moduledef =
     {
         PyModuleDef_HEAD_INIT,
         "linux_sgio",
         NULL,
-        sizeof(struct module_state),
+	-1,
         SGIOMethods,
-        NULL,
-        linux_sgio_traverse,
-        linux_sgio_clear,
-        NULL
     };
 
   #define INITERROR return NULL
@@ -374,10 +344,13 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
 #endif
       if( module == NULL)
         INITERROR;
-      struct module_state *st = GETSTATE(module);
 
-      st->SGIOError = PyErr_NewException( "linux_sgio.error", NULL, NULL );
-    if (st->SGIOError == NULL)
+      SGIOError = PyErr_NewException( "linux_sgio.SGIOError", NULL, NULL );
+      Py_INCREF(SGIOError);
+      if ( PyModule_AddObject(module, "SGIOError", SGIOError) == -1 )
+	INITERROR;
+
+    if (SGIOError == NULL)
     {
         Py_DECREF(module);
         INITERROR;
