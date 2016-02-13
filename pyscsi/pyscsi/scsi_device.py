@@ -15,6 +15,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+import sys
+
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
@@ -62,6 +64,8 @@ class SCSIDevice(_new_base_class):
         elif _have_linux_sgio and device[:5] == '/dev/':
             self._is_linux_sgio = True
             self._fd = linux_sgio.open(device, bool(readwrite))
+        else:
+            raise NotImplementedError('No backend implemented for %s' % device)
 
     def execute(self, cdb, dataout, datain, sense):
         """
