@@ -59,7 +59,7 @@ class SCSIDevice(_new_base_class):
             libiscsi.iscsi_full_connect_sync(self._iscsi, self._iscsi_url.portal, self._iscsi_url.lun)
 
             self._is_libiscsi = True
-        elif _have_linux_sgio and device[:7] == '/dev/sg':
+        elif _have_linux_sgio and device[:5] == '/dev/':
             self._is_linux_sgio = True
             self._fd = linux_sgio.open(device, bool(readwrite))
 
