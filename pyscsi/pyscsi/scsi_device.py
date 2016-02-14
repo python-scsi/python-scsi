@@ -101,7 +101,15 @@ class SCSIDevice(_new_base_class):
             raise self.SCSISGIOError
 
         elif self.isLinuxSGIO:
-            status = linux_sgio.execute(self._fd, cdb, dataout, datain, sense)
+            _dir = linux_sgio.DXFER_NONE
+            if len(datain) and len(dataout):
+                raise NotImplemented('Indirect IO is not supported')
+            elif len(datain):
+                _dir = linux_sgio.DXFER_FROM_DEV
+            elif len(dataout):
+                _dir = linux_sgio.DXFER_TO_DEV
+
+            status = linux_sgio.execute(self._fd, _dir, cdb, dataout, datain, sense)
             if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
                 raise self.CheckCondition(sense)
             if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:

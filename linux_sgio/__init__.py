@@ -1,1 +1,1 @@
-from .linux_sgio import open, execute, close
+from .linux_sgio import *
