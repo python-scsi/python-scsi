@@ -35,6 +35,7 @@ from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
+from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -64,18 +65,17 @@ class SCSI(object):
         mapper.
         """
         if self.device is not None:
-            dev_type = self.inquiry().result['peripheral_device_type']
-            if dev_type in (0x00, 0x04, 0x07, ):  # sbc
+            self.device.devicetype = self.inquiry().result['peripheral_device_type']
+            if self.device.devicetype in (0x00, 0x04, 0x07, ):  # sbc
                 self.device.opcodes = sbc
-            elif dev_type in (0x01, 0x02, 0x09):  # ssc
+            elif self.device.devicetype in (0x01, 0x02, 0x09):  # ssc
                 self.device.opcodes = ssc
-            elif dev_type in (0x03,):  # spc
+            elif self.device.devicetype in (0x03,):  # spc
                 self.device.opcodes = spc
-            elif dev_type in (0x08,):  # smc
+            elif self.device.devicetype in (0x08,):  # smc
                 self.device.opcodes = smc
-            elif dev_type in (0x05,):  # mmc
+            elif self.device.devicetype in (0x05,):  # mmc
                 self.device.opcodes = mmc
-
 
     @property
     def blocksize(self):
@@ -414,3 +414,13 @@ class SCSI(object):
         :return: a ReportLuns instance
         """
         return ReportLuns(self, **kwargs)
+
+    def reportpriority(self, **kwargs):
+        """
+        Return a ReportLuns Instance
+
+        :param priority=0x00: specifies information to be returned in data_in buffer
+        :param alloclen=16384: size of requested datain
+        :return: a ReportLuns instance
+        """
+        return ReportPriority(self, **kwargs)

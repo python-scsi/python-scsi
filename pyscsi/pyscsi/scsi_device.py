@@ -33,7 +33,7 @@ except ImportError as e:
 
 # make a new base class with the metaclass this should solve the problem with the
 # python 2 and python 3 metaclass definitions
-_new_base_class = ExMETA('NewBaseClass', (object,), {})
+_new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
 
 class SCSIDevice(_new_base_class):
@@ -45,6 +45,7 @@ class SCSIDevice(_new_base_class):
         """
         initialize a  new instance
         :param device: the file descriptor
+        :param readwrite: access type
         """
         self._is_libiscsi = False
         self._is_linux_sgio = False
@@ -125,3 +126,11 @@ class SCSIDevice(_new_base_class):
     @opcodes.setter
     def opcodes(self, value):
         self._opcodes = value
+
+    @property
+    def devicetype(self):
+        return self._devicetype
+
+    @devicetype.setter
+    def devicetype(self, value):
+        self._devicetype = value
