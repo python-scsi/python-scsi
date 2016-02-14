@@ -317,7 +317,7 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
         PyModuleDef_HEAD_INIT,
         "linux_sgio",
         NULL,
-	-1,
+	    -1,
         SGIOMethods,
     };
 

@@ -26,7 +26,7 @@ from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, 
 
 class ReportLuns(SCSICommand):
     """
-    A class to hold information from a GetLBAStatus command to a scsi device
+    A class to hold information from a ReportLuns command to a scsi device
     """
     _cdb_bits = {'opcode': [0xff, 0],
                  'select_report': [0xff, 2],
@@ -73,6 +73,7 @@ class ReportLuns(SCSICommand):
         _luns = []
         _count = 0
         while len(_data):
+            #  maybe we drop the whole "put a dict into the list for every lun" thing at all
             _r = {}
             decode_bits(_data[:8], ReportLuns._datain_bits, _r)
             key = 'lun%s' % _count

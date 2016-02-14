@@ -22,7 +22,7 @@ from pyscsi.utils.converter import (scsi_int_to_ba, scsi_ba_to_int,
 
 
 #
-# SCSI GetLBAStatus command and definitions
+# SCSI ReportPriority command and definitions
 #
 
 
