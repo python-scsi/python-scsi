@@ -417,9 +417,9 @@ class SCSI(object):
 
     def reportpriority(self, **kwargs):
         """
-        Return a ReportLuns Instance
+        Return a ReportPriority Instance
 
-        :param priority=0x00: specifies information to be returned in data_in buffer
+        :param priority=0: specifies information to be returned in data_in buffer
         :param alloclen=16384: size of requested datain
         :return: a ReportLuns instance
         """

@@ -39,7 +39,7 @@ class ReportPriority(SCSICommand):
                   'rtpi': [0xffff, 2],
                   'adlen': [0xffff, 6], }
 
-    def __init__(self, scsi, priority=0x00, alloclen=16384):
+    def __init__(self, scsi, priority=0, alloclen=16384):
         """
         initialize a new instance
 
