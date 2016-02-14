@@ -27,10 +27,14 @@ class SCSICommandExceptionMeta(type):
         class CommandNotImplemented(Exception):
             pass
 
+        class MissingBlocksizeException(Exception):
+            pass
+
         class OpcodeException(Exception):
             pass
 
         attributes.update({'CommandNotImplemented': CommandNotImplemented})
+        attributes.update({'MissingBlocksizeException': MissingBlocksizeException})
         attributes.update({'OpcodeException': OpcodeException})
 
         return type.__new__(mcs, cls, bases, attributes)

@@ -37,6 +37,9 @@ class Read12(SCSICommand):
                  'group': [0x1f, 10], }
 
     def __init__(self, scsi, lba, tl, **kwargs):
+        if scsi.blocksize == 0:
+            raise SCSICommand.MissingBlocksizeException
+
         SCSICommand.__init__(self, scsi, 0, scsi.blocksize * tl)
         self.cdb = self.build_cdb(lba, tl, **kwargs)
         self.execute()
