@@ -127,3 +127,17 @@ def print_data(data_dict):
                 print('%s -> %.02d' % (k, v))
             else:
                 print('%s -> 0x%02X' % (k, v))
+
+
+def get_opcode(enum, part):
+    """
+    A generator that returns an OpCode object from a given
+    Enum object.
+
+    :param enum: the Enum of opcodes
+    :param part: a string to lookup in the enum keys
+    :return: an OpCode object
+    """
+    for val in enum._enums:
+        if(val[len(val)-2:] == part):
+                yield getattr(enum, val)
