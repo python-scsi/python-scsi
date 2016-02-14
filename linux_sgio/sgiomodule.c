@@ -4,6 +4,7 @@
  * Copyright:
  *  Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
  *  Copyright (C) 2014 by Christopher R. Hertel <crh@ubiqx.org>
+ *  Copyright (C) 2016 by Diego Elio Pettenò <flameeyes@flameeyes.eu>
  *
  * Description: A Python binding for the Linux SCSI Generic (sg) Driver.
  *
