@@ -111,20 +111,6 @@
 char             bufr[bSIZE];
 static PyObject *SGIOError;
 
-/* adding some stuff from the Python Docs to make this module ready for
- * Python 3. This should be reviewed by the C Guys in the Project
- */
-struct module_state {
-    PyObject *SGIOError;
-};
-
-#if PY_MAJOR_VERSION >= 3
-#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
-
 /* -------------------------------------------------------------------------- **
  * Static functions:
  */
@@ -221,10 +207,15 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
     return( NULL );
   if( PyObject_GetBuffer( cdb_arg, &cdb_buf, PyBUF_WRITABLE ) < 0 )
     return( NULL );
-  if( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_WRITABLE ) < 0 )
+
+  if( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_SIMPLE ) < 0 )
     return( NULL );
-  if( PyObject_GetBuffer( datain_arg, &datain_buf, PyBUF_WRITABLE ) < 0 )
+
+  /* We need either dataout or datain, we don't need both. */
+  if ( dataout_buf.len <= 0 &&
+       PyObject_GetBuffer( datain_arg, &datain_buf, PyBUF_WRITABLE ) < 0 )
     return( NULL );
+
   if( PyObject_GetBuffer( sense_arg, &sense_buf, PyBUF_WRITABLE ) < 0 )
     return( NULL );
 
@@ -241,12 +232,16 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
     io_hdr.dxfer_len       = dataout_buf.len;
     io_hdr.dxferp          = dataout_buf.buf;
     }
-
-  if( datain_buf.len )
+  else if( datain_buf.len )
     {
     io_hdr.dxfer_direction = SG_DXFER_FROM_DEV;
     io_hdr.dxfer_len       = datain_buf.len;
     io_hdr.dxferp          = datain_buf.buf;
+    }
+  else
+    {
+    PyErr_SetString( SGIOError, "No input or output buffer provided." );
+    return( NULL );
     }
 
   io_hdr.sbp       = sense_buf.buf;
@@ -326,29 +321,13 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
 
 #if PY_MAJOR_VERSION >= 3
 
-  static int linux_sgio_traverse(PyObject *m, visitproc visit, void *arg)
-  {
-    Py_VISIT(GETSTATE(m)->SGIOError);
-    return 0;
-  }
-
-  static int linux_sgio_clear(PyObject *m)
-  {
-    Py_CLEAR(GETSTATE(m)->SGIOError);
-    return 0;
-  }
-
   static struct PyModuleDef moduledef =
     {
         PyModuleDef_HEAD_INIT,
         "linux_sgio",
         NULL,
-        sizeof(struct module_state),
+	-1,
         SGIOMethods,
-        NULL,
-        linux_sgio_traverse,
-        linux_sgio_clear,
-        NULL
     };
 
   #define INITERROR return NULL
@@ -374,10 +353,13 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
 #endif
       if( module == NULL)
         INITERROR;
-      struct module_state *st = GETSTATE(module);
 
-      st->SGIOError = PyErr_NewException( "linux_sgio.error", NULL, NULL );
-    if (st->SGIOError == NULL)
+      SGIOError = PyErr_NewException( "linux_sgio.SGIOError", NULL, NULL );
+      Py_INCREF(SGIOError);
+      if ( PyModule_AddObject(module, "SGIOError", SGIOError) == -1 )
+	INITERROR;
+
+    if (SGIOError == NULL)
     {
         Py_DECREF(module);
         INITERROR;
