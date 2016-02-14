@@ -219,7 +219,7 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
 
   if( dxfer == SG_DXFER_TO_DEV )
     {
-      if ( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_WRITABLE ) < 0 )
+      if ( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_SIMPLE ) < 0 )
 	return( NULL );
       io_hdr.dxfer_len       = dataout_buf.len;
       io_hdr.dxferp          = dataout_buf.buf;
