@@ -197,19 +197,15 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
   PyObject   *cdb_arg, *dataout_arg, *datain_arg, *sense_arg;
   Py_buffer   cdb_buf,  dataout_buf,  datain_buf,  sense_buf;
   sg_io_hdr_t io_hdr;
-  int         i;
+  int         i, dxfer;
 
   /* Parse and exctract the Python input parameters.
    *  See the discussion here:  https://docs.python.org/2/c-api/buffer.html
    */
-  if( !PyArg_ParseTuple( args, "iOOOO:sgio_execute", &i,
+  if( !PyArg_ParseTuple( args, "iiOOOO:sgio_execute", &i, &dxfer,
                          &cdb_arg, &dataout_arg, &datain_arg, &sense_arg ) )
     return( NULL );
   if( PyObject_GetBuffer( cdb_arg, &cdb_buf, PyBUF_WRITABLE ) < 0 )
-    return( NULL );
-  if( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_WRITABLE ) < 0 )
-    return( NULL );
-  if( PyObject_GetBuffer( datain_arg, &datain_buf, PyBUF_WRITABLE ) < 0 )
     return( NULL );
   if( PyObject_GetBuffer( sense_arg, &sense_buf, PyBUF_WRITABLE ) < 0 )
     return( NULL );
@@ -219,20 +215,21 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
   io_hdr.interface_id    = 'S';
   io_hdr.cmdp            = cdb_buf.buf;
   io_hdr.cmd_len         = cdb_buf.len;
-  io_hdr.dxfer_direction = 0;
+  io_hdr.dxfer_direction = dxfer;
 
-  if( dataout_buf.len )
+  if( dxfer == SG_DXFER_TO_DEV )
     {
-    io_hdr.dxfer_direction = SG_DXFER_TO_DEV;
-    io_hdr.dxfer_len       = dataout_buf.len;
-    io_hdr.dxferp          = dataout_buf.buf;
+      if ( PyObject_GetBuffer( dataout_arg, &dataout_buf, PyBUF_SIMPLE ) < 0 )
+	return( NULL );
+      io_hdr.dxfer_len       = dataout_buf.len;
+      io_hdr.dxferp          = dataout_buf.buf;
     }
-
-  if( datain_buf.len )
+  else if ( dxfer == SG_DXFER_FROM_DEV )
     {
-    io_hdr.dxfer_direction = SG_DXFER_FROM_DEV;
-    io_hdr.dxfer_len       = datain_buf.len;
-    io_hdr.dxferp          = datain_buf.buf;
+      if( PyObject_GetBuffer( datain_arg, &datain_buf, PyBUF_WRITABLE ) < 0 )
+	return( NULL );
+      io_hdr.dxfer_len       = datain_buf.len;
+      io_hdr.dxferp          = datain_buf.buf;
     }
 
   io_hdr.sbp       = sense_buf.buf;
@@ -348,6 +345,16 @@ static PyObject *linux_sgio_close( PyObject *self, PyObject *args )
       SGIOError = PyErr_NewException( "linux_sgio.SGIOError", NULL, NULL );
       Py_INCREF(SGIOError);
       if ( PyModule_AddObject(module, "SGIOError", SGIOError) == -1 )
+	INITERROR;
+
+      /* Define some of the SGIO constants for use in the Python code. */
+      if ( PyModule_AddIntConstant(module, "DXFER_NONE", SG_DXFER_NONE) < 0 )
+	INITERROR;
+      if ( PyModule_AddIntConstant(module, "DXFER_TO_DEV", SG_DXFER_TO_DEV) < 0 )
+	INITERROR;
+      if ( PyModule_AddIntConstant(module, "DXFER_FROM_DEV", SG_DXFER_FROM_DEV) < 0 )
+	INITERROR;
+      if ( PyModule_AddIntConstant(module, "DXFER_TO_FROM_DEV", SG_DXFER_TO_FROM_DEV) < 0 )
 	INITERROR;
 
     if (SGIOError == NULL)
