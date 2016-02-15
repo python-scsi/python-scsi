@@ -19,7 +19,7 @@ def main():
     s.blocksize = 512
     data = bytearray(512)
 
-    w = s.writesame16(1024, 27, data, ndob=True)
+    w = s.writesame16(1024, 27, data)
     cdb = w.cdb
     assert cdb[0] == s.device.opcodes.WRITE_SAME_16.value
     assert cdb[1] == 0
