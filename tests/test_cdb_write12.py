@@ -16,6 +16,7 @@ def main():
     dev = MockWrite12()
     dev.opcodes = sbc
     s = SCSI(dev)
+    s.blocksize = 512
 
     data = bytearray(27 * 512)
 

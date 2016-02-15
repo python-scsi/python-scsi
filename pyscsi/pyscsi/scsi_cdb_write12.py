@@ -36,6 +36,9 @@ class Write12(SCSICommand):
                  'tl': [0xffffffff, 6], }
 
     def __init__(self, scsi, lba, tl, data, **kwargs):
+        if scsi.blocksize == 0:
+            raise SCSICommand.MissingBlocksizeException
+
         SCSICommand.__init__(self, scsi, scsi.blocksize * tl, 0)
         self.dataout = data
         self.cdb = self.build_cdb(lba, tl, **kwargs)

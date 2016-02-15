@@ -23,6 +23,9 @@ class WriteSame16(SCSICommand):
 
     def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
                  unmap=False, ndob=False, group=0):
+        if not ndob and scsi.blocksize == 0:
+            raise SCSICommand.MissingBlocksizeException
+
         SCSICommand.__init__(self, scsi, 0 if ndob else scsi.blocksize, 0)
         self.dataout = None if ndob else data
         self.cdb = self.build_cdb(lba, nb, wrprotect, anchor, unmap,

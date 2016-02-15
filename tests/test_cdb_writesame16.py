@@ -16,10 +16,10 @@ def main():
     dev = MockWriteSame16()
     dev.opcodes = sbc
     s = SCSI(dev)
-
+    s.blocksize = 512
     data = bytearray(512)
 
-    w = s.writesame16(1024, 27, data)
+    w = s.writesame16(1024, 27, data, ndob=True)
     cdb = w.cdb
     assert cdb[0] == s.device.opcodes.WRITE_SAME_16.value
     assert cdb[1] == 0

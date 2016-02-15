@@ -16,6 +16,7 @@ def main():
     dev = MockRead10()
     dev.opcodes = sbc
     s = SCSI(dev)
+    s.blocksize = 512
 
     r = s.read10(1024, 27)
     cdb = r.cdb

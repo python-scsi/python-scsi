@@ -16,6 +16,7 @@ def main():
     dev = MockRead16()
     dev.opcodes = sbc
     s = SCSI(dev)
+    s.blocksize = 512
 
     r = s.read16(1024, 27)
     cdb = r.cdb
@@ -58,6 +59,7 @@ def main():
 
     d = Read16.unmarshall_cdb(Read16.marshall_cdb(cdb))
     assert d == cdb
+
 
 if __name__ == "__main__":
     main()
