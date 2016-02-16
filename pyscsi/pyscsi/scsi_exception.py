@@ -1,6 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
+# Copyright:
+#  Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
+#  Copyright (C) 2016 by Diego Elio Pettenò <flameeyes@flameeyes.eu>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -19,8 +21,8 @@ from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
 
 
 class SCSICommandExceptionMeta(type):
-    """A meta class for class depending SCSICommand exceptions
-
+    """
+    A meta class for class depending SCSICommand exceptions
     """
     def __new__(mcs, cls, bases, attributes):
 
@@ -41,10 +43,9 @@ class SCSICommandExceptionMeta(type):
 
 
 class SCSIDeviceExceptionMeta(type):
-    """A meta class for class depending SCSICommand exceptions
-
     """
-
+    A meta class for class depending SCSICommand exceptions
+    """
     def __new__(mcs, cls, bases, attributes):
 
         class CheckCondition(SCSICheckCondition):

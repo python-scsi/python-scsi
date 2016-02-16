@@ -26,10 +26,11 @@ from pyscsi.pyscsi.scsi_opcode import OpCode
 # The OpCode object holds a Enum object with the service actions and has a value and
 # a name property to access the opcode name and value.
 
-#------------------------------------------------------------------------------
-# Maintenance in Service Actions
-#------------------------------------------------------------------------------
-
+"""
+------------------------------------------------------------------------------
+Maintenance in Service Actions
+------------------------------------------------------------------------------
+"""
 sa_maintenance_in = {'REPORT_ASSIGNED_UNASSIGNED_P_EXTENT': 0x00,
                      'REPORT_COMPONENT_DEVICE': 0x01,
                      'REPORT_COMPONENT_DEVICE_ATTACHMENTS': 0x02,
@@ -41,9 +42,11 @@ sa_maintenance_in = {'REPORT_ASSIGNED_UNASSIGNED_P_EXTENT': 0x00,
                      'REPORT_SUPPORTED_CONFIGURATION_METHOD': 0x09,
                      'REPORT_UNCONFIGURED_CAPACITY': 0x08, }
 
-#------------------------------------------------------------------------------
-# Maintenance out Service Actions Dictionaries
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Maintenance out Service Actions Dictionaries
+------------------------------------------------------------------------------
+"""
 
 sa_maintenance_out = {'ADD_PERIPHERAL_DEVICE_COMPONENT_DEVICE': 0x00,
                       'ATTACH_TO_COMPONENT_DEVICE': 0x01,
@@ -54,9 +57,11 @@ sa_maintenance_out = {'ADD_PERIPHERAL_DEVICE_COMPONENT_DEVICE': 0x00,
                       'REMOVE_PERIPHERAL_DEVICE_COMPONENT_DEVICE': 0x05,
                       'SET_PERIPHERAL_DEVICE_COMPONENT_DEVICE_IDENTIFIER': 0x06, }
 
-#------------------------------------------------------------------------------
-# Service Actions Dictionaries for the A3 opcode
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Service Actions Dictionaries for the A3 opcode
+------------------------------------------------------------------------------
+"""
 
 spc_opcode_a3 = {'REPORT_DEVICE_IDENTIFIER': 0x05,
                  'REPORT_ALIASES': 0x0b,
@@ -86,9 +91,11 @@ smc_opcode_a3 = {'REPORT_ALIASES': 0x0b,
                  'REPORT_TIMESTAMP': 0x0f,
                  'REQUEST_DATA_TRANSFER_ELEMENT_INQUIRY': 0x06, }
 
-#------------------------------------------------------------------------------
-# Service Actions Dictionaries for the A4 opcode
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Service Actions Dictionaries for the A4 opcode
+------------------------------------------------------------------------------
+"""
 
 spc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
                  'SET_DEVICE_IDENTIFIER': 0x06,
@@ -111,9 +118,11 @@ smc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
                  'SET_PRIORITY': 0x0e,
                  'SET_TIMESTAMP': 0x0f, }
 
-#------------------------------------------------------------------------------
-# Service Actions Dictionaries for the 7F opcode
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Service Actions Dictionaries for the 7F opcode
+------------------------------------------------------------------------------
+"""
 
 sbc_opcode_7f = {'ORWRITE_32': 0x000e,
                  'READ_32': 0x0009,
@@ -126,24 +135,30 @@ sbc_opcode_7f = {'ORWRITE_32': 0x000e,
                  'XDWRITEREAD_32': 0x0007,
                  'XPWRITE_32': 0x0006, }
 
-#------------------------------------------------------------------------------
-# Service Actions Dictionaries for the 9E opcode
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Service Actions Dictionaries for the 9E opcode
+------------------------------------------------------------------------------
+"""
 
 sbc_opcode_9e = {'GET_LBA_STATUS': 0x12,
                  'READ_CAPACITY_16': 0x10,
                  'REPORT_REFERRALS': 0x13, }
 
-#------------------------------------------------------------------------------
-# Service Actions Dictionaries for the 1B opcode
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Service Actions Dictionaries for the 1B opcode
+------------------------------------------------------------------------------
+"""
 
 smc_opcode_1b = {'OPEN_IMPORTEXPORT_ELEMENT': 0x00,
                  'CLOSE_IMPORTEXPORT_ELEMENT': 0x01, }
 
-#------------------------------------------------------------------------------
-# opcode Dictionaries
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+opcode Dictionaries
+------------------------------------------------------------------------------
+"""
 
 spc_opcodes = {'SPC_OPCODE_A4': OpCode('SPC_OPCODE_A4', 0xa4, spc_opcode_a4),
                'SPC_OPCODE_A3': OpCode('SPC_OPCODE_A3', 0xa3, spc_opcode_a3),
@@ -398,9 +413,11 @@ mmc_opcodes = {'BLANK': OpCode('BLANK', 0xa1, {}),
                'WRITE_AND_VERIFY_10': OpCode('WRITE_AND_VERIFY_10', 0x2e, {}),
                'WRITE_BUFFER': OpCode('WRITE_BUFFER', 0x3b, {}), }
 
-#------------------------------------------------------------------------------
-# scsi status Dictionaries
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+scsi status Dictionaries
+------------------------------------------------------------------------------
+"""
 
 scsi_status = {'GOOD': 0x00,
                'CHECK_CONDITION': 0x02,
@@ -412,14 +429,19 @@ scsi_status = {'GOOD': 0x00,
                'TASK_ABORTED': 0x40,
                'SGIO_ERROR': 0xff, }
 
-#------------------------------------------------------------------------------
-# open/close
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+open/close
+------------------------------------------------------------------------------
+"""
 
 action_codes = {''}
-#------------------------------------------------------------------------------
-# Instantiate the Enum Objects
-#------------------------------------------------------------------------------
+
+"""
+------------------------------------------------------------------------------
+Instantiate the Enum Objects
+------------------------------------------------------------------------------
+"""
 
 SCSI_STATUS = Enum(scsi_status)
 
@@ -429,9 +451,11 @@ ssc = Enum(ssc_opcodes)
 smc = Enum(smc_opcodes)
 mmc = Enum(mmc_opcodes)
 
-#------------------------------------------------------------------------------
-# Obsolete Dictionaries and Enums
-#------------------------------------------------------------------------------
+"""
+------------------------------------------------------------------------------
+Obsolete Dictionaries and Enums
+------------------------------------------------------------------------------
+"""
 
 opcodes = {'INQUIRY': 0x12,
            'MODE_SENSE_6': 0x1a,
@@ -456,4 +480,7 @@ service_action_ins = {'READ_CAPACITY_16': 0x10,
                       'GET_LBA_STATUS': 0x12, }
 
 SERVICE_ACTION_IN = Enum(service_action_ins)
-#------------------------------------------------------------------------------
+
+"""
+------------------------------------------------------------------------------
+"""
