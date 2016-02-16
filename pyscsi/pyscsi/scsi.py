@@ -33,7 +33,6 @@ from pyscsi.pyscsi.scsi_cdb_read12 import Read12
 from pyscsi.pyscsi.scsi_cdb_read16 import Read16
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
-from pyscsi.pyscsi.scsi_cdb_readbuffer10 import ReadBuffer10
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
@@ -427,12 +426,3 @@ class SCSI(object):
         """
         return ReportPriority(self, **kwargs)
 
-    def readbuffer10(self, mode, mode_spec, buf_id, buf_offset, alloclen, **kwargs):
-        """
-        Return a ReportPriority Instance
-
-        :param priority=0: specifies information to be returned in data_in buffer
-        :param alloclen=16384: size of requested datain
-        :return: a ReportLuns instance
-        """
-        return ReadBuffer10(self, mode, mode_spec, buf_id, buf_offset, alloclen, **kwargs)
