@@ -54,9 +54,8 @@ class SCSI(object):
         self._blocksize = blocksize
         self.__init_opcode()
 
-    def __call__(self, dev, blocksize=0):
+    def __call__(self, dev):
         self.device = dev
-        elf._blocksize = blocksize
         self.__init_opcode()
 
     def __init_opcode(self):
@@ -425,4 +424,3 @@ class SCSI(object):
         :return: a ReportLuns instance
         """
         return ReportPriority(self, **kwargs)
-
