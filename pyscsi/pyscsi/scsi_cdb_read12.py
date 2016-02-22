@@ -37,6 +37,14 @@ class Read12(SCSICommand):
                  'group': [0x1f, 10], }
 
     def __init__(self, scsi, lba, tl, **kwargs):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI object
+        :param lba: Logical Block Address
+        :param tl: transfer length
+        :param kwargs: a list of keyword args including rdprotect, dpo, fua, rarc and group (all needed in the cdb)
+        """
         if scsi.blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
@@ -47,6 +55,14 @@ class Read12(SCSICommand):
     def build_cdb(self, lba, tl, rdprotect=0, dpo=0, fua=0, rarc=0, group=0):
         """
         Build a Read12 CDB
+
+        :param lba: Logical Block Address
+        :param tl: transfer length
+        :param rdprotect: value to specify checking the returning status for the read command
+        :param dpo: disable page out, can have a value 0f 0 or 1
+        :param fua: force until access, can have a value of 0 or 1
+        :param rarc: rebuild assist recovery control, can have a value of 0 or 1
+        :param group: group number, can be 0 or greater
         """
         cdb = {
             'opcode': self.scsi.device.opcodes.READ_12.value,
@@ -64,6 +80,9 @@ class Read12(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a Read12 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, Read12._cdb_bits, result)
@@ -73,6 +92,9 @@ class Read12(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a Read12 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, Read12._cdb_bits, result)

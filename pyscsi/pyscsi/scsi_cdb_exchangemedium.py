@@ -40,13 +40,13 @@ class ExchangeMedium(SCSICommand):
         """
         initialize a new instance
 
-        :param scsi:
-        :param xfer:
-        :param source:
-        :param dest1:
-        :param dest2:
-        :param inv1:
-        :param inv1:
+        :param scsi: a SCSI Object
+        :param xfer: medium transfer address
+        :param source: source address
+        :param dest1: first destination address
+        :param dest2: second destination address
+        :param inv1: value indicating if first destination should be inverted
+        :param inv2: value indicating if scond destination should be inverted
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(xfer, source, dest1, dest2, inv1, inv2)
@@ -56,6 +56,12 @@ class ExchangeMedium(SCSICommand):
         """
         Build a ExchangeMedium CDB
 
+        :param xfer: medium transfer address
+        :param source: source address
+        :param dest1: first destination address
+        :param dest2: second destination address
+        :param inv1: value indicating if first destination should be inverted
+        :param inv2: value indicating if scond destination should be inverted
         :return: a byte array representing a code descriptor block
         """
         cdb = {
@@ -72,6 +78,9 @@ class ExchangeMedium(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ExchangeMedium cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, ExchangeMedium._cdb_bits, result)
@@ -81,6 +90,9 @@ class ExchangeMedium(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ExchangeMedium cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, ExchangeMedium._cdb_bits, result)

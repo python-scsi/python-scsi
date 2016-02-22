@@ -44,6 +44,7 @@ class ReportPriority(SCSICommand):
         initialize a new instance
 
         :param scsi: a SCSI instance
+        :param priority: specifies information to be returned in data_in buffer
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
@@ -67,7 +68,7 @@ class ReportPriority(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the ReportPriority data.
+        wrapper method for the unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
@@ -75,6 +76,9 @@ class ReportPriority(SCSICommand):
     def unmarshall_datain(data):
         """
         Unmarshall the ReportPriority datain.
+
+        :param data: a byte array
+        :return result: a dic
         """
         result = {}
         #  get the data after the ppd_len
@@ -94,6 +98,9 @@ class ReportPriority(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the ReportPriority datain.
+
+        :param data: a dict
+        :return result: a byte array
         """
         result = bytearray(4)
         if not 'priority_descriptors' in data:
@@ -114,6 +121,9 @@ class ReportPriority(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ReportPriority cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, ReportPriority._cdb_bits, result)
@@ -123,6 +133,9 @@ class ReportPriority(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ReportPriority cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, ReportPriority._cdb_bits, result)

@@ -37,11 +37,11 @@ class MoveMedium(SCSICommand):
         """
         initialize a new instance
 
-        :param scsi:
-        :param xfer:
-        :param source:
-        :param dest:
-        :param invert:
+        :param scsi: a SCSI object
+        :param xfer: medium transport address
+        :param source: source address
+        :param dest: destination address
+        :param invert: invert can be 0 or 1
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(xfer, source, dest, invert)
@@ -51,6 +51,10 @@ class MoveMedium(SCSICommand):
         """
         Build a MoveMedium CDB
 
+        :param xfer: medium transport address
+        :param source: source address
+        :param dest: destination address
+        :param invert: invert can be 0 or 1
         :return: a byte array representing a code descriptor block
         """
         cdb = {
@@ -66,6 +70,9 @@ class MoveMedium(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a MoveMedium cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, MoveMedium._cdb_bits, result)
@@ -75,6 +82,9 @@ class MoveMedium(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a MoveMedium cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, MoveMedium._cdb_bits, result)

@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
@@ -50,11 +49,22 @@ class SCSI(object):
     The interface to  the specialized scsi classes
     """
     def __init__(self, dev, blocksize=0):
+        """
+        initialize a new instance
+
+        :param dev: a SCSIDevice object
+        :param blocksize:  integer defining a blocksize
+        """
         self.device = dev
         self._blocksize = blocksize
         self.__init_opcode()
 
     def __call__(self, dev):
+        """
+        call the instance again with new device
+
+        :param dev: a SCSIDevice object
+        """
         self.device = dev
         self.__init_opcode()
 
@@ -103,8 +113,8 @@ class SCSI(object):
         :param source: source element
         :param dest1: destination 1 element
         :param dest2: destination 2 element
-        :param inv1=0: invert/rotate the medium before loading
-        :param inv2=0: invert/rotate the medium before loading
+        :param kwargs: inv1=0 invert/rotate the medium before loading
+                       inv2=0 invert/rotate the medium before loading
         :return: an ExchangeMedium instance
         """
         return ExchangeMedium(self, xfer, source, dest1, dest2, **kwargs)
@@ -114,8 +124,9 @@ class SCSI(object):
         Returns a GetLBAStatus Instance
 
         :param lba: starting lba
-        :param alloc_len = 16384: size of requested datain
-        :return: a getlbastatus instance
+        :param kwargs: a dict with key/value pairs
+                       alloc_len = 16384: size of requested datain
+        :return: a GetLBAStatus instance
         """
         return GetLBAStatus(self, lba, **kwargs)
 
@@ -123,9 +134,10 @@ class SCSI(object):
         """
         Returns a Inquiry Instance
 
-        :param evpd = 0: a byte indicating if vital product data is supported
-        :param page_code = 0: a byte representing a page code for vpd
-        :param alloc_len = 96: a integer , the size of the data_in buffer
+        :param kwargs: a dict with key/value pairs
+                       evpd = 0, a byte indicating if vital product data is supported
+                       page_code = 0, a byte representing a page code for vpd
+                       alloc_len = 96, the size of the data_in buffer
         :return: a Inquiry instance
         """
         return Inquiry(self, **kwargs)
@@ -144,8 +156,9 @@ class SCSI(object):
 
         :param xfer: two byte indicating the address of the starting element
         :param elements: two byte representing a range of elements that should be initialized
-        :param range = 0: a integer indicating if elements should be ignored
-        :param fast = 0: a integer indicating if  elements should be scanned for media presence
+        :param kwargs: a dict with key/value pairs
+                       range = 0, a integer indicating if elements should be ignored
+                       fast = 0, a integer indicating if  elements should be scanned for media presence
         :return: a InitializeElementStatusWithRange instance
         """
         return InitializeElementStatusWithRange(self, xfer, elements, **kwargs)
@@ -155,8 +168,9 @@ class SCSI(object):
         Returns a ModeSelect6 Instance
 
         :param data: a dict containing the mode page to set
-        :param pf = 0: Page Format flag
-        :param sp = 0: Save Pages flag
+        :param kwargs: a dict with key/value pairs
+                       pf = 0, Page Format flag
+                       sp = 0, Save Pages flag
         :return: a ModeSelect6 instance
         """
         return ModeSelect6(self, data, **kwargs)
@@ -166,10 +180,11 @@ class SCSI(object):
         Returns a ModeSense6 Instance
 
         :param page_code:  The page requested
-        :param sub_page_code = 0: Requested subpage
-        :param dbd = 0: Disable Block Descriptors flag
-        :param pc = 0: Page Control flag
-        :param alloclen = 96
+        :param kwargs: a dict with key/value pairs
+                       sub_page_code = 0, Requested subpage
+                       dbd = 0, Disable Block Descriptors flag
+                       pc = 0, Page Control flag
+                       alloclen = 96
         :return: a ModeSense6 instance
         """
         return ModeSense6(self, page_code, **kwargs)
@@ -179,11 +194,11 @@ class SCSI(object):
         Returns a ModeSense10 Instance
 
         :param page_code:  The page requested
-        :param sub_page_code = 0: Requested subpage
-        :param llbaa = 0:
-        :param dbd = 0: Disable Block Descriptors flag
-        :param pc = 0: Page Control flag
-        :param alloclen = 96
+        :param kwargs: a dict with key/value pairs
+                       llbaa = 0, long LBA accepted can be 0 or 1
+                       dbd = 0, disable block descriptor can be 0 or 1.
+                       pc = 0, page control field, a value between 0 and 3
+                       alloclen = 0, the max number of bytes allocated for the data_in buffer
         :return: a ModeSense10 instance
         """
         return ModeSense10(self, page_code, **kwargs)
@@ -193,22 +208,23 @@ class SCSI(object):
         Returns a ModeSelect10 Instance
 
         :param data: a dict containing the mode page to set
-        :param pf = 0: Page Format flag
-        :param sp = 0: Save Pages flag
+        :param kwargs: a dict with key/value pairs
+                       pf = 0, Page Format flag
+                       sp = 0, Save Pages flag
         :return: a ModeSelect10 instance
         """
         return ModeSelect10(self, data, **kwargs)
 
-    def opencloseimportexportelement(self, xfer, acode):
+    def opencloseimportexportelement(self, xfer, acode, **kwargs):
         """
         Returns a OpenCloseImportExportElement Instance
 
-        :param data: a dict containing the mode page to set
-        :param pf = 0: Page Format flag
-        :param sp = 0: Save Pages flag
+        :param xfer: a dict containing the mode page to set
+        :param acode: Page Format flag
+        :param kwargs: a dict with key/value pairs
         :return: a OpenCloseImportExportElement instance
         """
-        return OpenCloseImportExportElement(self, xfer, acode)
+        return OpenCloseImportExportElement(self, xfer, acode, **kwargs)
 
     def positiontoelement(self, xfer, dest, **kwargs):
         """
@@ -216,7 +232,8 @@ class SCSI(object):
 
         :param xfer: medium transport element to use
         :param dest: destination element
-        :param invert=0: invert/rotate the medium before loading
+        :param kwargs: a dict with key/value pairs
+                       invert=0, invert/rotate the medium before loading
         :return: an PositionToElement instance
         """
         return PositionToElement(self, xfer, dest, **kwargs)
@@ -225,7 +242,8 @@ class SCSI(object):
         """
         Returns a PreventAllowMediumRemoval Instance
 
-        :param prevent=0: prevent/allow the medium to be removed
+        :param kwargs: a dict with key/value pairs
+                       prevent=0, prevent/allow the medium to be removed
         :return: an PreventAllowMediumRemoval instance
         """
         return PreventAllowMediumRemoval(self, **kwargs)
@@ -236,12 +254,13 @@ class SCSI(object):
 
         :param lba: Logical Block Address
         :param tl: Transfer Length
-        :param rdprotect = 0: ReadProtect flags
-        :param dpo = 0: DisablePageOut flag
-        :param fua = 0: Force Unit Access flag 
-        :param rarc = 0: Rebuild Assist Recovery control flag
-        :param group = 0: Group Number
-        :returns the data returned in self.datain
+        :param kwargs: a dict with key/value pairs
+                       rdprotect = 0, ReadProtect flags
+                       dpo = 0, DisablePageOut flag
+                       fua = 0, Force Unit Access flag
+                       rarc = 0, Rebuild Assist Recovery control flag
+                       group = 0, Group Number
+        :returns a Read10 Instance
         """
         return Read10(self, lba, tl, **kwargs)
 
@@ -251,12 +270,13 @@ class SCSI(object):
 
         :param lba: Logical Block Address
         :param tl: Transfer Length
-        :param rdprotect = 0: ReadProtect flags
-        :param dpo = 0: DisablePageOut flag
-        :param fua = 0: Force Unit Access flag 
-        :param rarc = 0: Rebuild Assist Recovery control flag
-        :param group = 0: Group Number
-        :returns the data returned in self.datain
+        :param kwargs: a dict with key/value pairs
+                       rdprotect = 0, ReadProtect flags
+                       dpo = 0, DisablePageOut flag
+                       fua = 0, Force Unit Access flag
+                       rarc = 0, Rebuild Assist Recovery control flag
+                       group = 0, Group Number
+        :returns a Read12 Instance
         """
         return Read12(self, lba, tl, **kwargs)
 
@@ -266,12 +286,13 @@ class SCSI(object):
 
         :param lba: Logical Block Address
         :param tl: Transfer Length
-        :param rdprotect = 0: ReadProtect flags
-        :param dpo = 0: DisablePageOut flag
-        :param fua = 0: Force Unit Access flag 
-        :param rarc = 0: Rebuild Assist Recovery control flag
-        :param group = 0: Group Number
-        :returns the data returned in self.datain
+        :param kwargs: a dict with key/value pairs
+                       rdprotect = 0, ReadProtect flags
+                       dpo = 0, DisablePageOut flag
+                       fua = 0, Force Unit Access flag
+                       rarc = 0, Rebuild Assist Recovery control flag
+                       group = 0, Group Number
+        :returns a Read16 Instance
         """
         return Read16(self, lba, tl, **kwargs)
 
@@ -279,7 +300,8 @@ class SCSI(object):
         """
         Returns a ReadCapacity10 Instance
 
-        :param alloc_len = 8: size of requested datain
+        :param kwargs: a dict with key/value pairs
+                       alloc_len = 8, size of requested datain
         :return: a ReadCapacity10 instance
         """
         return ReadCapacity10(self, **kwargs)
@@ -288,7 +310,8 @@ class SCSI(object):
         """
         Returns a ReadCapacity16 Instance
 
-        :param alloc_len = 32: size of requested datain
+        :param kwargs: a dict with key/value pairs
+                       alloc_len = 32, size of requested datain
         :return: a ReadCapacity16 instance
         """
         return ReadCapacity16(self, **kwargs)
@@ -299,11 +322,12 @@ class SCSI(object):
 
         :param start: starting address for first element to return
         :param num: numbver of elements to return
-        :param element_type=ELEMENT_TYPE.ALL: type of elements to return
-        :param voltag = 0: whether volume tag data should be returned
-        :param curdata = 1: check current data
-        :param dvcid = 0: whether to return device identifiers
-        :param alloclen=16384: max amount od data to return
+        :param kwargs: a dict with key/value pairs
+                       element_type, type of elements to return
+                       voltag = 0, whether volume tag data should be returned
+                       curdata = 1, check current data
+                       dvcid = 0, whether to return device identifiers
+                       alloclen=16384, max amount od data to return
         :return: an ReadElementStatus instance
         """
         return ReadElementStatus(self, start, num, **kwargs)
@@ -315,7 +339,8 @@ class SCSI(object):
         :param xfer: medium transport element to use
         :param source: source element
         :param dest: destination element
-        :param invert=0: invert/rotate the medium before loading
+        :param kwargs: a dict with key/value pairs
+                       invert=0, invert/rotate the medium before loading
         :return: an MoveMedium instance
         """
         return MoveMedium(self, xfer, source, dest, **kwargs)
@@ -324,8 +349,6 @@ class SCSI(object):
         """
         Returns a TestUnitReady Instance
 
-        No params
-        No return value
         """
         return TestUnitReady(self)
 
@@ -336,10 +359,11 @@ class SCSI(object):
         :param lba: Logical Block Address to write to
         :param tl: Transfer Length in blocks
         :param data: bytearray containing the data to write
-        :param wrprotect = 0: WriteProtect flags
-        :param dpo = 0: disable Page Out flag
-        :param fua = 0: Force Unit Access flag
-        :param group = 0: Group Number
+        :param kwargs: a dict with key/value pairs
+                       wrprotect = 0, WriteProtect flags
+                       dpo = 0, disable Page Out flag
+                       fua = 0, Force Unit Access flag
+                       group = 0, Group Number
         :return: a Write10 instance
         """
         return Write10(self, lba, tl, data, **kwargs)
@@ -351,10 +375,11 @@ class SCSI(object):
         :param lba: Logical Block Address to write to
         :param tl: Transfer Length in blocks
         :param data: bytearray containing the data to write
-        :param wrprotect = 0: WriteProtect flags
-        :param dpo = 0: disable Page Out flag
-        :param fua = 0: Force Unit Access flag
-        :param group = 0: Group Number
+        :param kwargs: a dict with key/value pairs
+                       wrprotect = 0, WriteProtect flags
+                       dpo = 0, disable Page Out flag
+                       fua = 0, Force Unit Access flag
+                       group = 0, Group Number
         :return: a Write12 instance
         """
         return Write12(self, lba, tl, data, **kwargs)
@@ -366,10 +391,11 @@ class SCSI(object):
         :param lba: Logical Block Address to write to
         :param tl: Transfer Length in blocks
         :param data: bytearray containing the data to write
-        :param wrprotect = 0: WriteProtect flags
-        :param dpo = 0: disable Page Out flag
-        :param fua = 0: Force Unit Access flag
-        :param group = 0: Group Number
+        :param kwargs: a dict with key/value pairs
+                       wrprotect = 0, WriteProtect flags
+                       dpo = 0, disable Page Out flag
+                       fua = 0, Force Unit Access flag
+                       group = 0, Group Number
         :return: a Write16 instance
         """
         return Write16(self, lba, tl, data, **kwargs)
@@ -381,11 +407,12 @@ class SCSI(object):
         :param lba: Logical Block Address to write to
         :param nb: Number of blocks
         :param data: bytearray containing the block to write
-        :param wrprotect = 0: WriteProtect flags
-        :param anchor = False: Anchor flag
-        :param unmap = False: Unmap flag
-        :param ndob = False: NoDataOutBuffer flag. When set data is None.
-        :param group = 0: Group Number
+        :param kwargs: a dict with key/value pairs
+                       wrprotect = 0, WriteProtect flags
+                       anchor = 0, Anchor flag
+                       unmap = 0, Unmap flag
+                       ndob = 0, NoDataOutBuffer flag. When set data is None.
+                       group = 0, Group Number
         :return: a WriteSame16 instance
         """
         return WriteSame16(self, lba, nb, data, **kwargs)
@@ -397,10 +424,11 @@ class SCSI(object):
         :param lba: Logical Block Address to write to
         :param nb: Number of blocks
         :param data: bytearray containing the block to write
-        :param wrprotect = 0: WriteProtect flags
-        :param anchor = False: Anchor flag
-        :param unmap = False: Unmap flag
-        :param group = 0: Group Number
+        :param kwargs: a dict with key/value pairs
+                       wrprotect = 0, WriteProtect flags
+                       anchor = 0, Anchor flag
+                       unmap = 0, Unmap flag
+                       group = 0, Group Number
         :return: a WriteSame10 instance
         """
         return WriteSame10(self, lba, nb, data, **kwargs)
@@ -409,8 +437,9 @@ class SCSI(object):
         """
         Return a ReportLuns Instance
 
-        :param report=0x00: type of logical unit addresses that shall be reported
-        :param alloclen=96: size of requested datain
+        :param kwargs: a dict with key/value pairs
+                       report=0x00, type of logical unit addresses that shall be reported
+                       alloclen=96, size of requested datain
         :return: a ReportLuns instance
         """
         return ReportLuns(self, **kwargs)
@@ -419,8 +448,9 @@ class SCSI(object):
         """
         Return a ReportPriority Instance
 
-        :param priority=0: specifies information to be returned in data_in buffer
-        :param alloclen=16384: size of requested datain
+        :param kwargs: a dict with key/value pairs
+                       priority=0, specifies information to be returned in data_in buffer
+                       alloclen=16384, size of requested datain
         :return: a ReportLuns instance
         """
         return ReportPriority(self, **kwargs)

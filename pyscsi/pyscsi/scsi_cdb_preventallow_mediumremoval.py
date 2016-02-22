@@ -35,8 +35,8 @@ class PreventAllowMediumRemoval(SCSICommand):
         """
         initialize a new instance
 
-        :param scsi:
-        :param prevent:
+        :param scsi: a SCSI object
+        :param prevent: prevent can have a value between 0 and 3
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(prevent)
@@ -46,6 +46,7 @@ class PreventAllowMediumRemoval(SCSICommand):
         """
         Build a PreventAllowMediumRemoval CDB
 
+        :param prevent: prevent can have a value between 0 and 3
         :return: a byte array representing a code descriptor block
         """
         cdb = {
@@ -58,6 +59,9 @@ class PreventAllowMediumRemoval(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a PreventAllowMediumRemoval cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, PreventAllowMediumRemoval._cdb_bits, result)
@@ -67,6 +71,9 @@ class PreventAllowMediumRemoval(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a PreventAllowMediumRemoval cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
         encode_dict(cdb, PreventAllowMediumRemoval._cdb_bits, result)

@@ -65,7 +65,7 @@ class ReadCapacity16(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the ReadCapacity16 data.
+        wrapper method for the unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
@@ -73,6 +73,9 @@ class ReadCapacity16(SCSICommand):
     def unmarshall_datain(data):
         """
         Unmarshall the ReadCapacity16 datain.
+
+        :param data: a byte array
+        :return result: a dict
         """
         result = {}
         decode_bits(data, ReadCapacity16._datain_bits, result)
@@ -82,6 +85,9 @@ class ReadCapacity16(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the ReadCapacity16 datain.
+
+        :param data: a dict
+        :return result: a byte array
         """
         result = bytearray(32)
         encode_dict(data, ReadCapacity16._datain_bits, result)
@@ -91,6 +97,9 @@ class ReadCapacity16(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ReadCapacity16 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, ReadCapacity16._cdb_bits, result)
@@ -100,6 +109,9 @@ class ReadCapacity16(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ReadCapacity16 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
         encode_dict(cdb, ReadCapacity16._cdb_bits, result)

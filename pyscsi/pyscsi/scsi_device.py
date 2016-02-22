@@ -15,8 +15,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-import sys
-
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
@@ -46,6 +44,7 @@ class SCSIDevice(_new_base_class):
     def __init__(self, device, readwrite=False):
         """
         initialize a  new instance
+
         :param device: the file descriptor
         :param readwrite: access type
         """
@@ -71,6 +70,7 @@ class SCSIDevice(_new_base_class):
     def execute(self, cdb, dataout, datain, sense):
         """
         execute a scsi command
+
         :param cdb: a byte array representing a command descriptor block
         :param dataout: a byte array to hold received data from the ioctl call
         :param datain: a byte array to hold data passed to the ioctl call

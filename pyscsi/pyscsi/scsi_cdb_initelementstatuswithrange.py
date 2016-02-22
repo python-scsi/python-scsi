@@ -38,7 +38,12 @@ class InitializeElementStatusWithRange(SCSICommand):
         """
         initialize a new instance
 
-        :param scsi:
+        :param scsi: a SCSI object
+        :param xfer: starting element address
+        :param elements: number of elements
+        :param rng: range  indicates if all elements should be checked, if set to 1 xfer and elements are ignored
+        :param fast: fast , if set to 1 scan for media presence only. If set to 0 scan elements for all relevant
+                     status.
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(xfer, elements, rng, fast)
@@ -48,6 +53,9 @@ class InitializeElementStatusWithRange(SCSICommand):
         """
         Build a InitializeElementStatusWithRange CDB
 
+        :param xfer: starting element address
+        :param elements: number of elements
+        :param rng: range can be 0 or 1
         :return: a byte array representing a code descriptor block
         """
         cdb = {'opcode': self.scsi.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE.value,
@@ -62,6 +70,9 @@ class InitializeElementStatusWithRange(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a InitializeElementStatusWithRange cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, InitializeElementStatusWithRange._cdb_bits, result)
@@ -71,6 +82,9 @@ class InitializeElementStatusWithRange(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a InitializeElementStatusWithRange cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
         encode_dict(cdb, InitializeElementStatusWithRange._cdb_bits, result)

@@ -38,6 +38,7 @@ class ReportLuns(SCSICommand):
         initialize a new instance
 
         :param scsi: a SCSI instance
+        :param report: select report field value
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
@@ -59,14 +60,17 @@ class ReportLuns(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the ReportLuns data.
+        wrapper method for the unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
     @staticmethod
     def unmarshall_datain(data):
         """
-        Unmarshall the ReportLuns datain.
+        Unmarshall the ReportLuns datain buffer.
+
+        :param data: a byte array
+        :return result: a dic
         """
         result = {}
         _data = data[8:scsi_ba_to_int(data[:4]) + 4]
@@ -89,6 +93,9 @@ class ReportLuns(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the ReportLuns datain.
+
+        :param data: a dict
+        :return result: a byte array
         """
         result = bytearray(8)
         if not 'luns' in data:
@@ -107,6 +114,9 @@ class ReportLuns(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ReportLuns cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, ReportLuns._cdb_bits, result)
@@ -116,6 +126,9 @@ class ReportLuns(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ReportLuns cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, ReportLuns._cdb_bits, result)

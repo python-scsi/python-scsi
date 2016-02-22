@@ -188,9 +188,6 @@ class Inquiry(SCSICommand):
         """
         method to create a byte array for a Command Descriptor Block with a proper length
 
-        init_cdb returns a byte array of 6,10,12 or 16 bytes depending on the operation code and if
-        vital product data is enabled
-
         :param evpd: the byte to enable or disable vital product data
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
@@ -205,14 +202,21 @@ class Inquiry(SCSICommand):
         return self.marshall_cdb(cdb)
 
     @staticmethod
-    def marshall_designator(type, data):
-        if type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+    def marshall_designator(_type, data):
+        """
+        static helper method to marshall designator data
+
+        :param _type: type of the designator
+        :param data: a dict with designator data
+        :return: a byte array
+        """
+        if _type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
             return data['vendor_specific']
 
-        if type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+        if _type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
             return data['t10_vendor_id'] + data['vendor_specific_id']
 
-        if type == inquiry_enums.DESIGNATOR.EUI_64:
+        if _type == inquiry_enums.DESIGNATOR.EUI_64:
             if 'identifier_extension' in data:
                 return data['identifier_extension'] + \
                     scsi_int_to_ba(data['ieee_company_id'], 3) + \
@@ -225,7 +229,7 @@ class Inquiry(SCSICommand):
             return scsi_int_to_ba(data['ieee_company_id'], 3) + \
                 data['vendor_specific_extension_id']
 
-        if type == inquiry_enums.DESIGNATOR.NAA:
+        if _type == inquiry_enums.DESIGNATOR.NAA:
             _r = bytearray(16)
             decode_bits(data, Inquiry._naa_type_bits, _r)
             if data['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
@@ -241,34 +245,40 @@ class Inquiry(SCSICommand):
                 encode_dict(data, Inquiry._naa_ieee_registered_extended_bits, _r)
                 return _r[:16]
 
-        if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+        if _type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
             _r = bytearray(4)
             encode_dict(data, Inquiry._relative_port_bits, _r)
             return _r
 
-        if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
+        if _type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
             _r = bytearray(4)
             encode_dict(data, Inquiry._target_portal_group_bits, _r)
             return _r
 
-        if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
+        if _type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
             _r = bytearray(4)
             encode_dict(data, Inquiry._logical_unit_group_bits, _r)
             return _r
 
-        if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+        if _type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
             return data['md5_logical_identifier']
 
-        if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+        if _type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
             return ['scsi_name_string']
 
-        if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+        if _type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
             _r = bytearray(8)
             encode_dict(data, Inquiry._pci_express_routing_id_bits, _r)
             return _r
 
     @staticmethod
     def marshall_designation_descriptor(data):
+        """
+        static helper method to marshall designation desciptor data
+
+        :param data: a dict with designator data
+        :return: a byte array
+        """
         _r = bytearray(4)
         encode_dict(data, Inquiry._designator_bits, _r)
 
@@ -277,16 +287,23 @@ class Inquiry(SCSICommand):
         return _r
 
     @staticmethod
-    def unmarshall_designator(type, data):
+    def unmarshall_designator(_type, data):
+        """
+        static helper method to unmarshall designator data
+
+        :param _type: type of the designator
+        :param data: a byte array with designator data
+        :return: a dict
+        """
         _d = {}
-        if type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+        if _type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
             _d['vendor_specific'] = data
 
-        if type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+        if _type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
             _d['t10_vendor_id'] = data[:8]
             _d['vendor_specific_id'] = data[8:]
 
-        if type == inquiry_enums.DESIGNATOR.EUI_64:
+        if _type == inquiry_enums.DESIGNATOR.EUI_64:
             if len(data) == 8:
                 _d['ieee_company_id'] = scsi_ba_to_int(data[:3])
                 _d['vendor_specific_extension_id'] = data[3:8]
@@ -299,7 +316,7 @@ class Inquiry(SCSICommand):
                 _d['ieee_company_id'] = scsi_ba_to_int(data[8:11])
                 _d['vendor_specific_extension_id'] = data[11:]
 
-        if type == inquiry_enums.DESIGNATOR.NAA:
+        if _type == inquiry_enums.DESIGNATOR.NAA:
             decode_bits(data, Inquiry._naa_type_bits, _d)
             if _d['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
                 decode_bits(data, Inquiry._naa_ieee_extended_bits, _d)
@@ -310,36 +327,40 @@ class Inquiry(SCSICommand):
             if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
                 decode_bits(data, Inquiry._naa_ieee_registered_extended_bits, _d)
 
-        if type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+        if _type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
             decode_bits(data, Inquiry._relative_port_bits, _d)
 
-        if type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
+        if _type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
             decode_bits(data, Inquiry._target_portal_group_bits, _d)
 
-        if type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
+        if _type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
             decode_bits(data, Inquiry._logical_unit_group_bits, _d)
 
-        if type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+        if _type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
             _d['md5_logical_identifier'] = data[0:16]
 
-        if type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+        if _type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
             _d['scsi_name_string'] = data
 
-        if type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+        if _type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
             decode_bits(data, Inquiry._pci_express_routing_id_bits, _d)
 
         return _d
 
     def unmarshall(self):
         """
-        Unmarshall the Inquiry data.
+        wrapper method for unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain, self._evpd)
 
     @staticmethod
     def unmarshall_datain(data, evpd=0):
         """
-        Unmarshall the Inquiry datain
+        Unmarshall the Inquiry datain buffer
+
+        :param data: a byte array with inquiry data
+        :param evpd: evpd can be 0 or 1
+        :return result: a dict
         """
         result = {}
         decode_bits(data, Inquiry._datain_bits, result)
@@ -407,6 +428,9 @@ class Inquiry(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the Inquiry datain.
+
+        :param data: a dict with data
+        :return result: a byte array
         """
         if 'page_code' not in data:
             result = bytearray(96)
@@ -444,6 +468,9 @@ class Inquiry(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall an Inquiry cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, Inquiry._cdb_bits, result)
@@ -453,6 +480,9 @@ class Inquiry(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall an Inquiry cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, Inquiry._cdb_bits, result)

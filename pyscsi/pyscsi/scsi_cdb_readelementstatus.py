@@ -69,9 +69,9 @@ class ReadElementStatus(SCSICommand):
         :param start: first element to return
         :param num: number of elements to return
         :param element_type: type of element to return data for
-        :param voltag
-        :param curdata
-        :param dvcid
+        :param voltag: volume tag, can have a value of 0 or 1
+        :param curdata: current data, can have a value of 0 or 1
+        :param dvcid: device id, can have a value of 0 or 1
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
@@ -83,6 +83,14 @@ class ReadElementStatus(SCSICommand):
                   voltag, curdata, dvcid, alloclen):
         """
         Build a ReadElementStatus CDB
+
+        :param start: first element to return
+        :param num: number of elements to return
+        :param element_type: type of element to return data for
+        :param voltag: volume tag, can have a value of 0 or 1
+        :param curdata: current data, can have a value of 0 or 1
+        :param dvcid: device id, can have a value of 0 or 1
+        :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         cdb = {
             'opcode': self.scsi.device.opcodes.READ_ELEMENT_STATUS.value,
@@ -98,13 +106,17 @@ class ReadElementStatus(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the ReadElementStatus data.
+        wrapper method for the unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
     @staticmethod
     def unmarshall_datain(data):
         """
+        Unmarshall the ReadElementStatus datain buffer.
+
+        :param data: a byte array
+        :return result: a dict
         """
         result = {}
         _esd = []
@@ -158,6 +170,9 @@ class ReadElementStatus(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the ReadCapacity16 datain.
+
+        :param data: a dict
+        :return result: a byte array
         """
         result = bytearray(8)
         encode_dict(data, ReadElementStatus._datain_bits, result)
@@ -203,6 +218,9 @@ class ReadElementStatus(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ReadElementStatus cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, ReadElementStatus._cdb_bits, result)
@@ -212,6 +230,9 @@ class ReadElementStatus(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ReadElementStatus cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, ReadElementStatus._cdb_bits, result)

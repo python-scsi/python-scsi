@@ -21,8 +21,20 @@ class WriteSame16(SCSICommand):
                  'group': [0x1f, 14],
                  'nb': [0xffffffff, 10], }
 
-    def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
-                 unmap=False, ndob=False, group=0):
+    def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=0, unmap=0, ndob=0, group=0):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI object
+        :param lba: logical block address
+        :param nb: number of logical blocks
+        :param data: a byte array with data
+        :param wrprotect: value to specify write protection information
+        :param anchor: anchor can have a value of 0 or 1
+        :param unmap: unmap can have a value of 0 or 1
+        :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
+        :param group: group number, can be 0 or greater
+        """
         if not ndob and scsi.blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
@@ -32,10 +44,17 @@ class WriteSame16(SCSICommand):
                                   ndob, group)
         self.execute()
 
-    def build_cdb(self, lba, nb, wrprotect, anchor, unmap,
-                  ndob, group):
+    def build_cdb(self, lba, nb, wrprotect, anchor, unmap, ndob, group):
         """
         Build a WriteSame16 CDB
+
+        :param lba: logical block address
+        :param nb: number of logical blocks
+        :param wrprotect: value to specify write protection information
+        :param anchor: anchor can have a value of 0 or 1
+        :param unmap: unmap can have a value of 0 or 1
+        :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
+        :param group: group number, can be 0 or greater
         """
         cdb = {
             'opcode': self.scsi.device.opcodes.WRITE_SAME_16.value,
@@ -53,6 +72,9 @@ class WriteSame16(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a WriteSame16 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, WriteSame16._cdb_bits, result)
@@ -62,6 +84,9 @@ class WriteSame16(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a WriteSame16 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
         encode_dict(cdb, WriteSame16._cdb_bits, result)

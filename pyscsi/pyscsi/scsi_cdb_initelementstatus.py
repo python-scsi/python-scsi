@@ -54,6 +54,9 @@ class InitializeElementStatus(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a InitializeElementStatus cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, InitializeElementStatus._cdb_bits, result)
@@ -63,6 +66,9 @@ class InitializeElementStatus(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a InitializeElementStatus cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
         encode_dict(cdb, InitializeElementStatus._cdb_bits, result)

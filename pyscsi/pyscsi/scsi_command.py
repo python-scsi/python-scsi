@@ -180,8 +180,6 @@ class SCSICommand(_new_base_class):
     def pagecode(self):
         """
         getter method of the pagecode property
-
-        :return:
         """
         return self._page_code
 
@@ -190,8 +188,7 @@ class SCSICommand(_new_base_class):
         """
         setter method of the pagecode property
 
-        :param value:
-        :return:
+        :param value: a hexadecimal
         """
         self._page_code = value
 

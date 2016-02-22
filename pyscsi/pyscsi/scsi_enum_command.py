@@ -455,6 +455,9 @@ mmc = Enum(mmc_opcodes)
 ------------------------------------------------------------------------------
 Obsolete Dictionaries and Enums
 ------------------------------------------------------------------------------
+
+NOTE: the dicts and Enums in this section and will be removed in a future release
+
 """
 
 opcodes = {'INQUIRY': 0x12,

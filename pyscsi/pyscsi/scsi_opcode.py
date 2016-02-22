@@ -19,12 +19,21 @@ from pyscsi.utils.enum import Enum
 
 
 class OpCode(object):
-
+    """
+    A class to hold information about a scsi operation code
+    """
     _name = ''
     _code = 0xff
     _serviceaction = None
 
     def __init__(self, name, code, serviceaction):
+        """
+        initialize a new instance
+
+        :param name: a string representing the name of the operation code
+        :param code: a hexadecimal value representing the value associated with the operation code
+        :param serviceaction: a Enum with service actions supported by the command associtaed with the operation code
+        """
         self._name = name
         self._code = code
         self._serviceaction = Enum(serviceaction)

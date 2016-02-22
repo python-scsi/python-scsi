@@ -40,6 +40,7 @@ class GetLBAStatus(SCSICommand):
         initialize a new instance
 
         :param scsi: a SCSI instance
+        :param lba: a local block address
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
@@ -50,7 +51,7 @@ class GetLBAStatus(SCSICommand):
         """
         Build a GetLBAStatus CDB
 
-        :param lba: starting LBA
+        :param lba: starting local block address
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
@@ -62,7 +63,7 @@ class GetLBAStatus(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the GetLBAStatus data.
+        wrapper method for unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
@@ -70,6 +71,9 @@ class GetLBAStatus(SCSICommand):
     def unmarshall_datain(data):
         """
         Unmarshall the GetLBAStatus datain.
+
+        :param data: a byte array
+        :return result: a dict
         """
         result = {}
         _data = data[8:scsi_ba_to_int(data[:4]) + 4]
@@ -87,6 +91,9 @@ class GetLBAStatus(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the GetLBAStatus datain.
+
+        :param data: a dict
+        :return result: a byte array
         """
         result = bytearray(8)
         if not 'lbas' in data:
@@ -105,6 +112,9 @@ class GetLBAStatus(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a GetLBAStatus cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, GetLBAStatus._cdb_bits, result)
@@ -114,6 +124,9 @@ class GetLBAStatus(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a GetLBAStatus cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
         encode_dict(cdb, GetLBAStatus._cdb_bits, result)

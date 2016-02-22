@@ -24,8 +24,6 @@ from pyscsi.utils.converter import encode_dict, decode_bits
 #
 
 
-
-
 class OpenCloseImportExportElement(SCSICommand):
     """
     A class to hold information from a OpenCloseImportExportElement
@@ -35,13 +33,13 @@ class OpenCloseImportExportElement(SCSICommand):
                  'element_address': [0xffff, 2],
                  'action_code': [0x1f, 4], }
 
-    def __init__(self, scsi, xfer, acode):
+    def __init__(self, scsi, xfer, acode, **kwargs):
         """
         initialize a new instance
 
-        :param scsi:
-        :param xfer:
-        :param acode:
+        :param scsi: a SCSI object
+        :param xfer: element address
+        :param acode: action code
         """
         SCSICommand.__init__(self, scsi, 0, 0)
         self.cdb = self.build_cdb(xfer, acode)
@@ -51,6 +49,8 @@ class OpenCloseImportExportElement(SCSICommand):
         """
         Build a ExchangeMedium CDB
 
+        :param xfer: element address
+        :param acode: action code
         :return: a byte array representing a code descriptor block
         """
         cdb = {
@@ -64,6 +64,9 @@ class OpenCloseImportExportElement(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a OpenCloseImportExportElement cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, OpenCloseImportExportElement._cdb_bits, result)
@@ -73,6 +76,9 @@ class OpenCloseImportExportElement(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a OpenCloseImportExportElement cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
         encode_dict(cdb, OpenCloseImportExportElement._cdb_bits, result)

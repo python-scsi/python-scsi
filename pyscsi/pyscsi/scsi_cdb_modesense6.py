@@ -29,16 +29,15 @@ class ModeSense6(SCSICommand):
     A class to hold information from a modesense6 command
     """
 
-    def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0,
-                 alloclen=96):
+    def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0, alloclen=96):
         """
         initialize a new instance
 
         :param scsi: a SCSI instance
         :param page_code: the page code for the vpd page
-        :param sub_page_code:
-        :param dbd:
-        :param pc:
+        :param sub_page_code: a integer representing a sub page code
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         SCSICommand.__init__(self, scsi, 0, alloclen)
@@ -48,6 +47,13 @@ class ModeSense6(SCSICommand):
 
     def build_cdb(self, page_code, sub_page_code, dbd, pc, alloclen):
         """
+        method to create a byte array for a Command Descriptor Block with a proper length
+
+        :param page_code: the page code for the vpd page
+        :param sub_page_code: a integer representing a sub page code
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param pc: page control field, a value between 0 and 3
+        :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         cdb = {'opcode': self.scsi.device.opcodes.MODE_SENSE_6.value,
                'dbd': dbd,
@@ -60,7 +66,7 @@ class ModeSense6(SCSICommand):
 
     def unmarshall(self):
         """
-        Unmarshall the ModeSense6 data.
+        wrapper method for unmarshall_datain method.
         """
         self.result = self.unmarshall_datain(self.datain)
 
@@ -68,13 +74,16 @@ class ModeSense6(SCSICommand):
     def unmarshall_datain(data):
         """
         Unmarshall the ModeSense6 datain.
+
+        :param data: a byte array with data
+        :return result: a dict
         """
         result = {}
         _mps = []
         decode_bits(data[0:4], MODESENSE6.mode_parameter_header_bits, result)
 
         _bdl = data[3]
-        block_descriptor = data[4:_bdl]
+        block_descriptor = data[4:_bdl]  # no one really use this variable in here ?
 
         data = data[4 + _bdl:]
 
@@ -106,6 +115,9 @@ class ModeSense6(SCSICommand):
     def marshall_datain(data):
         """
         Marshall the ModeSense6 datain.
+
+        :param data: a dict with data
+        :return result: a byte array
         """
         result = bytearray(4)
         encode_dict(data, MODESENSE6.mode_parameter_header_bits, result)
@@ -149,6 +161,9 @@ class ModeSense6(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ModeSense6 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, MODESENSE6.cdb_bits, result)
@@ -158,6 +173,9 @@ class ModeSense6(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ModeSense6 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
         encode_dict(cdb, MODESENSE6.cdb_bits, result)
@@ -174,8 +192,8 @@ class ModeSelect6(SCSICommand):
 
         :param scsi: a SCSI instance
         :param data: a dict holding mode page to set
-        :param pf:
-        :param sp:
+        :param pf: page format can be 0 or 1
+        :param sp: save pages can be 0 or 1
         """
         _d = ModeSense6.marshall_datain(data)
 
@@ -186,6 +204,9 @@ class ModeSelect6(SCSICommand):
 
     def build_cdb(self, pf, sp, alloclen):
         """
+        :param pf: page format can be 0 or 1
+        :param sp: save pages can be 0 or 1
+        :param alloclen: length of the parameter list
         """
         cdb = {'opcode': self.scsi.device.opcodes.MODE_SELECT_6.value,
                'pf': pf,
@@ -197,6 +218,8 @@ class ModeSelect6(SCSICommand):
     def unmarshall_datain(data):
         """
         Unmarshall the ModeSelect6 dataout.
+
+        :param data: a byte array with data
         """
         return ModeSense6.unmarshall_dataout(data)
 
@@ -204,6 +227,9 @@ class ModeSelect6(SCSICommand):
     def marshall_dataout(data):
         """
         Marshall the ModeSelect6 dataout.
+
+        :param data: a dict with data
+        :return result: a byte array
         """
         return ModeSense6.marshall_datain(data)
 
@@ -211,6 +237,9 @@ class ModeSelect6(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a ModeSelect6 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, MODESELECT6.modeselect6_cdb_bits, result)
@@ -220,6 +249,9 @@ class ModeSelect6(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a ModeSelect6 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
         encode_dict(cdb, MODESELECT6.modeselect6_cdb_bits, result)

@@ -36,6 +36,15 @@ class Write12(SCSICommand):
                  'tl': [0xffffffff, 6], }
 
     def __init__(self, scsi, lba, tl, data, **kwargs):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI object
+        :param lba: Logical Block Address
+        :param tl: transfer length
+        :param data: a byte array with data
+        :param kwargs: a list of keyword args including wrprotect, dpo, fua and group (all needed in the cdb)
+        """
         if scsi.blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
@@ -47,6 +56,13 @@ class Write12(SCSICommand):
     def build_cdb(self, lba, tl, wrprotect=0, dpo=0, fua=0, group=0):
         """
         Build a Write12 CDB
+
+        :param lba: Logical Block Address
+        :param tl: transfer length
+        :param wrprotect: value to specify write protection information
+        :param dpo: disable page out, can have a value 0f 0 or 1
+        :param fua: force until access, can have a value of 0 or 1
+        :param group: group number, can be 0 or greater
         """
         cdb = {
             'opcode': self.scsi.device.opcodes.WRITE_12.value,
@@ -63,6 +79,9 @@ class Write12(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a Write12 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, Write12._cdb_bits, result)
@@ -72,6 +91,9 @@ class Write12(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a Write12 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
         encode_dict(cdb, Write12._cdb_bits, result)

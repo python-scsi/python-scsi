@@ -35,8 +35,19 @@ class WriteSame10(SCSICommand):
                  'group': [0x1f, 6],
                  'nb': [0xffff, 7], }
 
-    def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=False,
-                 unmap=False, group=0):
+    def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=0, unmap=0, group=0):
+        """
+        initialize a new instance
+
+        :param scsi: a SCSI object
+        :param lba: logical block address
+        :param nb: number of logical blocks
+        :param data: a byte array with data
+        :param wrprotect: value to specify write protection information
+        :param anchor: anchor can have a value of 0 or 1
+        :param unmap: unmap can have a value of 0 or 1
+        :param group: group number, can be 0 or greater
+        """
         if scsi.blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
@@ -48,6 +59,13 @@ class WriteSame10(SCSICommand):
     def build_cdb(self, lba, nb, wrprotect, anchor, unmap, group):
         """
         Build a WriteSame10 CDB
+
+        :param lba: logical block address
+        :param nb: number of logical blocks
+        :param wrprotect: value to specify write protection information
+        :param anchor: anchor can have a value of 0 or 1
+        :param unmap: unmap can have a value of 0 or 1
+        :param group: group number, can be 0 or greater
         """
         cdb = {
             'opcode': self.scsi.device.opcodes.WRITE_SAME_10.value,
@@ -64,6 +82,9 @@ class WriteSame10(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a WriteSame10 cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, WriteSame10._cdb_bits, result)
@@ -73,6 +94,9 @@ class WriteSame10(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a WriteSame10 cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
         encode_dict(cdb, WriteSame10._cdb_bits, result)

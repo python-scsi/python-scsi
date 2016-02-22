@@ -34,6 +34,7 @@ class TestUnitReady(SCSICommand):
     def __init__(self, scsi):
         """
         initialize a new instance
+
         :param scsi: a SCSI instance
         """
         SCSICommand.__init__(self, scsi, 0, 0)
@@ -53,6 +54,9 @@ class TestUnitReady(SCSICommand):
     def unmarshall_cdb(cdb):
         """
         Unmarshall a TestUnitReady cdb
+
+        :param cdb: a byte array representing a code descriptor block
+        :return result: a dict
         """
         result = {}
         decode_bits(cdb, TestUnitReady._cdb_bits, result)
@@ -62,6 +66,9 @@ class TestUnitReady(SCSICommand):
     def marshall_cdb(cdb):
         """
         Marshall a TestUnitReady cdb
+
+        :param cdb: a dict with key:value pairs representing a code descriptor block
+        :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
         encode_dict(cdb, TestUnitReady._cdb_bits, result)
