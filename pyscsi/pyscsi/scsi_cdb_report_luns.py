@@ -33,17 +33,16 @@ class ReportLuns(SCSICommand):
                  'alloc_len': [0xffffffff, 6], }
     _datain_bits = {'lun': [0xffffffffffffffff, 0], }
 
-    def __init__(self, scsi, report=0x00, alloclen=96):
+    def __init__(self, opcode, report=0x00, alloclen=96):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param report: select report field value
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
+        SCSICommand.__init__(self, opcode, 0, alloclen)
         self.cdb = self.build_cdb(report, alloclen)
-        self.execute()
 
     def build_cdb(self, report, alloclen):
         """
@@ -53,7 +52,7 @@ class ReportLuns(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.REPORT_LUNS.value,
+        cdb = {'opcode': self.opcode.value,
                'select_report': report,
                'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)

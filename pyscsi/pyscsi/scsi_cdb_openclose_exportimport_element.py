@@ -33,17 +33,16 @@ class OpenCloseImportExportElement(SCSICommand):
                  'element_address': [0xffff, 2],
                  'action_code': [0x1f, 4], }
 
-    def __init__(self, scsi, xfer, acode, **kwargs):
+    def __init__(self, opcode, xfer, acode, **kwargs):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
         :param xfer: element address
         :param acode: action code
         """
-        SCSICommand.__init__(self, scsi, 0, 0)
+        SCSICommand.__init__(self, opcode, 0, 0)
         self.cdb = self.build_cdb(xfer, acode)
-        self.execute()
 
     def build_cdb(self, xfer, acode):
         """
@@ -54,7 +53,7 @@ class OpenCloseImportExportElement(SCSICommand):
         :return: a byte array representing a code descriptor block
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.OPEN_CLOSE_IMPORT_EXPORT_ELEMENT.value,
+            'opcode': self.opcode.value,
             'element_address': xfer,
             'action_code': acode, }
 

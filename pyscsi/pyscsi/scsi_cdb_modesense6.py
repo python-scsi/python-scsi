@@ -29,21 +29,19 @@ class ModeSense6(SCSICommand):
     A class to hold information from a modesense6 command
     """
 
-    def __init__(self, scsi, page_code, sub_page_code=0, dbd=0, pc=0, alloclen=96):
+    def __init__(self, opcode, page_code, sub_page_code=0, dbd=0, pc=0, alloclen=96):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
         :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.cdb = self.build_cdb(page_code, sub_page_code, dbd, pc,
-                                  alloclen)
-        self.execute()
+        SCSICommand.__init__(self, opcode, 0, alloclen)
+        self.cdb = self.build_cdb(page_code, sub_page_code, dbd, pc, alloclen)
 
     def build_cdb(self, page_code, sub_page_code, dbd, pc, alloclen):
         """
@@ -55,7 +53,7 @@ class ModeSense6(SCSICommand):
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        cdb = {'opcode': self.scsi.device.opcodes.MODE_SENSE_6.value,
+        cdb = {'opcode': self.opcode.value,
                'dbd': dbd,
                'pc': pc,
                'page_code': page_code,
@@ -186,29 +184,28 @@ class ModeSelect6(SCSICommand):
     """
     A class to hold information from a modeselect6 command
     """
-    def __init__(self, scsi, data, pf=1, sp=0):
+    def __init__(self, opcode, data, pf=1, sp=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param data: a dict holding mode page to set
         :param pf: page format can be 0 or 1
         :param sp: save pages can be 0 or 1
         """
         _d = ModeSense6.marshall_datain(data)
 
-        SCSICommand.__init__(self, scsi, len(_d), 0)
+        SCSICommand.__init__(self, opcode, len(_d), 0)
         self.dataout = _d
         self.cdb = self.build_cdb(pf, sp, len(_d))
-        self.execute()
 
-    def build_cdb(self, pf, sp, alloclen):
+    def build_cdb(self,pf, sp, alloclen):
         """
         :param pf: page format can be 0 or 1
         :param sp: save pages can be 0 or 1
         :param alloclen: length of the parameter list
         """
-        cdb = {'opcode': self.scsi.device.opcodes.MODE_SELECT_6.value,
+        cdb = {'opcode': self.opcode.value,
                'pf': pf,
                'sp': sp,
                'parameter_list_length': alloclen, }

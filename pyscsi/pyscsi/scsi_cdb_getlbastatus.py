@@ -35,17 +35,16 @@ class GetLBAStatus(SCSICommand):
                     'num_blocks': [0xffffffff, 8],
                     'p_status': [0x0f, 12], }
 
-    def __init__(self, scsi, lba, alloclen=16384):
+    def __init__(self, opcode, lba, alloclen=16384):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param lba: a local block address
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
+        SCSICommand.__init__(self, opcode, 0, alloclen)
         self.cdb = self.build_cdb(lba, alloclen)
-        self.execute()
 
     def build_cdb(self, lba, alloclen):
         """
@@ -55,8 +54,8 @@ class GetLBAStatus(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
-               'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.GET_LBA_STATUS,
+        cdb = {'opcode': self.opcode.value,
+               'service_action': self.opcode.serviceaction.GET_LBA_STATUS,
                'lba': lba,
                'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)

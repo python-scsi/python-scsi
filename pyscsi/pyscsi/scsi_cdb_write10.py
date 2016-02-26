@@ -35,23 +35,23 @@ class Write10(SCSICommand):
                  'group': [0x1f, 6],
                  'tl': [0xffff, 7], }
 
-    def __init__(self, scsi, lba, tl, data, **kwargs):
+    def __init__(self, opcode, blocksize, lba, tl, data, **kwargs):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
+        :param blocksize: a blocksize
         :param lba: Logical Block Address
         :param tl: transfer length
         :param data: a byte array with data
         :param kwargs: a list of keyword args including wrprotect, dpo, fua and group (all needed in the cdb)
         """
-        if scsi.blocksize == 0:
+        if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, scsi, scsi.blocksize * tl, 0)
+        SCSICommand.__init__(self, opcode, blocksize * tl, 0)
         self.dataout = data
         self.cdb = self.build_cdb(lba, tl, **kwargs)
-        self.execute()
 
     def build_cdb(self, lba, tl, wrprotect=0, dpo=0, fua=0, group=0):
         """
@@ -65,7 +65,7 @@ class Write10(SCSICommand):
         :param group: group number, can be 0 or greater
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.WRITE_10.value,
+            'opcode': self.opcode.value,
             'lba': lba,
             'tl': tl,
             'wrprotect': wrprotect,

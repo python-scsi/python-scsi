@@ -33,18 +33,17 @@ class PositionToElement(SCSICommand):
                  'destination_address': [0xffff, 4],
                  'invert': [0x01, 8], }
 
-    def __init__(self, scsi, xfer, dest, invert=0):
+    def __init__(self, opcode, xfer, dest, invert=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
         :param xfer: medium transport address
         :param dest: destination address
         :param invert: invert can be 0 or 1
         """
-        SCSICommand.__init__(self, scsi, 0, 0)
+        SCSICommand.__init__(self, opcode, 0, 0)
         self.cdb = self.build_cdb(xfer, dest, invert)
-        self.execute()
 
     def build_cdb(self, xfer, dest, invert):
         """
@@ -56,7 +55,7 @@ class PositionToElement(SCSICommand):
         :return: a byte array representing a code descriptor block
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.POSITION_TO_ELEMENT.value,
+            'opcode': self.opcode.value,
             'medium_transport_address': xfer,
             'destination_address': dest,
             'invert': invert

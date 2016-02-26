@@ -36,21 +36,21 @@ class Read12(SCSICommand):
                  'tl': [0xffffffff, 6],
                  'group': [0x1f, 10], }
 
-    def __init__(self, scsi, lba, tl, **kwargs):
+    def __init__(self, opcode, blocksize, lba, tl, **kwargs):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
+        :param blocksize: a blocksize
         :param lba: Logical Block Address
         :param tl: transfer length
         :param kwargs: a list of keyword args including rdprotect, dpo, fua, rarc and group (all needed in the cdb)
         """
-        if scsi.blocksize == 0:
+        if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, scsi, 0, scsi.blocksize * tl)
+        SCSICommand.__init__(self, opcode, 0, blocksize * tl)
         self.cdb = self.build_cdb(lba, tl, **kwargs)
-        self.execute()
 
     def build_cdb(self, lba, tl, rdprotect=0, dpo=0, fua=0, rarc=0, group=0):
         """
@@ -65,7 +65,7 @@ class Read12(SCSICommand):
         :param group: group number, can be 0 or greater
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.READ_12.value,
+            'opcode': self.opcode.value,
             'lba': lba,
             'tl': tl,
             'rdprotect': rdprotect,

@@ -42,6 +42,7 @@ from pyscsi.pyscsi.scsi_cdb_write16 import Write16
 from pyscsi.pyscsi.scsi_cdb_writesame10 import WriteSame10
 from pyscsi.pyscsi.scsi_cdb_writesame16 import WriteSame16
 from pyscsi.pyscsi.scsi_enum_command import spc, sbc, smc, ssc, mmc
+from pyscsi.utils.converter import get_opcode
 
 
 class SCSI(object):
@@ -87,6 +88,30 @@ class SCSI(object):
             elif self.device.devicetype in (0x05,):  # mmc
                 self.device.opcodes = mmc
 
+    def execute(self, cmd):
+        """
+        wrapper method to call the SCSIDevice.execute method
+
+        :param cmd: a SCSICommand object
+        """
+        try:
+            self.device.execute(cmd.cdb, cmd.dataout, cmd.datain, cmd.sense)
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def unmarshall(cmd):
+        """
+        wrapper method to call a SCSICommand.umarshall method if defined in the Command
+
+        :param cmd: a SCSICommand object
+        """
+        try:
+            if getattr(cmd, 'unmarshall'):
+                cmd.unmarshall()
+        except Exception as e:
+            raise e
+
     @property
     def blocksize(self):
         """
@@ -117,7 +142,10 @@ class SCSI(object):
                        inv2=0 invert/rotate the medium before loading
         :return: an ExchangeMedium instance
         """
-        return ExchangeMedium(self, xfer, source, dest1, dest2, **kwargs)
+        opcode = self.device.opcodes.EXCHANGE_MEDIUM
+        cmd = ExchangeMedium(opcode, xfer, source, dest1, dest2, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def getlbastatus(self, lba, **kwargs):
         """
@@ -128,7 +156,11 @@ class SCSI(object):
                        alloc_len = 16384: size of requested datain
         :return: a GetLBAStatus instance
         """
-        return GetLBAStatus(self, lba, **kwargs)
+        opcode = next(get_opcode(self.device.opcodes, '9E'))
+        cmd = GetLBAStatus(opcode, lba, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def inquiry(self, **kwargs):
         """
@@ -140,7 +172,11 @@ class SCSI(object):
                        alloc_len = 96, the size of the data_in buffer
         :return: a Inquiry instance
         """
-        return Inquiry(self, **kwargs)
+        opcode = self.device.opcodes.INQUIRY
+        cmd = Inquiry(opcode, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def initializeelementstatus(self):
         """
@@ -148,7 +184,10 @@ class SCSI(object):
 
         :return: a InitializeElementStatus instance
         """
-        return InitializeElementStatus(self)
+        opcode = self.device.opcodes.INITIALIZE_ELEMENT_STATUS
+        cmd = InitializeElementStatus(opcode)
+        self.execute(cmd)
+        return cmd
 
     def initializeelementstatuswithrange(self, xfer, elements, **kwargs):
         """
@@ -161,7 +200,10 @@ class SCSI(object):
                        fast = 0, a integer indicating if  elements should be scanned for media presence
         :return: a InitializeElementStatusWithRange instance
         """
-        return InitializeElementStatusWithRange(self, xfer, elements, **kwargs)
+        opcode = self.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE
+        cmd = InitializeElementStatusWithRange(opcode, xfer, elements, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def modeselect6(self, data, **kwargs):
         """
@@ -173,7 +215,11 @@ class SCSI(object):
                        sp = 0, Save Pages flag
         :return: a ModeSelect6 instance
         """
-        return ModeSelect6(self, data, **kwargs)
+        opcode = self.device.opcodes.MODE_SELECT_6
+        cmd = ModeSelect6(opcode, data, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def modesense6(self, page_code, **kwargs):
         """
@@ -187,7 +233,11 @@ class SCSI(object):
                        alloclen = 96
         :return: a ModeSense6 instance
         """
-        return ModeSense6(self, page_code, **kwargs)
+        opcode = self.device.opcodes.MODE_SENSE_6
+        cmd = ModeSense6(opcode, page_code, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def modesense10(self, page_code, **kwargs):
         """
@@ -201,7 +251,11 @@ class SCSI(object):
                        alloclen = 0, the max number of bytes allocated for the data_in buffer
         :return: a ModeSense10 instance
         """
-        return ModeSense10(self, page_code, **kwargs)
+        opcode = self.device.opcodes.MODE_SENSE_10
+        cmd = ModeSense10(opcode, page_code, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def modeselect10(self, data, **kwargs):
         """
@@ -213,7 +267,11 @@ class SCSI(object):
                        sp = 0, Save Pages flag
         :return: a ModeSelect10 instance
         """
-        return ModeSelect10(self, data, **kwargs)
+        opcode = self.device.opcodes.MODE_SELECT_10
+        cmd = ModeSelect10(opcode, data, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def opencloseimportexportelement(self, xfer, acode, **kwargs):
         """
@@ -224,7 +282,10 @@ class SCSI(object):
         :param kwargs: a dict with key/value pairs
         :return: a OpenCloseImportExportElement instance
         """
-        return OpenCloseImportExportElement(self, xfer, acode, **kwargs)
+        opcode = self.device.opcodes.OPEN_CLOSE_IMPORT_EXPORT_ELEMENT
+        cmd = OpenCloseImportExportElement(opcode, xfer, acode, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def positiontoelement(self, xfer, dest, **kwargs):
         """
@@ -236,7 +297,10 @@ class SCSI(object):
                        invert=0, invert/rotate the medium before loading
         :return: an PositionToElement instance
         """
-        return PositionToElement(self, xfer, dest, **kwargs)
+        opcode = self.device.opcodes.POSITION_TO_ELEMENT
+        cmd = PositionToElement(opcode, xfer, dest, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def preventallowmediumremoval(self, **kwargs):
         """
@@ -246,7 +310,10 @@ class SCSI(object):
                        prevent=0, prevent/allow the medium to be removed
         :return: an PreventAllowMediumRemoval instance
         """
-        return PreventAllowMediumRemoval(self, **kwargs)
+        opcode = self.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL
+        cmd = PreventAllowMediumRemoval(opcode=opcode, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def read10(self, lba, tl, **kwargs):
         """
@@ -262,7 +329,10 @@ class SCSI(object):
                        group = 0, Group Number
         :returns a Read10 Instance
         """
-        return Read10(self, lba, tl, **kwargs)
+        opcode = self.device.opcodes.READ_10
+        cmd = Read10(opcode, self.blocksize, lba, tl, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def read12(self, lba, tl, **kwargs):
         """
@@ -278,7 +348,10 @@ class SCSI(object):
                        group = 0, Group Number
         :returns a Read12 Instance
         """
-        return Read12(self, lba, tl, **kwargs)
+        opcode = self.device.opcodes.READ_12
+        cmd = Read12(opcode, self.blocksize, lba, tl, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def read16(self, lba, tl, **kwargs):
         """
@@ -294,7 +367,10 @@ class SCSI(object):
                        group = 0, Group Number
         :returns a Read16 Instance
         """
-        return Read16(self, lba, tl, **kwargs)
+        opcode = self.device.opcodes.READ_16
+        cmd = Read16(opcode, self.blocksize, lba, tl, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def readcapacity10(self, **kwargs):
         """
@@ -304,7 +380,11 @@ class SCSI(object):
                        alloc_len = 8, size of requested datain
         :return: a ReadCapacity10 instance
         """
-        return ReadCapacity10(self, **kwargs)
+        opcode = self.device.opcodes.READ_CAPACITY_10
+        cmd = ReadCapacity10(opcode=opcode, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def readcapacity16(self, **kwargs):
         """
@@ -314,7 +394,11 @@ class SCSI(object):
                        alloc_len = 32, size of requested datain
         :return: a ReadCapacity16 instance
         """
-        return ReadCapacity16(self, **kwargs)
+        opcode = next(get_opcode(self.device.opcodes, '9E'))
+        cmd = ReadCapacity16(opcode=opcode, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def readelementstatus(self, start, num, **kwargs):
         """
@@ -330,7 +414,11 @@ class SCSI(object):
                        alloclen=16384, max amount od data to return
         :return: an ReadElementStatus instance
         """
-        return ReadElementStatus(self, start, num, **kwargs)
+        opcode = self.device.opcodes.READ_ELEMENT_STATUS
+        cmd = ReadElementStatus(opcode, start, num, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def movemedium(self, xfer, source, dest, **kwargs):
         """
@@ -343,14 +431,20 @@ class SCSI(object):
                        invert=0, invert/rotate the medium before loading
         :return: an MoveMedium instance
         """
-        return MoveMedium(self, xfer, source, dest, **kwargs)
+        opcode = self.device.opcodes.MOVE_MEDIUM
+        cmd = MoveMedium(opcode, xfer, source, dest, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def testunitready(self):
         """
         Returns a TestUnitReady Instance
 
         """
-        return TestUnitReady(self)
+        opcode = self.device.opcodes.TEST_UNIT_READY
+        cmd = TestUnitReady(opcode)
+        self.execute(cmd)
+        return cmd
 
     def write10(self, lba, tl, data, **kwargs):
         """
@@ -366,7 +460,10 @@ class SCSI(object):
                        group = 0, Group Number
         :return: a Write10 instance
         """
-        return Write10(self, lba, tl, data, **kwargs)
+        opcode = self.device.opcodes.WRITE_10
+        cmd = Write10(opcode, self.blocksize, lba, tl, data, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def write12(self, lba, tl, data, **kwargs):
         """
@@ -382,7 +479,10 @@ class SCSI(object):
                        group = 0, Group Number
         :return: a Write12 instance
         """
-        return Write12(self, lba, tl, data, **kwargs)
+        opcode = self.device.opcodes.WRITE_12
+        cmd = Write12(opcode, self.blocksize, lba, tl, data, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def write16(self, lba, tl, data, **kwargs):
         """
@@ -398,7 +498,10 @@ class SCSI(object):
                        group = 0, Group Number
         :return: a Write16 instance
         """
-        return Write16(self, lba, tl, data, **kwargs)
+        opcode = self.device.opcodes.WRITE_16
+        cmd = Write16(opcode, self.blocksize, lba, tl, data, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def writesame16(self, lba, nb, data, **kwargs):
         """
@@ -415,7 +518,10 @@ class SCSI(object):
                        group = 0, Group Number
         :return: a WriteSame16 instance
         """
-        return WriteSame16(self, lba, nb, data, **kwargs)
+        opcode = self.device.opcodes.WRITE_SAME_16
+        cmd = WriteSame16(opcode, self.blocksize, lba, nb, data, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def writesame10(self, lba, nb, data, **kwargs):
         """
@@ -431,7 +537,10 @@ class SCSI(object):
                        group = 0, Group Number
         :return: a WriteSame10 instance
         """
-        return WriteSame10(self, lba, nb, data, **kwargs)
+        opcode = self.device.opcodes.WRITE_SAME_10
+        cmd = WriteSame10(opcode, self.blocksize, lba, nb, data, **kwargs)
+        self.execute(cmd)
+        return cmd
 
     def reportluns(self, **kwargs):
         """
@@ -442,7 +551,11 @@ class SCSI(object):
                        alloclen=96, size of requested datain
         :return: a ReportLuns instance
         """
-        return ReportLuns(self, **kwargs)
+        opcode = self.device.opcodes.REPORT_LUNS
+        cmd = ReportLuns(opcode=opcode, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd
 
     def reportpriority(self, **kwargs):
         """
@@ -453,4 +566,8 @@ class SCSI(object):
                        alloclen=16384, size of requested datain
         :return: a ReportLuns instance
         """
-        return ReportPriority(self, **kwargs)
+        opcode = next(get_opcode(self.device.opcodes, 'A3'))
+        cmd = ReportPriority(opcode=opcode, **kwargs)
+        self.execute(cmd)
+        SCSI.unmarshall(cmd)
+        return cmd

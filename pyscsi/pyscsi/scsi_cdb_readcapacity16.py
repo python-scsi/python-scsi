@@ -40,16 +40,15 @@ class ReadCapacity16(SCSICommand):
                     'lbprz': [0x40, 14],
                     'lowest_aligned_lba': [0x3fff, 14], }
 
-    def __init__(self, scsi, alloclen=32):
+    def __init__(self, opcode, alloclen=32):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
+        SCSICommand.__init__(self, opcode, 0, alloclen)
         self.cdb = self.build_cdb(alloclen)
-        self.execute()
 
     def build_cdb(self, alloclen):
         """
@@ -58,8 +57,8 @@ class ReadCapacity16(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.SBC_OPCODE_9E.value,
-               'service_action': self.scsi.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16,
+        cdb = {'opcode': self.opcode.value,
+               'service_action': self.opcode.serviceaction.READ_CAPACITY_16,
                'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)
 

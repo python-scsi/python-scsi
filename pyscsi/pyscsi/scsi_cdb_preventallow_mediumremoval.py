@@ -31,16 +31,15 @@ class PreventAllowMediumRemoval(SCSICommand):
     _cdb_bits = {'opcode': [0xff, 0],
                  'prevent': [0x03, 8], }
 
-    def __init__(self, scsi, prevent=0):
+    def __init__(self, opcode, prevent=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
         :param prevent: prevent can have a value between 0 and 3
         """
-        SCSICommand.__init__(self, scsi, 0, 0)
+        SCSICommand.__init__(self, opcode, 0, 0)
         self.cdb = self.build_cdb(prevent)
-        self.execute()
 
     def build_cdb(self, prevent):
         """
@@ -50,7 +49,7 @@ class PreventAllowMediumRemoval(SCSICommand):
         :return: a byte array representing a code descriptor block
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value,
+            'opcode': self.opcode.value,
             'prevent': prevent, }
 
         return self.marshall_cdb(cdb)

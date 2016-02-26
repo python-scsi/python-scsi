@@ -31,25 +31,23 @@ class ReadCapacity10(SCSICommand):
     _datain_bits = {'returned_lba': [0xffffffff, 0],
                     'block_length': [0xffffffff, 4], }
 
-    def __init__(self, scsi, alloclen=8):
+    def __init__(self, opcode, alloclen=8):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.cdb = self.build_cdb(alloclen)
-        self.execute()
+        SCSICommand.__init__(self, opcode, 0, alloclen)
+        self.cdb = self.build_cdb()
 
-    def build_cdb(self, alloclen):
+    def build_cdb(self):
         """
         Build a ReadCapacity10 CDB
 
-        :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.READ_CAPACITY_10.value, }
+        cdb = {'opcode': self.opcode.value, }
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):

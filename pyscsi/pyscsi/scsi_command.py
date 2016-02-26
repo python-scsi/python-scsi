@@ -28,21 +28,21 @@ class SCSICommand(_new_base_class):
     The base class for a derived scsi command class
     """
 
-    def __init__(self, scsi, dataout_alloclen, datain_alloclen):
+    def __init__(self, opcode, dataout_alloclen, datain_alloclen):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param dataout_alloclen: integer representing the size of the data_out buffer
         :param datain_alloclen: integer representing the size of the data_in buffer
         """
-        self.scsi = scsi
         self._sense = bytearray(32)
         self._dataout = bytearray(dataout_alloclen)
         self._datain = bytearray(datain_alloclen)
         self._result = {}
         self._cdb = None
         self._page_code = None
+        self._opcode = opcode
 
     @classmethod
     def init_cdb(cls, opcode):
@@ -67,24 +67,6 @@ class SCSICommand(_new_base_class):
 
         cdb[0] = opcode
         return cdb
-
-    def execute(self):
-        """
-        method to call the SCSIDevice.execute method
-
-        this method takes no arguments but it calls the execute method of the device instance
-        with the local attributes of the SCSICommand class.
-        """
-        try:
-            self.scsi.device.execute(self.cdb, self.dataout, self.datain, self.sense)
-        except Exception as e:
-            raise e
-        else:
-            try:
-                if getattr(self, 'unmarshall'):
-                    self.unmarshall()
-            except:
-                pass
 
     @property
     def result(self):
@@ -191,6 +173,22 @@ class SCSICommand(_new_base_class):
         :param value: a hexadecimal
         """
         self._page_code = value
+
+    @property
+    def opcode(self):
+        """
+        getter method of the opcode property
+        """
+        return self._opcode
+
+    @opcode.setter
+    def opcode(self, value):
+        """
+        setter method of the opcode property
+
+        :param value: a OpCode object
+        """
+        self._opcode = value
 
     def print_cdb(self):
         for b in self._cdb:

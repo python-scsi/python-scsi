@@ -21,11 +21,12 @@ class WriteSame16(SCSICommand):
                  'group': [0x1f, 14],
                  'nb': [0xffffffff, 10], }
 
-    def __init__(self, scsi, lba, nb, data, wrprotect=0, anchor=0, unmap=0, ndob=0, group=0):
+    def __init__(self, opcode, blocksize, lba, nb, data, wrprotect=0, anchor=0, unmap=0, ndob=0, group=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI object
+        :param opcode: a OpCode instance
+        :param blocksize: a blocksize
         :param lba: logical block address
         :param nb: number of logical blocks
         :param data: a byte array with data
@@ -35,14 +36,12 @@ class WriteSame16(SCSICommand):
         :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
         :param group: group number, can be 0 or greater
         """
-        if not ndob and scsi.blocksize == 0:
+        if not ndob and blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, scsi, 0 if ndob else scsi.blocksize, 0)
+        SCSICommand.__init__(self, opcode, 0 if ndob else blocksize, 0)
         self.dataout = None if ndob else data
-        self.cdb = self.build_cdb(lba, nb, wrprotect, anchor, unmap,
-                                  ndob, group)
-        self.execute()
+        self.cdb = self.build_cdb(lba, nb, wrprotect, anchor, unmap, ndob, group)
 
     def build_cdb(self, lba, nb, wrprotect, anchor, unmap, ndob, group):
         """
@@ -57,7 +56,7 @@ class WriteSame16(SCSICommand):
         :param group: group number, can be 0 or greater
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.WRITE_SAME_16.value,
+            'opcode': self.opcode.value,
             'lba': lba,
             'nb': nb,
             'wrprotect': wrprotect,

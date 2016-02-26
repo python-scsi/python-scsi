@@ -170,19 +170,18 @@ class Inquiry(SCSICommand):
         'pci_express_routing_id': [0xffff, 0],
     }
 
-    def __init__(self, scsi, evpd=0, page_code=0, alloclen=96):
+    def __init__(self, opcode, evpd=0, page_code=0, alloclen=96):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param evpd: the byte to enable or disable vital product data
         :param page_code: the page code for the vpd page
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
+        SCSICommand.__init__(self, opcode, 0, alloclen)
         self._evpd = evpd
         self.cdb = self.build_cdb(evpd, page_code, alloclen)
-        self.execute()
 
     def build_cdb(self, evpd, page_code, alloclen):
         """
@@ -194,7 +193,7 @@ class Inquiry(SCSICommand):
         :return: a byte array representing a code descriptor block
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.INQUIRY.value,
+            'opcode': self.opcode.value,
             'evpd': evpd,
             'page_code': page_code,
             'alloc_len': alloclen

@@ -31,11 +31,11 @@ class ModeSense10(SCSICommand):
     A class to hold information from a modesense10 command
     """
 
-    def __init__(self, scsi, page_code, sub_page_code=0, llbaa=0, dbd=0, pc=0, alloclen=96):
+    def __init__(self, opcode, page_code, sub_page_code=0, llbaa=0, dbd=0, pc=0, alloclen=96):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
         :param llbaa: long LBA accepted can be 0 or 1
@@ -43,10 +43,8 @@ class ModeSense10(SCSICommand):
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.cdb = self.build_cdb(page_code, sub_page_code, llbaa, dbd, pc,
-                                  alloclen)
-        self.execute()
+        SCSICommand.__init__(self, opcode, 0, alloclen)
+        self.cdb = self.build_cdb(page_code, sub_page_code, llbaa, dbd, pc, alloclen)
 
     def build_cdb(self, page_code, sub_page_code, llbaa, dbd, pc, alloclen):
         """
@@ -59,7 +57,7 @@ class ModeSense10(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        cdb = {'opcode': self.scsi.device.opcodes.MODE_SENSE_10.value,
+        cdb = {'opcode': self.opcode.value,
                'llbaa': llbaa,
                'dbd': dbd,
                'page_code': page_code,
@@ -88,7 +86,7 @@ class ModeSense10(SCSICommand):
         decode_bits(data[0:8], MODESENSE10.mode_parameter_header_bits, result)
 
         _bdl = scsi_ba_to_int(data[6:8])
-        block_descriptor = data[8:_bdl]
+        block_descriptor = data[8:_bdl]  # no one really use this variable in here ?
 
         data = data[8 + _bdl:]
 
@@ -191,21 +189,20 @@ class ModeSelect10(SCSICommand):
     """
     A class to hold information from a ModeSelect10 command
     """
-    def __init__(self, scsi, data, pf=1, sp=0):
+    def __init__(self, opcode, data, pf=1, sp=0):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param data: a dict holding mode page to set
         :param pf: page format value can be 0 or 1
         :param sp: save pages value can be 0 or 1
         """
         _d = ModeSense10.marshall_datain(data)
 
-        SCSICommand.__init__(self, scsi, len(_d), 0)
+        SCSICommand.__init__(self, opcode, len(_d), 0)
         self.dataout = _d
         self.cdb = self.build_cdb(pf, sp, len(_d))
-        self.execute()
 
     def build_cdb(self, pf, sp, alloclen):
         """
@@ -215,7 +212,7 @@ class ModeSelect10(SCSICommand):
         :param sp: save pages value can be 0 or 1
         :param alloclen: length of the parameter list
         """
-        cdb = {'opcode': self.scsi.device.opcodes.MODE_SELECT_10.value,
+        cdb = {'opcode': self.opcode.value,
                'pf': pf,
                'sp': sp,
                'parameter_list_length': alloclen, }

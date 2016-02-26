@@ -27,26 +27,23 @@ class TestUnitReady(SCSICommand):
     """
     A class to hold information from a testunitready command to a scsi device
     """
-    _cdb_bits = {
-        'opcode': [0xff, 0]
-    }
+    _cdb_bits = {'opcode': [0xff, 0], }
 
-    def __init__(self, scsi):
+    def __init__(self, opcode):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         """
-        SCSICommand.__init__(self, scsi, 0, 0)
+        SCSICommand.__init__(self, opcode, 0, 0)
         self.cdb = self.build_cdb()
-        self.execute()
 
     def build_cdb(self):
         """
         Build a TestUnitReady CDB
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.TEST_UNIT_READY.value,
+            'opcode': self.opcode.value,
         }
         return self.marshall_cdb(cdb)
 

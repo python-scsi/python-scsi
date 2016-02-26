@@ -60,12 +60,12 @@ class ReadElementStatus(SCSICommand):
                                       'access': [0x08, 2],
                                       'impexp': [0x02, 2], }
 
-    def __init__(self, scsi, start, num, element_type=readelementstatus_enums.ELEMENT_TYPE.ALL,
+    def __init__(self, opcode, start, num, element_type=readelementstatus_enums.ELEMENT_TYPE.ALL,
                  voltag=0, curdata=1, dvcid=0, alloclen=16384):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param start: first element to return
         :param num: number of elements to return
         :param element_type: type of element to return data for
@@ -74,13 +74,10 @@ class ReadElementStatus(SCSICommand):
         :param dvcid: device id, can have a value of 0 or 1
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
-        self.cdb = self.build_cdb(start, num, element_type, voltag, curdata,
-                                  dvcid, alloclen)
-        self.execute()
+        SCSICommand.__init__(self, opcode, 0, alloclen)
+        self.cdb = self.build_cdb(start, num, element_type, voltag, curdata, dvcid, alloclen)
 
-    def build_cdb(self, start, num, element_type,
-                  voltag, curdata, dvcid, alloclen):
+    def build_cdb(self, start, num, element_type, voltag, curdata, dvcid, alloclen):
         """
         Build a ReadElementStatus CDB
 
@@ -93,7 +90,7 @@ class ReadElementStatus(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
         cdb = {
-            'opcode': self.scsi.device.opcodes.READ_ELEMENT_STATUS.value,
+            'opcode': self.opcode.value,
             'voltag': voltag,
             'element_type': element_type,
             'starting_element_address': start,

@@ -17,8 +17,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import (scsi_int_to_ba, scsi_ba_to_int,
-                                    encode_dict, decode_bits, get_opcode)
+from pyscsi.utils.converter import (scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits)
 
 
 #
@@ -39,17 +38,16 @@ class ReportPriority(SCSICommand):
                   'rtpi': [0xffff, 2],
                   'adlen': [0xffff, 6], }
 
-    def __init__(self, scsi, priority=0, alloclen=16384):
+    def __init__(self, opcode, priority=0, alloclen=16384):
         """
         initialize a new instance
 
-        :param scsi: a SCSI instance
+        :param opcode: a OpCode instance
         :param priority: specifies information to be returned in data_in buffer
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, scsi, 0, alloclen)
+        SCSICommand.__init__(self, opcode, 0, alloclen)
         self.cdb = self.build_cdb(priority, alloclen)
-        self.execute()
 
     def build_cdb(self, priority, alloclen):
         """
@@ -59,9 +57,8 @@ class ReportPriority(SCSICommand):
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
         """
-        opcode = next(get_opcode(self.scsi.device.opcodes, 'A3'))
-        cdb = {'opcode': opcode.value,
-               'service_action': opcode.serviceaction.REPORT_PRIORITY,
+        cdb = {'opcode': self.opcode.value,
+               'service_action': self.opcode.serviceaction.REPORT_PRIORITY,
                'priority_reported': priority,
                'alloc_len': alloclen, }
         return self.marshall_cdb(cdb)
