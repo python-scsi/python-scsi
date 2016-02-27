@@ -24,7 +24,10 @@ class SCSICommandExceptionMeta(type):
     """
     A meta class for class depending SCSICommand exceptions
     """
-    def __new__(mcs, cls, bases, attributes):
+    def __new__(mcs,
+                cls,
+                bases,
+                attributes):
 
         class CommandNotImplemented(Exception):
             pass
@@ -39,14 +42,20 @@ class SCSICommandExceptionMeta(type):
         attributes.update({'MissingBlocksizeException': MissingBlocksizeException})
         attributes.update({'OpcodeException': OpcodeException})
 
-        return type.__new__(mcs, cls, bases, attributes)
+        return type.__new__(mcs,
+                            cls,
+                            bases,
+                            attributes)
 
 
 class SCSIDeviceExceptionMeta(type):
     """
     A meta class for class depending SCSICommand exceptions
     """
-    def __new__(mcs, cls, bases, attributes):
+    def __new__(mcs,
+                cls,
+                bases,
+                attributes):
 
         class CheckCondition(SCSICheckCondition):
             pass
@@ -57,19 +66,41 @@ class SCSIDeviceExceptionMeta(type):
         attributes.update({'CheckCondition': CheckCondition})
         attributes.update({'SCSISGIOError': SCSISGIOError})
 
-        return type.__new__(mcs, cls, bases, attributes)
+        return type.__new__(mcs,
+                            cls,
+                            bases,
+                            attributes)
 
 
-class SCSIDeviceCommandExceptionMeta(SCSICommandExceptionMeta, SCSIDeviceExceptionMeta):
+class SCSIDeviceCommandExceptionMeta(SCSICommandExceptionMeta,
+                                     SCSIDeviceExceptionMeta):
 
-    def __init__(cls, name, bases, attr):
-        SCSICommandExceptionMeta.__init__(cls, name, bases, attr)
-        SCSIDeviceExceptionMeta.__init__(cls, name, bases, attr)
+    def __init__(cls,
+                 name,
+                 bases,
+                 attr):
+        SCSICommandExceptionMeta.__init__(cls,
+                                          name,
+                                          bases,
+                                          attr)
+        SCSIDeviceExceptionMeta.__init__(cls,
+                                         name,
+                                         bases,
+                                         attr)
 
-    def __new__(mcs, name, bases, attr):
-        t1 = SCSICommandExceptionMeta.__new__(mcs, name, bases, attr)
+    def __new__(mcs,
+                name,
+                bases,
+                attr):
+        t1 = SCSICommandExceptionMeta.__new__(mcs,
+                                              name,
+                                              bases,
+                                              attr)
         name = t1.__name__
         bases = tuple(t1.mro())
         attr = t1.__dict__.copy()
-        t2 = SCSIDeviceExceptionMeta.__new__(mcs, name, bases, attr)
+        t2 = SCSIDeviceExceptionMeta.__new__(mcs,
+                                             name,
+                                             bases,
+                                             attr)
         return t2

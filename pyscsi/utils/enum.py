@@ -39,7 +39,9 @@ class Enum(type):
           - adding check if value exists
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls,
+                *args,
+                **kwargs):
         if len(args) > 0:
             if len(args) == 1:
                 if type(args[0]).__name__ == 'dict':
@@ -56,29 +58,46 @@ class Enum(type):
         else:
             tmp = dict()
         tmp['_enums'] = tmp.keys()
-        return type.__new__(cls, cls.__name__, (), tmp)
+        return type.__new__(cls,
+                            cls.__name__,
+                            (),
+                            tmp)
 
-    def __init__(self, *args, **kwargs):
-        setattr(self, 'add', classmethod(self.__class__.add))
-        setattr(self, 'remove', classmethod(self.__class__.remove))
+    def __init__(self,
+                 *args,
+                 **kwargs):
+        setattr(self,
+                'add',
+                classmethod(self.__class__.add))
+        setattr(self,
+                'remove',
+                classmethod(self.__class__.remove))
 
-    def __getitem__(self, value):
+    def __getitem__(self,
+                    value):
         for key in self._enums:
                 if self.__getattribute__(self, key) == value:
                     return key
         return ""
 
-    def add(self, key, value):
+    def add(self,
+            key,
+            value):
         try:
-            getattr(self, key)
+            getattr(self,
+                    key)
             print("key %s already exist" % key)
         except:
             self._enums.append(key)
-            setattr(self, key, value)
+            setattr(self,
+                    key,
+                    value)
 
-    def remove(self, key):
+    def remove(self,
+               key):
         try:
-            delattr(self, key)
+            delattr(self,
+                    key)
             self._enums.remove(key)
         except (AttributeError, KeyError) as e:
             print ("Key %s not found" % e)

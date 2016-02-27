@@ -33,7 +33,11 @@ class PositionToElement(SCSICommand):
                  'destination_address': [0xffff, 4],
                  'invert': [0x01, 8], }
 
-    def __init__(self, opcode, xfer, dest, invert=0):
+    def __init__(self,
+                 opcode,
+                 xfer,
+                 dest,
+                 invert=0):
         """
         initialize a new instance
 
@@ -42,10 +46,19 @@ class PositionToElement(SCSICommand):
         :param dest: destination address
         :param invert: invert can be 0 or 1
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
-        self.cdb = self.build_cdb(xfer, dest, invert)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
 
-    def build_cdb(self, xfer, dest, invert):
+        self.cdb = self.build_cdb(xfer,
+                                  dest,
+                                  invert)
+
+    def build_cdb(self,
+                  xfer,
+                  dest,
+                  invert):
         """
         Build a PositionToElement CDB
 
@@ -54,13 +67,10 @@ class PositionToElement(SCSICommand):
         :param invert: invert can be 0 or 1
         :return: a byte array representing a code descriptor block
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'medium_transport_address': xfer,
-            'destination_address': dest,
-            'invert': invert
-        }
-
+        cdb = {'opcode': self.opcode.value,
+               'medium_transport_address': xfer,
+               'destination_address': dest,
+               'invert': invert, }
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -72,7 +82,9 @@ class PositionToElement(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, PositionToElement._cdb_bits, result)
+        decode_bits(cdb,
+                    PositionToElement._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -84,7 +96,7 @@ class PositionToElement(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, PositionToElement._cdb_bits, result)
+        encode_dict(cdb,
+                    PositionToElement._cdb_bits,
+                    result)
         return result
-
-

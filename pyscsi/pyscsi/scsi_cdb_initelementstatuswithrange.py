@@ -34,7 +34,12 @@ class InitializeElementStatusWithRange(SCSICommand):
                  'starting_element_address': [0xffff, 2],
                  'number_of_elements': [0xffff, 6], }
 
-    def __init__(self, opcode, xfer, elements, rng=0, fast=0):
+    def __init__(self,
+                 opcode,
+                 xfer,
+                 elements,
+                 rng=0,
+                 fast=0):
         """
         initialize a new instance
 
@@ -45,10 +50,21 @@ class InitializeElementStatusWithRange(SCSICommand):
         :param fast: fast , if set to 1 scan for media presence only. If set to 0 scan elements for all relevant
                      status.
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
-        self.cdb = self.build_cdb(xfer, elements, rng, fast)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
 
-    def build_cdb(self, xfer, elements, rng, fast):
+        self.cdb = self.build_cdb(xfer,
+                                  elements,
+                                  rng,
+                                  fast)
+
+    def build_cdb(self,
+                  xfer,
+                  elements,
+                  rng,
+                  fast):
         """
         Build a InitializeElementStatusWithRange CDB
 
@@ -75,7 +91,10 @@ class InitializeElementStatusWithRange(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, InitializeElementStatusWithRange._cdb_bits, result)
+        decode_bits(cdb,
+                    InitializeElementStatusWithRange._cdb_bits,
+                    result)
+
         return result
 
     @staticmethod
@@ -87,8 +106,8 @@ class InitializeElementStatusWithRange(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, InitializeElementStatusWithRange._cdb_bits, result)
+        encode_dict(cdb,
+                    InitializeElementStatusWithRange._cdb_bits,
+                    result)
+
         return result
-
-
-

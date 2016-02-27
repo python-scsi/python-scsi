@@ -26,7 +26,10 @@ class OpCode(object):
     _code = 0xff
     _serviceaction = None
 
-    def __init__(self, name, code, serviceaction):
+    def __init__(self,
+                 name,
+                 code,
+                 serviceaction):
         """
         initialize a new instance
 
@@ -39,10 +42,12 @@ class OpCode(object):
         self._serviceaction = Enum(serviceaction)
 
     def __str__(self):
-        return '%s - %x' % (self.name, self.value)
+        return '%s - %x' % (self.name,
+                            self.value)
 
     def __repr__(self):
-        return '%s - %x' % (self.name, self.value)
+        return '%s - %x' % (self.name,
+                            self.value)
 
     @property
     def name(self):
@@ -54,7 +59,8 @@ class OpCode(object):
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self,
+             value):
         """
         setter method of the name property
 
@@ -72,7 +78,8 @@ class OpCode(object):
         return self._code
 
     @value.setter
-    def value(self, value):
+    def value(self,
+              value):
         """
         setter method of the value property
 
@@ -90,7 +97,8 @@ class OpCode(object):
         return self._serviceaction
 
     @serviceaction.setter
-    def serviceaction(self, value):
+    def serviceaction(self,
+                      value):
         """
         setter method of the serviceaction property
 

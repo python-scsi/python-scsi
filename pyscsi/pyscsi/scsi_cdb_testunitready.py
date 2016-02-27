@@ -29,22 +29,26 @@ class TestUnitReady(SCSICommand):
     """
     _cdb_bits = {'opcode': [0xff, 0], }
 
-    def __init__(self, opcode):
+    def __init__(self,
+                 opcode):
         """
         initialize a new instance
 
         :param opcode: a OpCode instance
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
+
         self.cdb = self.build_cdb()
 
     def build_cdb(self):
         """
         Build a TestUnitReady CDB
         """
-        cdb = {
-            'opcode': self.opcode.value,
-        }
+        cdb = {'opcode': self.opcode.value, }
+
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -56,7 +60,9 @@ class TestUnitReady(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, TestUnitReady._cdb_bits, result)
+        decode_bits(cdb,
+                    TestUnitReady._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -68,5 +74,7 @@ class TestUnitReady(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
-        encode_dict(cdb, TestUnitReady._cdb_bits, result)
+        encode_dict(cdb,
+                    TestUnitReady._cdb_bits,
+                    result)
         return result

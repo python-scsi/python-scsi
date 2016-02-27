@@ -27,9 +27,10 @@ class ReadCapacity16(SCSICommand):
     """
     A class to hold information from a ReadCapacity(16) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'service_action': [0x1f, 1],
-                 'alloc_len': [0xffffffff, 10], }
+    _cdb_bits =    {'opcode': [0xff, 0],
+                    'service_action': [0x1f, 1],
+                    'alloc_len': [0xffffffff, 10], }
+
     _datain_bits = {'returned_lba': [0xffffffffffffffff, 0],
                     'block_length': [0xffffffff, 8],
                     'p_type': [0x0e, 12],
@@ -40,17 +41,24 @@ class ReadCapacity16(SCSICommand):
                     'lbprz': [0x40, 14],
                     'lowest_aligned_lba': [0x3fff, 14], }
 
-    def __init__(self, opcode, alloclen=32):
+    def __init__(self,
+                 opcode,
+                 alloclen=32):
         """
         initialize a new instance
 
         :param opcode: a OpCode instance
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
+
         self.cdb = self.build_cdb(alloclen)
 
-    def build_cdb(self, alloclen):
+    def build_cdb(self,
+                  alloclen):
         """
         Build a ReadCapacity16 CDB
 
@@ -60,6 +68,7 @@ class ReadCapacity16(SCSICommand):
         cdb = {'opcode': self.opcode.value,
                'service_action': self.opcode.serviceaction.READ_CAPACITY_16,
                'alloc_len': alloclen, }
+
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):
@@ -77,7 +86,9 @@ class ReadCapacity16(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(data, ReadCapacity16._datain_bits, result)
+        decode_bits(data,
+                    ReadCapacity16._datain_bits,
+                    result)
         return result
 
     @staticmethod
@@ -89,7 +100,9 @@ class ReadCapacity16(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(32)
-        encode_dict(data, ReadCapacity16._datain_bits, result)
+        encode_dict(data,
+                    ReadCapacity16._datain_bits,
+                    result)
         return result
 
     @staticmethod
@@ -101,7 +114,9 @@ class ReadCapacity16(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, ReadCapacity16._cdb_bits, result)
+        decode_bits(cdb,
+                    ReadCapacity16._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -113,5 +128,7 @@ class ReadCapacity16(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
-        encode_dict(cdb, ReadCapacity16._cdb_bits, result)
+        encode_dict(cdb,
+                    ReadCapacity16._cdb_bits,
+                    result)
         return result

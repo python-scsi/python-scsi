@@ -21,7 +21,17 @@ class WriteSame16(SCSICommand):
                  'group': [0x1f, 14],
                  'nb': [0xffffffff, 10], }
 
-    def __init__(self, opcode, blocksize, lba, nb, data, wrprotect=0, anchor=0, unmap=0, ndob=0, group=0):
+    def __init__(self,
+                 opcode,
+                 blocksize,
+                 lba,
+                 nb,
+                 data,
+                 wrprotect=0,
+                 anchor=0,
+                 unmap=0,
+                 ndob=0,
+                 group=0):
         """
         initialize a new instance
 
@@ -39,11 +49,27 @@ class WriteSame16(SCSICommand):
         if not ndob and blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, opcode, 0 if ndob else blocksize, 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0 if ndob else blocksize,
+                             0)
         self.dataout = None if ndob else data
-        self.cdb = self.build_cdb(lba, nb, wrprotect, anchor, unmap, ndob, group)
+        self.cdb = self.build_cdb(lba,
+                                  nb,
+                                  wrprotect,
+                                  anchor,
+                                  unmap,
+                                  ndob,
+                                  group)
 
-    def build_cdb(self, lba, nb, wrprotect, anchor, unmap, ndob, group):
+    def build_cdb(self,
+                  lba,
+                  nb,
+                  wrprotect,
+                  anchor,
+                  unmap,
+                  ndob,
+                  group):
         """
         Build a WriteSame16 CDB
 
@@ -55,16 +81,15 @@ class WriteSame16(SCSICommand):
         :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
         :param group: group number, can be 0 or greater
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'lba': lba,
-            'nb': nb,
-            'wrprotect': wrprotect,
-            'anchor': anchor,
-            'unmap': unmap,
-            'ndob': ndob,
-            'group': group,
-        }
+        cdb = {'opcode': self.opcode.value,
+               'lba': lba,
+               'nb': nb,
+               'wrprotect': wrprotect,
+               'anchor': anchor,
+               'unmap': unmap,
+               'ndob': ndob,
+               'group': group, }
+
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -76,7 +101,10 @@ class WriteSame16(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, WriteSame16._cdb_bits, result)
+        decode_bits(cdb,
+                    WriteSame16._cdb_bits,
+                    result)
+
         return result
 
     @staticmethod
@@ -88,5 +116,7 @@ class WriteSame16(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
-        encode_dict(cdb, WriteSame16._cdb_bits, result)
+        encode_dict(cdb,
+                    WriteSame16._cdb_bits,
+                    result)
         return result

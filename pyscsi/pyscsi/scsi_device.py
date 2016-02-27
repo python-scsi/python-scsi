@@ -38,12 +38,30 @@ _new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
 class SCSIDevice(_new_base_class):
     """
-    The base class for a derived  scsi device class
+    The scsi device class
+
+    By default it gets the SPC opcodes assigned so it's always possible to issue
+    a inquiry command to the device. This is important since the the Command will
+    figure out the opcode from the SCSIDevice first to use it for building the cdb.
+    This means after the that it's possible to use the proper OpCodes for the device.
+
+    A basic workflow for using a device would be:
+        - try to open the device passed by the device arg
+        - create a  Inquiry instance, with the default opcodes of the device
+        - execute the inquiry with the device
+        - unmarshall the datain from the inquiry command to figure out the device type
+        - assign the proper Opcode for the device type (it would also work just to use the opcodes
+          without assigning them to the device since the command builds the cdb and the device just executes)
+
+    Note: The workflow above is already implemented in the SCSI class
+
     """
 
-    def __init__(self, device, readwrite=False):
+    def __init__(self,
+                 device,
+                 readwrite=False):
         """
-        initialize a  new instance
+        initialize a  new instance of a SCSIDevice
 
         :param device: the file descriptor
         :param readwrite: access type
@@ -54,20 +72,31 @@ class SCSIDevice(_new_base_class):
 
         if _have_libiscsi and device[:8] == 'iscsi://':
             self._iscsi = libiscsi.iscsi_create_context('iqn.2007-10.com.github:python-scsi')
-            self._iscsi_url = libiscsi.iscsi_parse_full_url(self._iscsi, device)
-            libiscsi.iscsi_set_targetname(self._iscsi, self._iscsi_url.target)
-            libiscsi.iscsi_set_session_type(self._iscsi, libiscsi.ISCSI_SESSION_NORMAL)
-            libiscsi.iscsi_set_header_digest(self._iscsi, libiscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
-            libiscsi.iscsi_full_connect_sync(self._iscsi, self._iscsi_url.portal, self._iscsi_url.lun)
+            self._iscsi_url = libiscsi.iscsi_parse_full_url(self._iscsi,
+                                                            device)
+            libiscsi.iscsi_set_targetname(self._iscsi,
+                                          self._iscsi_url.target)
+            libiscsi.iscsi_set_session_type(self._iscsi,
+                                            libiscsi.ISCSI_SESSION_NORMAL)
+            libiscsi.iscsi_set_header_digest(self._iscsi,
+                                             libiscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+            libiscsi.iscsi_full_connect_sync(self._iscsi,
+                                             self._iscsi_url.portal,
+                                             self._iscsi_url.lun)
 
             self._is_libiscsi = True
         elif _have_linux_sgio and device[:5] == '/dev/':
             self._is_linux_sgio = True
-            self._fd = linux_sgio.open(device, bool(readwrite))
+            self._fd = linux_sgio.open(device,
+                                       bool(readwrite))
         else:
             raise NotImplementedError('No backend implemented for %s' % device)
 
-    def execute(self, cdb, dataout, datain, sense):
+    def execute(self,
+                cdb,
+                dataout,
+                datain,
+                sense):
         """
         execute a scsi command
 
@@ -85,14 +114,22 @@ class SCSIDevice(_new_base_class):
             if len(dataout):
                 _dir = libiscsi.SCSI_XFER_WRITE
                 _xferlen = len(dataout)
-            _task = libiscsi.scsi_create_task(cdb, _dir, _xferlen)
+            _task = libiscsi.scsi_create_task(cdb,
+                                              _dir,
+                                              _xferlen)
             if len(datain):
-                libiscsi.scsi_task_add_data_in_buffer(_task, datain)
+                libiscsi.scsi_task_add_data_in_buffer(_task,
+                                                      datain)
             if len(dataout):
-                libiscsi.scsi_task_add_data_out_buffer(_task, dataout)
+                libiscsi.scsi_task_add_data_out_buffer(_task,
+                                                       dataout)
 
-            libiscsi.iscsi_scsi_command_sync(self._iscsi, self._iscsi_url.lun, _task, None)
-            _status = libiscsi.scsi_task_get_status(_task, None)
+            libiscsi.iscsi_scsi_command_sync(self._iscsi,
+                                             self._iscsi_url.lun,
+                                             _task,
+                                             None)
+            _status = libiscsi.scsi_task_get_status(_task,
+                                                    None)
             if _status == libiscsi.SCSI_STATUS_CHECK_CONDITION:
                 raise self.CheckCondition(sense)
             if _status == libiscsi.SCSI_STATUS_GOOD:
@@ -109,7 +146,12 @@ class SCSIDevice(_new_base_class):
             elif len(dataout):
                 _dir = linux_sgio.DXFER_TO_DEV
 
-            status = linux_sgio.execute(self._fd, _dir, cdb, dataout, datain, sense)
+            status = linux_sgio.execute(self._fd,
+                                        _dir,
+                                        cdb,
+                                        dataout,
+                                        datain,
+                                        sense)
             if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
                 raise self.CheckCondition(sense)
             if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
@@ -120,7 +162,8 @@ class SCSIDevice(_new_base_class):
         return self._is_libiscsi
 
     @isLibSCSI.setter
-    def isLibSCSI(self, value):
+    def isLibSCSI(self,
+                  value):
         self._is_libiscsi = value
 
     @property
@@ -128,7 +171,8 @@ class SCSIDevice(_new_base_class):
         return self._is_linux_sgio
 
     @isLinuxSGIO.setter
-    def isLinuxSGIO(self, value):
+    def isLinuxSGIO(self,
+                    value):
         self._is_linux_sgio = value
 
     @property
@@ -136,7 +180,8 @@ class SCSIDevice(_new_base_class):
         return self._opcodes
 
     @opcodes.setter
-    def opcodes(self, value):
+    def opcodes(self,
+                value):
         self._opcodes = value
 
     @property
@@ -144,5 +189,6 @@ class SCSIDevice(_new_base_class):
         return self._devicetype
 
     @devicetype.setter
-    def devicetype(self, value):
+    def devicetype(self,
+                   value):
         self._devicetype = value

@@ -21,7 +21,8 @@
 from __future__ import print_function
 
 
-def scsi_int_to_ba(to_convert=0, array_size=4):
+def scsi_int_to_ba(to_convert=0,
+                   array_size=4):
     """
     This function converts a  integer of (8 *array_size)-bit to a bytearray(array_size) in
     BigEndian byte order. Here we use the 32-bit as default.
@@ -33,8 +34,8 @@ def scsi_int_to_ba(to_convert=0, array_size=4):
 
         so we take a 32-bit integer and get a byte array(4)
 
-    :to_convert: a integer
-    :array_size: a integer defining the size of the byte array
+    :param to_convert: a integer
+    :param array_size: a integer defining the size of the byte array
     :return: a byte array
     """
     return bytearray((to_convert >> i * 8) & 0xff for i in reversed(range(array_size)))
@@ -45,65 +46,117 @@ def scsi_ba_to_int(ba):
     This function converts a bytearray  in BigEndian byte order
     to an integer.
 
-    param ba: a bytearray
-    return: an integer
+    :param ba: a bytearray
+    :return: an integer
     """
     return sum(ba[i] << ((len(ba) - 1 - i) * 8) for i in range(len(ba)))
 
 
-def decode_bits(data, check_dict, result_dict):
+def decode_bits(data,
+                check_dict,
+                result_dict):
     """
     helper method to perform some simple bit operations
 
     the list in the value of each key:value pair contains 2 values
     - the bit mask
-    - thy byte number for the byte in the datain byte array
+    - the offset byte in the datain byte array
 
     for now we assume he have to right shift only
 
-    :data: a buffer containing the bits to decode
-    :check_dict: a dict with a list as value in each key:value pair
+    :param data: a buffer containing the bits to decode
+    :param check_dict: a dict mapping field-names to notation tuples.
+    :param result_dict: a dict mapping field-names to notation tuples.
     """
     for key in check_dict.keys():
-        # get the values from dict
-        bitmask, byte_pos = check_dict[key]
-        _num = 1
-        _bm = bitmask
-        while _bm > 0xff:
-            _bm >>= 8
-            _num += 1
-        value = scsi_ba_to_int(data[byte_pos:byte_pos + _num])
-        while not bitmask & 0x01:
-            bitmask >>= 1
-            value >>= 1
-        value &= bitmask
+        # Notation format:
+        #
+        # If the length is 2 we have the legacy notation [bitmask, offset]
+        # Example: 'sync': [0x10, 7],
+        #
+        # >2-tuples is the new style of notation.
+        # These tuples always consist of at least three elements, where the
+        # first element is a string that describes the type of value.
+        #
+        # 'b': Byte array blobs
+        # ----------------
+        # ('b', offset, length)
+        # Example: 't10_vendor_identification': ('b', 8, 8),
+        #
+
+        val = check_dict[key]
+        if len(val) == 2:
+            bitmask, byte_pos = val
+            _num = 1
+            _bm = bitmask
+            while _bm > 0xff:
+                _bm >>= 8
+                _num += 1
+            value = scsi_ba_to_int(data[byte_pos:byte_pos + _num])
+            while not bitmask & 0x01:
+                bitmask >>= 1
+                value >>= 1
+            value &= bitmask
+        elif val[0] == 'b':
+            offset, length = val[1:]
+            value = data[offset:offset + length]
+        elif val[0] == 'w':
+            offset, length = val[1:]
+            value = data[offset:offset + length * 2]
+        elif val[0] == 'dw':
+            offset, length = val[1:]
+            value = data[offset:offset + length * 4]
         result_dict.update({key: value})
 
 
-def encode_dict(data_dict, check_dict, result):
+def encode_dict(data_dict,
+                check_dict,
+                result):
     """
-    encode a dict back into a bytearray
+    helper method to perform some simple bit operations
+
+    the list in the value of each key:value pair contains 2 values
+    - the bit mask
+    - the offset byte in the datain byte array
+
+    for now we assume he have to right shift only
+
+    :param data_dict:  a dict mapping field-names to notation tuples.
+    :param check_dict: a dict mapping field-names to notation tuples.
+    :param result: a buffer containing the bits encoded
     """
     for key in data_dict.keys():
         if not key in check_dict:
             continue
         value = data_dict[key]
-        bitmask, bytepos = check_dict[key]
 
-        _num = 1
-        _bm = bitmask
-        while _bm > 0xff:
-            _bm >>= 8
-            _num += 1
+        val = check_dict[key]
+        if len(val) == 2:
+            bitmask, bytepos = val
 
-        _bm = bitmask
-        while not _bm & 0x01:
-            _bm >>= 1
-            value <<= 1
+            _num = 1
+            _bm = bitmask
+            while _bm > 0xff:
+                _bm >>= 8
+                _num += 1
 
-        v = scsi_int_to_ba(value, _num)
-        for i in range(len(v)):
-            result[bytepos + i] ^= v[i]
+            _bm = bitmask
+            while not _bm & 0x01:
+                _bm >>= 1
+                value <<= 1
+
+            v = scsi_int_to_ba(value, _num)
+            for i in range(len(v)):
+                result[bytepos + i] ^= v[i]
+        elif val[0] == 'b':
+            offset, length = val[1:]
+            result[offset:offset + length] = value
+        elif val[0] == 'w':
+            offset, length = val[1:]
+            result[offset:offset + length * 2] = value
+        elif val[0] == 'dw':
+            offset, length = val[1:]
+            result[offset:offset + length * 4] = value
 
 
 def print_data(data_dict):
@@ -129,7 +182,8 @@ def print_data(data_dict):
                 print('%s -> 0x%02X' % (k, v))
 
 
-def get_opcode(enum, part):
+def get_opcode(enum,
+               part):
     """
     A generator that returns an OpCode object from a given
     Enum object.
@@ -139,5 +193,5 @@ def get_opcode(enum, part):
     :return: an OpCode object
     """
     for val in enum._enums:
-        if(val[len(val)-2:] == part):
+        if val[len(val)-2:] == part:
                 yield getattr(enum, val)

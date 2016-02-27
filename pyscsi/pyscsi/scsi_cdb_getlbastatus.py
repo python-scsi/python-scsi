@@ -35,7 +35,10 @@ class GetLBAStatus(SCSICommand):
                     'num_blocks': [0xffffffff, 8],
                     'p_status': [0x0f, 12], }
 
-    def __init__(self, opcode, lba, alloclen=16384):
+    def __init__(self,
+                 opcode,
+                 lba,
+                 alloclen=16384):
         """
         initialize a new instance
 
@@ -43,10 +46,16 @@ class GetLBAStatus(SCSICommand):
         :param lba: a local block address
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
-        self.cdb = self.build_cdb(lba, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
+        self.cdb = self.build_cdb(lba,
+                                  alloclen)
 
-    def build_cdb(self, lba, alloclen):
+    def build_cdb(self,
+                  lba,
+                  alloclen):
         """
         Build a GetLBAStatus CDB
 
@@ -79,7 +88,10 @@ class GetLBAStatus(SCSICommand):
         _lbas = []
         while len(_data):
             _r = {}
-            decode_bits(_data[:16], GetLBAStatus._datain_bits, _r)
+            decode_bits(_data[:16],
+                        GetLBAStatus._datain_bits,
+                        _r)
+
             _lbas.append(_r)
             _data = _data[16:]
 
@@ -101,7 +113,10 @@ class GetLBAStatus(SCSICommand):
 
         for l in data['lbas']:
             _r = bytearray(16)
-            encode_dict(l, GetLBAStatus._datain_bits, _r)
+            encode_dict(l,
+                        GetLBAStatus._datain_bits,
+                        _r)
+
             result += _r
 
         result[:4] = scsi_int_to_ba(len(result) - 4, 4)
@@ -116,7 +131,10 @@ class GetLBAStatus(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, GetLBAStatus._cdb_bits, result)
+        decode_bits(cdb,
+                    GetLBAStatus._cdb_bits,
+                    result)
+
         return result
 
     @staticmethod
@@ -128,5 +146,8 @@ class GetLBAStatus(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(16)
-        encode_dict(cdb, GetLBAStatus._cdb_bits, result)
+        encode_dict(cdb,
+                    GetLBAStatus._cdb_bits,
+                    result)
+
         return result

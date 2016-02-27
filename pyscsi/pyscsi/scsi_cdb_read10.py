@@ -36,7 +36,12 @@ class Read10(SCSICommand):
                  'group': [0x1f, 6],
                  'tl': [0xffff, 7], }
 
-    def __init__(self, opcode, blocksize, lba, tl, **kwargs):
+    def __init__(self,
+                 opcode,
+                 blocksize,
+                 lba,
+                 tl,
+                 **kwargs):
         """
         initialize a new instance
 
@@ -49,10 +54,23 @@ class Read10(SCSICommand):
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, opcode, 0, blocksize * tl)
-        self.cdb = self.build_cdb(lba, tl, **kwargs)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             blocksize * tl)
 
-    def build_cdb(self, lba, tl, rdprotect=0, dpo=0, fua=0, rarc=0, group=0):
+        self.cdb = self.build_cdb(lba,
+                                  tl,
+                                  **kwargs)
+
+    def build_cdb(self,
+                  lba,
+                  tl,
+                  rdprotect=0,
+                  dpo=0,
+                  fua=0,
+                  rarc=0,
+                  group=0):
         """
         Build a Read10 CDB
 
@@ -64,16 +82,14 @@ class Read10(SCSICommand):
         :param rarc: rebuild assist recovery control, can have a value of 0 or 1
         :param group: group number, can be 0 or greater
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'lba': lba,
-            'tl': tl,
-            'rdprotect': rdprotect,
-            'dpo': dpo,
-            'fua': fua,
-            'rarc': rarc,
-            'group': group,
-        }
+        cdb = {'opcode': self.opcode.value,
+               'lba': lba,
+               'tl': tl,
+               'rdprotect': rdprotect,
+               'dpo': dpo,
+               'fua': fua,
+               'rarc': rarc,
+               'group': group, }
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -85,7 +101,9 @@ class Read10(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, Read10._cdb_bits, result)
+        decode_bits(cdb,
+                    Read10._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -97,5 +115,7 @@ class Read10(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, Read10._cdb_bits, result)
+        encode_dict(cdb,
+                    Read10._cdb_bits,
+                    result)
         return result

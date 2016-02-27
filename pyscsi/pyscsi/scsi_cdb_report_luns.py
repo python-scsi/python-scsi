@@ -28,12 +28,16 @@ class ReportLuns(SCSICommand):
     """
     A class to hold information from a ReportLuns command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'select_report': [0xff, 2],
-                 'alloc_len': [0xffffffff, 6], }
+    _cdb_bits =    {'opcode': [0xff, 0],
+                    'select_report': [0xff, 2],
+                    'alloc_len': [0xffffffff, 6], }
+
     _datain_bits = {'lun': [0xffffffffffffffff, 0], }
 
-    def __init__(self, opcode, report=0x00, alloclen=96):
+    def __init__(self,
+                 opcode,
+                 report=0x00,
+                 alloclen=96):
         """
         initialize a new instance
 
@@ -41,10 +45,17 @@ class ReportLuns(SCSICommand):
         :param report: select report field value
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
-        self.cdb = self.build_cdb(report, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
 
-    def build_cdb(self, report, alloclen):
+        self.cdb = self.build_cdb(report,
+                                  alloclen)
+
+    def build_cdb(self,
+                  report,
+                  alloclen):
         """
         Build a ReportLuns CDB
 
@@ -55,6 +66,7 @@ class ReportLuns(SCSICommand):
         cdb = {'opcode': self.opcode.value,
                'select_report': report,
                'alloc_len': alloclen, }
+
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):
@@ -78,7 +90,9 @@ class ReportLuns(SCSICommand):
         while len(_data):
             #  maybe we drop the whole "put a dict into the list for every lun" thing at all
             _r = {}
-            decode_bits(_data[:8], ReportLuns._datain_bits, _r)
+            decode_bits(_data[:8],
+                        ReportLuns._datain_bits,
+                        _r)
             key = 'lun%s' % _count
             _r[key] = _r.pop('lun')
             _luns.append(_r)
@@ -103,9 +117,11 @@ class ReportLuns(SCSICommand):
 
         for l in data['luns']:
             _r = bytearray(8)
-            encode_dict(l, ReportLuns._datain_bits, _r)
-            result += _r
+            encode_dict(l,
+                        ReportLuns._datain_bits,
+                        _r)
 
+            result += _r
         result[:4] = scsi_int_to_ba(len(result) - 4, 4)
         return result
 
@@ -118,7 +134,9 @@ class ReportLuns(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, ReportLuns._cdb_bits, result)
+        decode_bits(cdb,
+                    ReportLuns._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -130,5 +148,7 @@ class ReportLuns(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
-        encode_dict(cdb, ReportLuns._cdb_bits, result)
+        encode_dict(cdb,
+                    ReportLuns._cdb_bits,
+                    result)
         return result

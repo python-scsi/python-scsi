@@ -29,7 +29,13 @@ class ModeSense6(SCSICommand):
     A class to hold information from a modesense6 command
     """
 
-    def __init__(self, opcode, page_code, sub_page_code=0, dbd=0, pc=0, alloclen=96):
+    def __init__(self,
+                 opcode,
+                 page_code,
+                 sub_page_code=0,
+                 dbd=0,
+                 pc=0,
+                 alloclen=96):
         """
         initialize a new instance
 
@@ -40,10 +46,22 @@ class ModeSense6(SCSICommand):
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
-        self.cdb = self.build_cdb(page_code, sub_page_code, dbd, pc, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
+        self.cdb = self.build_cdb(page_code,
+                                  sub_page_code,
+                                  dbd,
+                                  pc,
+                                  alloclen)
 
-    def build_cdb(self, page_code, sub_page_code, dbd, pc, alloclen):
+    def build_cdb(self,
+                  page_code,
+                  sub_page_code,
+                  dbd,
+                  pc,
+                  alloclen):
         """
         method to create a byte array for a Command Descriptor Block with a proper length
 
@@ -78,7 +96,9 @@ class ModeSense6(SCSICommand):
         """
         result = {}
         _mps = []
-        decode_bits(data[0:4], MODESENSE6.mode_parameter_header_bits, result)
+        decode_bits(data[0:4],
+                    MODESENSE6.mode_parameter_header_bits,
+                    result)
 
         _bdl = data[3]
         block_descriptor = data[4:_bdl]  # no one really use this variable in here ?
@@ -87,22 +107,34 @@ class ModeSense6(SCSICommand):
 
         _r = {}
         if not data[0] & 0x40:
-            decode_bits(data, MODESENSE6.page_zero_bits, _r)
+            decode_bits(data,
+                        MODESENSE6.page_zero_bits,
+                        _r)
             data = data[2:]
         else:
-            decode_bits(data, MODESENSE6.sub_page_bits, _r)
+            decode_bits(data,
+                        MODESENSE6.sub_page_bits,
+                        _r)
             data = data[4:]
 
         if _r['page_code'] == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-            decode_bits(data, MODESENSE6.element_address_bits, _r)
+            decode_bits(data,
+                        MODESENSE6.element_address_bits,
+                        _r)
         if _r['page_code'] == PAGE_CODE.CONTROL:
             if not 'sub_page_code' in _r:
-                decode_bits(data, MODESENSE6.control_bits, _r)
+                decode_bits(data,
+                            MODESENSE6.control_bits,
+                            _r)
             elif _r['sub_page_code'] == 1:
-                decode_bits(data, MODESENSE6.control_extension_1_bits, _r)
+                decode_bits(data,
+                            MODESENSE6.control_extension_1_bits,
+                            _r)
         if _r['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
             if not 'sub_page_code' in _r:
-                decode_bits(data, MODESENSE6.disconnect_reconnect_bits, _r)
+                decode_bits(data,
+                            MODESENSE6.disconnect_reconnect_bits,
+                            _r)
 
         _mps.append(_r)
 
@@ -118,31 +150,45 @@ class ModeSense6(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(4)
-        encode_dict(data, MODESENSE6.mode_parameter_header_bits, result)
+        encode_dict(data,
+                    MODESENSE6.mode_parameter_header_bits,
+                    result)
 
         # mode page header
         for mp in data['mode_pages']:
             if not mp['spf']:
                 _d = bytearray(2)
-                encode_dict(mp, MODESENSE6.page_zero_bits, _d)
+                encode_dict(mp,
+                            MODESENSE6.page_zero_bits,
+                            _d)
             else:
                 _d = bytearray(4)
-                encode_dict(mp, MODESENSE6.sub_page_bits, _d)
+                encode_dict(mp,
+                            MODESENSE6.sub_page_bits,
+                            _d)
 
             if mp['page_code'] == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
                 _mpd = bytearray(18)
-                encode_dict(mp, MODESENSE6.element_address_bits, _mpd)
+                encode_dict(mp,
+                            MODESENSE6.element_address_bits,
+                            _mpd)
             if mp['page_code'] == PAGE_CODE.CONTROL:
                 if not mp['spf']:
                     _mpd = bytearray(10)
-                    encode_dict(mp, MODESENSE6.control_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE6.control_bits,
+                                _mpd)
                 elif mp['sub_page_code'] == 1:
                     _mpd = bytearray(28)
-                    encode_dict(mp, MODESENSE6.control_extension_1_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE6.control_extension_1_bits,
+                                _mpd)
             if mp['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
                 if not mp['spf']:
                     _mpd = bytearray(14)
-                    encode_dict(mp, MODESENSE6.disconnect_reconnect_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE6.disconnect_reconnect_bits,
+                                _mpd)
 
             if not mp['spf']:
                 _d[1] = len(_mpd)
@@ -164,7 +210,9 @@ class ModeSense6(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, MODESENSE6.cdb_bits, result)
+        decode_bits(cdb,
+                    MODESENSE6.cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -176,7 +224,9 @@ class ModeSense6(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
-        encode_dict(cdb, MODESENSE6.cdb_bits, result)
+        encode_dict(cdb,
+                    MODESENSE6.cdb_bits,
+                    result)
         return result
 
 
@@ -184,7 +234,11 @@ class ModeSelect6(SCSICommand):
     """
     A class to hold information from a modeselect6 command
     """
-    def __init__(self, opcode, data, pf=1, sp=0):
+    def __init__(self,
+                 opcode,
+                 data,
+                 pf=1,
+                 sp=0):
         """
         initialize a new instance
 
@@ -195,11 +249,19 @@ class ModeSelect6(SCSICommand):
         """
         _d = ModeSense6.marshall_datain(data)
 
-        SCSICommand.__init__(self, opcode, len(_d), 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             len(_d),
+                             0)
         self.dataout = _d
-        self.cdb = self.build_cdb(pf, sp, len(_d))
+        self.cdb = self.build_cdb(pf,
+                                  sp,
+                                  len(_d))
 
-    def build_cdb(self,pf, sp, alloclen):
+    def build_cdb(self,
+                  pf,
+                  sp,
+                  alloclen):
         """
         :param pf: page format can be 0 or 1
         :param sp: save pages can be 0 or 1
@@ -239,7 +301,9 @@ class ModeSelect6(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, MODESELECT6.modeselect6_cdb_bits, result)
+        decode_bits(cdb,
+                    MODESELECT6.modeselect6_cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -251,5 +315,7 @@ class ModeSelect6(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
-        encode_dict(cdb, MODESELECT6.modeselect6_cdb_bits, result)
+        encode_dict(cdb,
+                    MODESELECT6.modeselect6_cdb_bits,
+                    result)
         return result

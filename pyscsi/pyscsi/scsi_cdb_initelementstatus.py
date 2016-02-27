@@ -30,14 +30,19 @@ class InitializeElementStatus(SCSICommand):
     """
     _cdb_bits = {'opcode': [0xff, 0], }
 
-    def __init__(self, opcode):
+    def __init__(self,
+                 opcode):
         """
         initialize a new instance
 
         :param opcode: a OpCode instance
         :param scsi:
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
+
         self.cdb = self.build_cdb()
 
     def build_cdb(self):
@@ -58,7 +63,10 @@ class InitializeElementStatus(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, InitializeElementStatus._cdb_bits, result)
+        decode_bits(cdb,
+                    InitializeElementStatus._cdb_bits,
+                    result)
+
         return result
 
     @staticmethod
@@ -70,7 +78,10 @@ class InitializeElementStatus(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
-        encode_dict(cdb, InitializeElementStatus._cdb_bits, result)
+        encode_dict(cdb,
+                    InitializeElementStatus._cdb_bits,
+                    result)
+
         return result
 
 

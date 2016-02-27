@@ -36,7 +36,14 @@ class ExchangeMedium(SCSICommand):
                  'inv2': [0x01, 10],
                  'inv1': [0x02, 10], }
 
-    def __init__(self, opcode, xfer, source, dest1, dest2, inv1=0, inv2=0):
+    def __init__(self,
+                 opcode,
+                 xfer,
+                 source,
+                 dest1,
+                 dest2,
+                 inv1=0,
+                 inv2=0):
         """
         initialize a new instance
 
@@ -48,10 +55,24 @@ class ExchangeMedium(SCSICommand):
         :param inv1: value indicating if first destination should be inverted
         :param inv2: value indicating if scond destination should be inverted
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
-        self.cdb = self.build_cdb(xfer, source, dest1, dest2, inv1, inv2)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
+        self.cdb = self.build_cdb(xfer,
+                                  source,
+                                  dest1,
+                                  dest2,
+                                  inv1,
+                                  inv2)
 
-    def build_cdb(self, xfer, source, dest1, dest2, inv1, inv2):
+    def build_cdb(self,
+                  xfer,
+                  source,
+                  dest1,
+                  dest2,
+                  inv1,
+                  inv2):
         """
         Build a ExchangeMedium CDB
 
@@ -63,14 +84,13 @@ class ExchangeMedium(SCSICommand):
         :param inv2: value indicating if scond destination should be inverted
         :return: a byte array representing a code descriptor block
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'medium_transport_address': xfer,
-            'source_address': source,
-            'first_destination_address': dest1,
-            'second_destination_address': dest2,
-            'inv1': inv1,
-            'inv2': inv2, }
+        cdb = {'opcode': self.opcode.value,
+               'medium_transport_address': xfer,
+               'source_address': source,
+               'first_destination_address': dest1,
+               'second_destination_address': dest2,
+               'inv1': inv1,
+               'inv2': inv2, }
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -82,7 +102,10 @@ class ExchangeMedium(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, ExchangeMedium._cdb_bits, result)
+        decode_bits(cdb,
+                    ExchangeMedium._cdb_bits,
+                    result)
+
         return result
 
     @staticmethod
@@ -94,6 +117,9 @@ class ExchangeMedium(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
-        encode_dict(cdb, ExchangeMedium._cdb_bits, result)
+        encode_dict(cdb,
+                    ExchangeMedium._cdb_bits,
+                    result)
+
         return result
 

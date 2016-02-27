@@ -33,7 +33,12 @@ class MoveMedium(SCSICommand):
                  'destination_address': [0xffff, 6],
                  'invert': [0x01, 10], }
 
-    def __init__(self, opcode, xfer, source, dest, invert=0):
+    def __init__(self,
+                 opcode,
+                 xfer,
+                 source,
+                 dest,
+                 invert=0):
         """
         initialize a new instance
 
@@ -43,10 +48,21 @@ class MoveMedium(SCSICommand):
         :param dest: destination address
         :param invert: invert can be 0 or 1
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
-        self.cdb = self.build_cdb(xfer, source, dest, invert)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
 
-    def build_cdb(self, xfer, source, dest, invert):
+        self.cdb = self.build_cdb(xfer,
+                                  source,
+                                  dest,
+                                  invert)
+
+    def build_cdb(self,
+                  xfer,
+                  source,
+                  dest,
+                  invert):
         """
         Build a MoveMedium CDB
 
@@ -56,13 +72,12 @@ class MoveMedium(SCSICommand):
         :param invert: invert can be 0 or 1
         :return: a byte array representing a code descriptor block
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'medium_transport_address': xfer,
-            'source_address': source,
-            'destination_address': dest,
-            'invert': invert
-        }
+        cdb = {'opcode': self.opcode.value,
+               'medium_transport_address': xfer,
+               'source_address': source,
+               'destination_address': dest,
+               'invert': invert, }
+
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -74,7 +89,9 @@ class MoveMedium(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, MoveMedium._cdb_bits, result)
+        decode_bits(cdb,
+                    MoveMedium._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -86,5 +103,7 @@ class MoveMedium(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
-        encode_dict(cdb, MoveMedium._cdb_bits, result)
+        encode_dict(cdb,
+                    MoveMedium._cdb_bits,
+                    result)
         return result

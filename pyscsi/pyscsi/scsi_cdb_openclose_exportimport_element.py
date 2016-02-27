@@ -33,7 +33,11 @@ class OpenCloseImportExportElement(SCSICommand):
                  'element_address': [0xffff, 2],
                  'action_code': [0x1f, 4], }
 
-    def __init__(self, opcode, xfer, acode, **kwargs):
+    def __init__(self,
+                 opcode,
+                 xfer,
+                 acode,
+                 **kwargs):
         """
         initialize a new instance
 
@@ -41,10 +45,17 @@ class OpenCloseImportExportElement(SCSICommand):
         :param xfer: element address
         :param acode: action code
         """
-        SCSICommand.__init__(self, opcode, 0, 0)
-        self.cdb = self.build_cdb(xfer, acode)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             0)
 
-    def build_cdb(self, xfer, acode):
+        self.cdb = self.build_cdb(xfer,
+                                  acode)
+
+    def build_cdb(self,
+                  xfer,
+                  acode):
         """
         Build a ExchangeMedium CDB
 
@@ -52,10 +63,9 @@ class OpenCloseImportExportElement(SCSICommand):
         :param acode: action code
         :return: a byte array representing a code descriptor block
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'element_address': xfer,
-            'action_code': acode, }
+        cdb = {'opcode': self.opcode.value,
+               'element_address': xfer,
+               'action_code': acode, }
 
         return self.marshall_cdb(cdb)
 
@@ -68,7 +78,9 @@ class OpenCloseImportExportElement(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, OpenCloseImportExportElement._cdb_bits, result)
+        decode_bits(cdb,
+                    OpenCloseImportExportElement._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -80,5 +92,7 @@ class OpenCloseImportExportElement(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(6)
-        encode_dict(cdb, OpenCloseImportExportElement._cdb_bits, result)
+        encode_dict(cdb,
+                    OpenCloseImportExportElement._cdb_bits,
+                    result)
         return result

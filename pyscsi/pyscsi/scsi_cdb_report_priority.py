@@ -29,16 +29,19 @@ class ReportPriority(SCSICommand):
     """
     A class to hold information from a ReportPriority command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'service_action': [0x1f, 1],
-                 'priority_reported': [0xc0, 2],
-                 'alloc_len': [0xffffffff, 6], }
+    _cdb_bits =  {'opcode': [0xff, 0],
+                  'service_action': [0x1f, 1],
+                  'priority_reported': [0xc0, 2],
+                  'alloc_len': [0xffffffff, 6], }
 
     _data_bits = {'current_priority': [0x0f, 0],
                   'rtpi': [0xffff, 2],
                   'adlen': [0xffff, 6], }
 
-    def __init__(self, opcode, priority=0, alloclen=16384):
+    def __init__(self,
+                 opcode,
+                 priority=0,
+                 alloclen=16384):
         """
         initialize a new instance
 
@@ -46,10 +49,17 @@ class ReportPriority(SCSICommand):
         :param priority: specifies information to be returned in data_in buffer
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
-        self.cdb = self.build_cdb(priority, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
 
-    def build_cdb(self, priority, alloclen):
+        self.cdb = self.build_cdb(priority,
+                                  alloclen)
+
+    def build_cdb(self,
+                  priority,
+                  alloclen):
         """
         Build a ReportPriority CDB
 
@@ -61,6 +71,7 @@ class ReportPriority(SCSICommand):
                'service_action': self.opcode.serviceaction.REPORT_PRIORITY,
                'priority_reported': priority,
                'alloc_len': alloclen, }
+
         return self.marshall_cdb(cdb)
 
     def unmarshall(self):
@@ -85,7 +96,9 @@ class ReportPriority(SCSICommand):
             _r = {}
             _dict = dict(ReportPriority._datain_bits.copy)
             _dict.update({'transport_id': [hex(scsi_ba_to_int(_data[6:7])), 8], })
-            decode_bits(_data[:8 + scsi_ba_to_int(_data[6:7])], _dict, _r)
+            decode_bits(_data[:8 + scsi_ba_to_int(_data[6:7])],
+                        _dict,
+                        _r)
             _descriptors.append(_r)
             _data = _data[scsi_ba_to_int(_r['adlen']) + 8:]
         result.update({'priority_descriptors': _descriptors, })
@@ -123,7 +136,9 @@ class ReportPriority(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, ReportPriority._cdb_bits, result)
+        decode_bits(cdb,
+                    ReportPriority._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -135,5 +150,7 @@ class ReportPriority(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(12)
-        encode_dict(cdb, ReportPriority._cdb_bits, result)
+        encode_dict(cdb,
+                    ReportPriority._cdb_bits,
+                    result)
         return result

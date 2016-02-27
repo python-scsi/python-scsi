@@ -22,27 +22,27 @@ from pyscsi.utils.converter import decode_bits
 #
 # SPC4 4.5 Sense Data
 #
-SENSE_FORMAT_CURRENT_FIXED = 0x70
-SENSE_FORMAT_DEFERRED_FIXED = 0x71
-SENSE_FORMAT_CURRENT_DESCRIPTOR = 0x72
+SENSE_FORMAT_CURRENT_FIXED =       0x70
+SENSE_FORMAT_DEFERRED_FIXED =      0x71
+SENSE_FORMAT_CURRENT_DESCRIPTOR =  0x72
 SENSE_FORMAT_DEFERRED_DESCRIPTOR = 0x73
 
 # dict with common key code qualifiers
-sense_key_dict = {0x00: 'No Sense',
-                  0x01: 'Recovered Error',
-                  0x02: 'Not Ready',
-                  0x03: 'Medium Error',
-                  0x04: 'Hardware Error',
-                  0x05: 'Illegal Request',
-                  0x06: 'Unit Attention',
-                  0x07: 'Data Protect',
-                  0x08: 'Blank Check',
-                  0x09: 'Vendor Specific',
-                  0x0a: 'Copy Aborted',
-                  0x0b: 'Aborted Command',
-                  0x0d: 'Volume Overflow',
-                  0x0e: 'Miscompare',
-                  0x0f: 'Completed'}
+sense_key_dict =  {0x00: 'No Sense',
+                   0x01: 'Recovered Error',
+                   0x02: 'Not Ready',
+                   0x03: 'Medium Error',
+                   0x04: 'Hardware Error',
+                   0x05: 'Illegal Request',
+                   0x06: 'Unit Attention',
+                   0x07: 'Data Protect',
+                   0x08: 'Blank Check',
+                   0x09: 'Vendor Specific',
+                   0x0a: 'Copy Aborted',
+                   0x0b: 'Aborted Command',
+                   0x0d: 'Volume Overflow',
+                   0x0e: 'Miscompare',
+                   0x0f: 'Completed', }
 
 # dict with additional sense data
 sense_ascq_dict = {0x0001: 'FILEMARK DETECTED',
@@ -762,190 +762,191 @@ class SCSICheckCondition(Exception):
     """
 
     # sense data descriptor
-    _sdata_desc_bits = {'desc_type': [0xff, 0],
-                        'additional_len': [0xff, 1], }
+    _sdata_desc_bits =                            {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1], }
 
     # information sense data descriptor
-    _info_sdata_desc_bits = {'desc_type': [0xff, 0],
-                             'additional_len': [0xff, 1],
-                             'valid': [0x80, 2],
-                             'information': [0xffffffffffffffff, 4], }
+    _info_sdata_desc_bits =                       {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'valid': [0x80, 2],
+                                                   'information': [0xffffffffffffffff, 4], }
 
     # command-specific information sense data descriptor
-    _cmd_info_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                 'additional_len': [0xff, 1],
-                                 'cmd_specific_information': [0xffffffffffffffff, 4], }
+    _cmd_info_sdata_desc_bits =                   {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'cmd_specific_information': [0xffffffffffffffff, 4], }
 
     # sense key specific sense data descriptor
-    _skey_sdata_desc_bits = {'desc_type': [0xff, 0],
-                             'additional_len': [0xff, 1],
-                             'sksv': [0x80, 4],
-                             'skey_specific_information': [0x7fffff, 4], }
+    _skey_sdata_desc_bits =                       {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'sksv': [0x80, 4],
+                                                   'skey_specific_information': [0x7fffff, 4], }
 
     # field pointer sense key specific information
-    _fptr_skey_sdata_desc_bits = {'sksv': [0x80, 0],
-                                  'cd': [0x40, 0],
-                                  'bpv': [0x08, 0],
-                                  'bit_pointer': [0x07, 0],
-                                  'field_pointer': [0xffff, 1], }
+    _fptr_skey_sdata_desc_bits =                  {'sksv': [0x80, 0],
+                                                   'cd': [0x40, 0],
+                                                   'bpv': [0x08, 0],
+                                                   'bit_pointer': [0x07, 0],
+                                                   'field_pointer': [0xffff, 1], }
 
     # actual retry count sense key specific information
-    _retry_count_skey_sdata_desc_bits = {'sksv': [0x80, 0],
-                                         'actual_retry_counter': [0xffff, 1], }
+    _retry_count_skey_sdata_desc_bits =           {'sksv': [0x80, 0],
+                                                   'actual_retry_counter': [0xffff, 1], }
 
     # progress indication sense key specific information
-    _progress_skey_sdata_desc_bits = {'sksv': [0x80, 0],
-                                      'progress_indication': [0xffff, 1], }
+    _progress_skey_sdata_desc_bits =              {'sksv': [0x80, 0],
+                                                   'progress_indication': [0xffff, 1], }
 
     # segment pointer sense key specific information
-    _segptr_skey_sdata_desc_bits = {'sksv': [0x80, 0],
-                                    'sd': [0x40, 0],
-                                    'bpv': [0x20, 0],
-                                    'bit_pointer': [0x07, 0],
-                                    'field_pointer': [0xffff, 1], }
+    _segptr_skey_sdata_desc_bits =                {'sksv': [0x80, 0],
+                                                   'sd': [0x40, 0],
+                                                   'bpv': [0x20, 0],
+                                                   'bit_pointer': [0x07, 0],
+                                                   'field_pointer': [0xffff, 1], }
 
     # unit attention condition queue overflow sense key specific info
-    _uacqo_skey_sdata_desc_bits = {'sksv': [0x80, 0],
-                                   'overflow': [0x01, 0], }
+    _uacqo_skey_sdata_desc_bits =                 {'sksv': [0x80, 0],
+                                                   'overflow': [0x01, 0], }
 
     # field replaceable unit sense data descriptor
-    _fld_replace_unit_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                         'additional_len': [0xff, 1],
-                                         'field_replaceable_unit_code': [0xff, 3], }
+    _fld_replace_unit_sdata_desc_bits =           {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'field_replaceable_unit_code': [0xff, 3], }
 
     # stream commands sense data descriptor
-    _stream_cmd_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                   'additional_len': [0xff, 1],
-                                   'filemark': [0x80, 3],
-                                   'eom': [0x40, 3],
-                                   'ili': [0x20, 3], }
+    _stream_cmd_sdata_desc_bits =                 {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'filemark': [0x80, 3],
+                                                   'eom': [0x40, 3],
+                                                   'ili': [0x20, 3], }
 
     # block commands sense data descriptor
-    _blk_cmd_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                'additional_len': [0xff, 1],
-                                'ili': [0x20, 3], }
+    _blk_cmd_sdata_desc_bits =                    {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'ili': [0x20, 3], }
 
     # OSD object identification sense data descriptor
-    _osd_obj_ident_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                      'additional_len': [0xff, 1],
-                                      'not_initiated_command_function': [0xffffff, 8],
-                                      'completed_command_functions': [0xffffffff, 12],
-                                      'partition_id': [0xffffffffffffff, 16],
-                                      'object_id': [0xffffffffffffff, 24], }
+    _osd_obj_ident_sdata_desc_bits =              {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'not_initiated_command_function': [0xffffff, 8],
+                                                   'completed_command_functions': [0xffffffff, 12],
+                                                   'partition_id': [0xffffffffffffff, 16],
+                                                   'object_id': [0xffffffffffffff, 24], }
 
     # bits contained in the not_initiated_command_function field
-    _osd_cmd_func_bits = {'validation': [0x80, 0],
-                          'cmd_cap_v': [0x20, 0],
-                          'command': [0x10, 0],
-                          'imp_st_att': [0x10, 1],
-                          'sa_cap_v': [0x20, 2],
-                          'set_att': [0x10, 2],
-                          'ga_cap_v': [0x20, 3],
-                          'get_att': [0x10, 3], }
+    _osd_cmd_func_bits =                          {'validation': [0x80, 0],
+                                                   'cmd_cap_v': [0x20, 0],
+                                                   'command': [0x10, 0],
+                                                   'imp_st_att': [0x10, 1],
+                                                   'sa_cap_v': [0x20, 2],
+                                                   'set_att': [0x10, 2],
+                                                   'ga_cap_v': [0x20, 3],
+                                                   'get_att': [0x10, 3], }
 
     # OSD response integrity check value sense data descriptor
     _osd_respnd_integrity_ckval_sdata_desc_bits = {'desc_type': [0xff, 0],
                                                    'additional_len': [0xff, 1],
-                                                   'response_integrity_check_value':
-                                                       [0xffffffffffffffffffffffffffffffffffffff, 2], }
+                                                   'response_integrity_check_value': [0xffffffffffffffffffffffffffffffffffffff, 2], }
     # OSD attribute identification sense data descriptor
-    _osd_attr_ident_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                       'additional_len': [0xff, 1], }
+    _osd_attr_ident_sdata_desc_bits =             {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1], }
 
     # OSD sense data attribute descriptor
-    _osd_sdata_attr_desc_bits = {'attribute_page': [0xffffffff, 0],
-                                 'attribute_number': [0xffffffff, 4], }
+    _osd_sdata_attr_desc_bits =                   {'attribute_page': [0xffffffff, 0],
+                                                   'attribute_number': [0xffffffff, 4], }
 
     # ATA status return descriptor
-    _ata_status_return_desc_bits = {'desc_type': [0xff, 0],
-                                    'additional_len': [0xff, 1],
-                                    'extend': [0x01, 2],
-                                    'error': [0xff, 3],
-                                    'count_15_8': [0xff, 4],
-                                    'count_7_0': [0xff, 5],
-                                    'lba_31_24': [0xff, 6],
-                                    'lba_7_0': [0xff, 7],
-                                    'lba_39_32': [0xff, 8],
-                                    'lba_15_8': [0xff, 9],
-                                    'lba_47_40': [0xff, 10],
-                                    'lba_23_16': [0xff, 11],
-                                    'device': [0xff, 12],
-                                    'status': [0xff, 13], }
+    _ata_status_return_desc_bits =                {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'extend': [0x01, 2],
+                                                   'error': [0xff, 3],
+                                                   'count_15_8': [0xff, 4],
+                                                   'count_7_0': [0xff, 5],
+                                                   'lba_31_24': [0xff, 6],
+                                                   'lba_7_0': [0xff, 7],
+                                                   'lba_39_32': [0xff, 8],
+                                                   'lba_15_8': [0xff, 9],
+                                                   'lba_47_40': [0xff, 10],
+                                                   'lba_23_16': [0xff, 11],
+                                                   'device': [0xff, 12],
+                                                   'status': [0xff, 13], }
 
     # another progress indication sense data descriptor
-    _aprogress_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                  'additional_len': [0xff, 1],
-                                  'another_sense_key': [0xff, 2],
-                                  'another_additional_sense_code': [0xff, 3],
-                                  'another_additional_sense_code_qualifier': [0xff, 4],
-                                  'another_progress_indication': [0xffff, 6], }
+    _aprogress_sdata_desc_bits =                  {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'another_sense_key': [0xff, 2],
+                                                   'another_additional_sense_code': [0xff, 3],
+                                                   'another_additional_sense_code_qualifier': [0xff, 4],
+                                                   'another_progress_indication': [0xffff, 6], }
 
     # user data segment referral sense data descriptor
-    _udata_segref_sdata_desc_bits = {'desc_type': [0xff, 0],
-                                     'additional_len': [0xff, 1],
-                                     'not_all_r': [0x01, 2], }
+    _udata_segref_sdata_desc_bits =               {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'not_all_r': [0x01, 2], }
 
     # user data segment referral descriptor
-    _udata_segref_desc_bits = {'number_of_trarget_port_group_descriptors': [0xff, 3],
-                               'first_user_data_segment_lba': [0xffffffffffffffff, 4],
-                               'last_user_data_segment_lba': [0xffffffffffffffff, 12], }
+    _udata_segref_desc_bits =                     {'number_of_trarget_port_group_descriptors': [0xff, 3],
+                                                   'first_user_data_segment_lba': [0xffffffffffffffff, 4],
+                                                   'last_user_data_segment_lba': [0xffffffffffffffff, 12], }
 
     # target port group descriptor
-    _tgt_pgroup_desc_bits = {'asymmetric_access_state': [0x0f, 0],
-                             'target_port_group': [0xffff, 2], }
+    _tgt_pgroup_desc_bits =                       {'asymmetric_access_state': [0x0f, 0],
+                                                   'target_port_group': [0xffff, 2], }
 
     # forwarded sense data descriptor
-    _fwd_sdata_desc_bits = {'desc_type': [0xff, 0],
-                            'additional_len': [0xff, 1],
-                            'fsdt': [0x80, 2],
-                            'sense_data_source': [0x0f, 2],
-                            'forwarded_status': [0xff, 3], }
+    _fwd_sdata_desc_bits =                        {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1],
+                                                   'fsdt': [0x80, 2],
+                                                   'sense_data_source': [0x0f, 2],
+                                                   'forwarded_status': [0xff, 3], }
 
     # vendor specific sense data descriptors
-    _vendor_sdata_desc_bits = {'desc_type': [0xff, 0],
-                               'additional_len': [0xff, 1], }
+    _vendor_sdata_desc_bits =                     {'desc_type': [0xff, 0],
+                                                   'additional_len': [0xff, 1], }
 
     # fixed format sense data
-    _fixed_format_sdata_bits = {'valid': [0x80, 0],
-                                'response_code': [0x7f, 0],
-                                'filemark': [0x80, 2],
-                                'eom': [0x40, 2],
-                                'ili': [0x20, 2],
-                                'sdat_ovfl': [0x10, 2],
-                                'sense_key': [0x0f, 2],
-                                'information': [0xffffffff, 3],
-                                'additional_sense_len': [0xff, 7],
-                                'command_specific_information': [0xffffffff, 8],
-                                'additional_sense_code': [0xff, 12],
-                                'additional_sense_code_qualifier': [0xff, 13],
-                                'field_replaceable_unit_code': [0xff, 14],
-                                'sksv': [0x80, 15],
-                                'sense_key_specific_information': [0x7fffff, 15], }
+    _fixed_format_sdata_bits =                    {'valid': [0x80, 0],
+                                                   'response_code': [0x7f, 0],
+                                                   'filemark': [0x80, 2],
+                                                   'eom': [0x40, 2],
+                                                   'ili': [0x20, 2],
+                                                   'sdat_ovfl': [0x10, 2],
+                                                   'sense_key': [0x0f, 2],
+                                                   'information': [0xffffffff, 3],
+                                                   'additional_sense_len': [0xff, 7],
+                                                   'command_specific_information': [0xffffffff, 8],
+                                                   'additional_sense_code': [0xff, 12],
+                                                   'additional_sense_code_qualifier': [0xff, 13],
+                                                   'field_replaceable_unit_code': [0xff, 14],
+                                                   'sksv': [0x80, 15],
+                                                   'sense_key_specific_information': [0x7fffff, 15], }
 
     # descriptor format sense data
-    _desc_format_sdata_bits = {'response_code': [0x7f, 0],
-                               'sdat_ovfl': [0x80, 4],
-                               'sense_key': [0x0f, 1],
-                               'additional_sense_code': [0xff, 2],
-                               'additional_sense_code_qualifier': [0xff, 3],
-                               'additional_sense_len': [0xff, 7], }
+    _desc_format_sdata_bits =                     {'response_code': [0x7f, 0],
+                                                   'sdat_ovfl': [0x80, 4],
+                                                   'sense_key': [0x0f, 1],
+                                                   'additional_sense_code': [0xff, 2],
+                                                   'additional_sense_code_qualifier': [0xff, 3],
+                                                   'additional_sense_len': [0xff, 7], }
 
-    _descriptor_type_dict = {0x00: _info_sdata_desc_bits,
-                             0x01: _cmd_info_sdata_desc_bits,
-                             0x02: _skey_sdata_desc_bits,
-                             0x03: _fld_replace_unit_sdata_desc_bits,
-                             0x04: _stream_cmd_sdata_desc_bits,
-                             0x05: _blk_cmd_sdata_desc_bits,
-                             0x06: _osd_obj_ident_sdata_desc_bits,
-                             0x07: _osd_respnd_integrity_ckval_sdata_desc_bits,
-                             0x08: _osd_attr_ident_sdata_desc_bits,
-                             0x09: _ata_status_return_desc_bits,
-                             0x0a: _aprogress_sdata_desc_bits,
-                             0x0b: _udata_segref_sdata_desc_bits,
-                             0x0c: _fwd_sdata_desc_bits,
-                             0x80: _vendor_sdata_desc_bits, }
+    _descriptor_type_dict =                       {0x00: _info_sdata_desc_bits,
+                                                   0x01: _cmd_info_sdata_desc_bits,
+                                                   0x02: _skey_sdata_desc_bits,
+                                                   0x03: _fld_replace_unit_sdata_desc_bits,
+                                                   0x04: _stream_cmd_sdata_desc_bits,
+                                                   0x05: _blk_cmd_sdata_desc_bits,
+                                                   0x06: _osd_obj_ident_sdata_desc_bits,
+                                                   0x07: _osd_respnd_integrity_ckval_sdata_desc_bits,
+                                                   0x08: _osd_attr_ident_sdata_desc_bits,
+                                                   0x09: _ata_status_return_desc_bits,
+                                                   0x0a: _aprogress_sdata_desc_bits,
+                                                   0x0b: _udata_segref_sdata_desc_bits,
+                                                   0x0c: _fwd_sdata_desc_bits,
+                                                   0x80: _vendor_sdata_desc_bits, }
 
-    def __init__(self, sense, print_data=False):
+    def __init__(self,
+                 sense,
+                 print_data=False):
         self.valid = sense[0] & 0x80
         self.response_code = sense[0] & 0x7f
         self.data = {}
@@ -969,5 +970,7 @@ class SCSICheckCondition(Exception):
     @staticmethod
     def unmarshall_fixed_format_sense_data(data):
         result = {}
-        decode_bits(data, SCSICheckCondition._fixed_format_sdata_bits, result)
+        decode_bits(data,
+                    SCSICheckCondition._fixed_format_sdata_bits,
+                    result)
         return result

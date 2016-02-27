@@ -35,7 +35,13 @@ class Write10(SCSICommand):
                  'group': [0x1f, 6],
                  'tl': [0xffff, 7], }
 
-    def __init__(self, opcode, blocksize, lba, tl, data, **kwargs):
+    def __init__(self,
+                 opcode,
+                 blocksize,
+                 lba,
+                 tl,
+                 data,
+                 **kwargs):
         """
         initialize a new instance
 
@@ -49,11 +55,22 @@ class Write10(SCSICommand):
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self, opcode, blocksize * tl, 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             blocksize * tl,
+                             0)
         self.dataout = data
-        self.cdb = self.build_cdb(lba, tl, **kwargs)
+        self.cdb = self.build_cdb(lba,
+                                  tl,
+                                  **kwargs)
 
-    def build_cdb(self, lba, tl, wrprotect=0, dpo=0, fua=0, group=0):
+    def build_cdb(self,
+                  lba,
+                  tl,
+                  wrprotect=0,
+                  dpo=0,
+                  fua=0,
+                  group=0):
         """
         Build a Write10 CDB
 
@@ -64,15 +81,14 @@ class Write10(SCSICommand):
         :param fua: force until access, can have a value of 0 or 1
         :param group: group number, can be 0 or greater
         """
-        cdb = {
-            'opcode': self.opcode.value,
-            'lba': lba,
-            'tl': tl,
-            'wrprotect': wrprotect,
-            'dpo': dpo,
-            'fua': fua,
-            'group': group,
-        }
+        cdb = {'opcode': self.opcode.value,
+               'lba': lba,
+               'tl': tl,
+               'wrprotect': wrprotect,
+               'dpo': dpo,
+               'fua': fua,
+               'group': group, }
+
         return self.marshall_cdb(cdb)
 
     @staticmethod
@@ -84,7 +100,9 @@ class Write10(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, Write10._cdb_bits, result)
+        decode_bits(cdb,
+                    Write10._cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -96,5 +114,7 @@ class Write10(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, Write10._cdb_bits, result)
+        encode_dict(cdb,
+                    Write10._cdb_bits,
+                    result)
         return result

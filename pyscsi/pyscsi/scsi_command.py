@@ -28,7 +28,10 @@ class SCSICommand(_new_base_class):
     The base class for a derived scsi command class
     """
 
-    def __init__(self, opcode, dataout_alloclen, datain_alloclen):
+    def __init__(self,
+                 opcode,
+                 dataout_alloclen,
+                 datain_alloclen):
         """
         initialize a new instance
 
@@ -45,7 +48,8 @@ class SCSICommand(_new_base_class):
         self._opcode = opcode
 
     @classmethod
-    def init_cdb(cls, opcode):
+    def init_cdb(cls,
+                 opcode):
         """
         init a byte array representing a command descriptor block with fixed length depending on the Opcode
 
@@ -78,7 +82,8 @@ class SCSICommand(_new_base_class):
         return self._result
 
     @result.setter
-    def result(self, value):
+    def result(self,
+               value):
         """
         setter method of the result property
 
@@ -96,7 +101,8 @@ class SCSICommand(_new_base_class):
         return self._cdb
 
     @cdb.setter
-    def cdb(self, value):
+    def cdb(self,
+            value):
         """
         setter method of the cdb property
 
@@ -114,7 +120,8 @@ class SCSICommand(_new_base_class):
         return self._datain
 
     @datain.setter
-    def datain(self, value):
+    def datain(self,
+               value):
         """
         setter method of the datain property
 
@@ -132,7 +139,8 @@ class SCSICommand(_new_base_class):
         return self._dataout
 
     @dataout.setter
-    def dataout(self, value):
+    def dataout(self,
+                value):
         """
         setter method of the dataout property
 
@@ -150,7 +158,8 @@ class SCSICommand(_new_base_class):
         return self._sense
 
     @sense.setter
-    def sense(self, value):
+    def sense(self,
+              value):
         """
         setter method of the sense property
 
@@ -166,7 +175,8 @@ class SCSICommand(_new_base_class):
         return self._page_code
 
     @pagecode.setter
-    def pagecode(self, value):
+    def pagecode(self,
+                 value):
         """
         setter method of the pagecode property
 
@@ -182,7 +192,8 @@ class SCSICommand(_new_base_class):
         return self._opcode
 
     @opcode.setter
-    def opcode(self, value):
+    def opcode(self,
+               value):
         """
         setter method of the opcode property
 

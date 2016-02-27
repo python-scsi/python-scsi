@@ -31,7 +31,14 @@ class ModeSense10(SCSICommand):
     A class to hold information from a modesense10 command
     """
 
-    def __init__(self, opcode, page_code, sub_page_code=0, llbaa=0, dbd=0, pc=0, alloclen=96):
+    def __init__(self,
+                 opcode,
+                 page_code,
+                 sub_page_code=0,
+                 llbaa=0,
+                 dbd=0,
+                 pc=0,
+                 alloclen=96):
         """
         initialize a new instance
 
@@ -43,10 +50,24 @@ class ModeSense10(SCSICommand):
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self, opcode, 0, alloclen)
-        self.cdb = self.build_cdb(page_code, sub_page_code, llbaa, dbd, pc, alloclen)
+        SCSICommand.__init__(self,
+                             opcode,
+                             0,
+                             alloclen)
+        self.cdb = self.build_cdb(page_code,
+                                  sub_page_code,
+                                  llbaa,
+                                  dbd,
+                                  pc,
+                                  alloclen)
 
-    def build_cdb(self, page_code, sub_page_code, llbaa, dbd, pc, alloclen):
+    def build_cdb(self,
+                  page_code,
+                  sub_page_code,
+                  llbaa,
+                  dbd,
+                  pc,
+                  alloclen):
         """
 
         :param page_code: the page code for the vpd page
@@ -83,7 +104,9 @@ class ModeSense10(SCSICommand):
         """
         result = {}
         _mps = []
-        decode_bits(data[0:8], MODESENSE10.mode_parameter_header_bits, result)
+        decode_bits(data[0:8],
+                    MODESENSE10.mode_parameter_header_bits,
+                    result)
 
         _bdl = scsi_ba_to_int(data[6:8])
         block_descriptor = data[8:_bdl]  # no one really use this variable in here ?
@@ -92,22 +115,34 @@ class ModeSense10(SCSICommand):
 
         _r = {}
         if not data[0] & 0x40:
-            decode_bits(data, MODESENSE10.page_zero_bits, _r)
+            decode_bits(data,
+                        MODESENSE10.page_zero_bits,
+                        _r)
             data = data[2:]
         else:
-            decode_bits(data, MODESENSE10.sub_page_bits, _r)
+            decode_bits(data,
+                        MODESENSE10.sub_page_bits,
+                        _r)
             data = data[4:]
 
         if _r['page_code'] == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
-            decode_bits(data, MODESENSE10.element_address_bits, _r)
+            decode_bits(data,
+                        MODESENSE10.element_address_bits,
+                        _r)
         if _r['page_code'] == PAGE_CODE.CONTROL:
             if not 'sub_page_code' in _r:
-                decode_bits(data, MODESENSE10.control_bits, _r)
+                decode_bits(data,
+                            MODESENSE10.control_bits,
+                            _r)
             elif _r['sub_page_code'] == 1:
-                decode_bits(data, MODESENSE10.control_extension_1_bits, _r)
+                decode_bits(data,
+                            MODESENSE10.control_extension_1_bits,
+                            _r)
         if _r['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
             if not 'sub_page_code' in _r:
-                decode_bits(data, MODESENSE10.disconnect_reconnect_bits, _r)
+                decode_bits(data,
+                            MODESENSE10.disconnect_reconnect_bits,
+                            _r)
 
         _mps.append(_r)
 
@@ -123,31 +158,45 @@ class ModeSense10(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(8)
-        encode_dict(data, MODESENSE10.mode_parameter_header_bits, result)
+        encode_dict(data,
+                    MODESENSE10.mode_parameter_header_bits,
+                    result)
 
         # mode page header
         for mp in data['mode_pages']:
             if not mp['spf']:
                 _d = bytearray(2)
-                encode_dict(mp, MODESENSE10.page_zero_bits, _d)
+                encode_dict(mp,
+                            MODESENSE10.page_zero_bits,
+                            _d)
             else:
                 _d = bytearray(4)
-                encode_dict(mp, MODESENSE10.sub_page_bits, _d)
+                encode_dict(mp,
+                            MODESENSE10.sub_page_bits,
+                            _d)
 
             if mp['page_code'] == PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT:
                 _mpd = bytearray(18)
-                encode_dict(mp, MODESENSE10.element_address_bits, _mpd)
+                encode_dict(mp,
+                            MODESENSE10.element_address_bits,
+                            _mpd)
             if mp['page_code'] == PAGE_CODE.CONTROL:
                 if not mp['spf']:
                     _mpd = bytearray(10)
-                    encode_dict(mp, MODESENSE10.control_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE10.control_bits,
+                                _mpd)
                 elif mp['sub_page_code'] == 1:
                     _mpd = bytearray(28)
-                    encode_dict(mp, MODESENSE10.control_extension_1_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE10.control_extension_1_bits,
+                                _mpd)
             if mp['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
                 if not mp['spf']:
                     _mpd = bytearray(14)
-                    encode_dict(mp, MODESENSE10.disconnect_reconnect_bits, _mpd)
+                    encode_dict(mp,
+                                MODESENSE10.disconnect_reconnect_bits,
+                                _mpd)
 
             if not mp['spf']:
                 _d[1] = len(_mpd)
@@ -169,7 +218,9 @@ class ModeSense10(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, MODESENSE10.cdb_bits, result)
+        decode_bits(cdb,
+                    MODESENSE10.cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -181,7 +232,9 @@ class ModeSense10(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, MODESENSE10.cdb_bits, result)
+        encode_dict(cdb,
+                    MODESENSE10.cdb_bits,
+                    result)
         return result
 
 
@@ -189,7 +242,11 @@ class ModeSelect10(SCSICommand):
     """
     A class to hold information from a ModeSelect10 command
     """
-    def __init__(self, opcode, data, pf=1, sp=0):
+    def __init__(self,
+                 opcode,
+                 data,
+                 pf=1,
+                 sp=0):
         """
         initialize a new instance
 
@@ -200,11 +257,19 @@ class ModeSelect10(SCSICommand):
         """
         _d = ModeSense10.marshall_datain(data)
 
-        SCSICommand.__init__(self, opcode, len(_d), 0)
+        SCSICommand.__init__(self,
+                             opcode,
+                             len(_d),
+                             0)
         self.dataout = _d
-        self.cdb = self.build_cdb(pf, sp, len(_d))
+        self.cdb = self.build_cdb(pf,
+                                  sp,
+                                  len(_d))
 
-    def build_cdb(self, pf, sp, alloclen):
+    def build_cdb(self,
+                  pf,
+                  sp,
+                  alloclen):
         """
         method to create a byte array for a Command Descriptor Block with a proper length
 
@@ -247,7 +312,9 @@ class ModeSelect10(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb, MODESELECT10.modeselect10_cdb_bits, result)
+        decode_bits(cdb,
+                    MODESELECT10.modeselect10_cdb_bits,
+                    result)
         return result
 
     @staticmethod
@@ -259,5 +326,7 @@ class ModeSelect10(SCSICommand):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(10)
-        encode_dict(cdb, MODESELECT10.modeselect10_cdb_bits, result)
+        encode_dict(cdb,
+                    MODESELECT10.modeselect10_cdb_bits,
+                    result)
         return result
