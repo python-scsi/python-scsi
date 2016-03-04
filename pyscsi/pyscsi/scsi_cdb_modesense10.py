@@ -46,7 +46,8 @@ class ModeSense10(SCSICommand):
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
         :param llbaa: long LBA accepted can be 0 or 1
-        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not
+                    return any block descriptor
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
@@ -73,7 +74,8 @@ class ModeSense10(SCSICommand):
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
         :param llbaa: long LBA accepted can be 0 or 1
-        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not
+                    return any block descriptor
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         :return: a byte array representing a code descriptor block
@@ -130,7 +132,7 @@ class ModeSense10(SCSICommand):
                         MODESENSE10.element_address_bits,
                         _r)
         if _r['page_code'] == PAGE_CODE.CONTROL:
-            if not 'sub_page_code' in _r:
+            if 'sub_page_code' not in _r:
                 decode_bits(data,
                             MODESENSE10.control_bits,
                             _r)
@@ -139,7 +141,7 @@ class ModeSense10(SCSICommand):
                             MODESENSE10.control_extension_1_bits,
                             _r)
         if _r['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
-            if not 'sub_page_code' in _r:
+            if 'sub_page_code' not in _r:
                 decode_bits(data,
                             MODESENSE10.disconnect_reconnect_bits,
                             _r)

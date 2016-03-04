@@ -107,7 +107,7 @@ class GetLBAStatus(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(8)
-        if not 'lbas' in data:
+        if 'lbas' not in data:
             result[:4] = scsi_int_to_ba(len(result) - 4, 4)
             return result
 

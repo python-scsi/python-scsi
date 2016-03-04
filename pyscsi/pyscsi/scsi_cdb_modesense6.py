@@ -42,7 +42,8 @@ class ModeSense6(SCSICommand):
         :param opcode: a OpCode instance
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
-        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not
+                    return any block descriptor
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
@@ -67,7 +68,8 @@ class ModeSense6(SCSICommand):
 
         :param page_code: the page code for the vpd page
         :param sub_page_code: a integer representing a sub page code
-        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not return any block descriptor
+        :param dbd: disable block descriptor can be 0 or 1. If set to 1 server shall not
+                    return any block descriptor
         :param pc: page control field, a value between 0 and 3
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
@@ -122,7 +124,7 @@ class ModeSense6(SCSICommand):
                         MODESENSE6.element_address_bits,
                         _r)
         if _r['page_code'] == PAGE_CODE.CONTROL:
-            if not 'sub_page_code' in _r:
+            if 'sub_page_code' not in _r:
                 decode_bits(data,
                             MODESENSE6.control_bits,
                             _r)
@@ -131,7 +133,7 @@ class ModeSense6(SCSICommand):
                             MODESENSE6.control_extension_1_bits,
                             _r)
         if _r['page_code'] == PAGE_CODE.DISCONNECT_RECONNECT:
-            if not 'sub_page_code' in _r:
+            if 'sub_page_code' not in _r:
                 decode_bits(data,
                             MODESENSE6.disconnect_reconnect_bits,
                             _r)

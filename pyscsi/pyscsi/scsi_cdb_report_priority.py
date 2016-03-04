@@ -113,7 +113,7 @@ class ReportPriority(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(4)
-        if not 'priority_descriptors' in data:
+        if 'priority_descriptors' not in data:
             result[:4] = scsi_int_to_ba(len(result), 4)
             return result
 
