@@ -21,8 +21,9 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 
 try:
     import linux_sgio
+    _has_sgio = True
 except ImportError as e:
-    raise e
+    _has_sgio = False
 
 # make a new base class with the metaclass this should solve the problem with the
 # python 2 and python 3 metaclass definitions
@@ -62,7 +63,7 @@ class SCSIDevice(_new_base_class):
         self._read_write = readwrite
         self._fd = None
 
-        if device[:5] == '/dev/':
+        if _has_sgio and device[:5] == '/dev/':
             self.open()
         else:
             raise NotImplementedError('No backend implemented for %s' % device)

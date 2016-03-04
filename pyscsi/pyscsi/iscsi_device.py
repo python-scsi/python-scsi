@@ -3,8 +3,9 @@ import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 
 try:
     import libiscsi
+    _has_libiscsi = True
 except ImportError as e:
-    raise e
+    _has_libiscsi = False
 
 # make a new base class with the metaclass this should solve the problem with the
 # python 2 and python 3 metaclass definitions
@@ -42,7 +43,7 @@ class ISCSIDevice(_new_base_class):
         self._file_name = device
         self._iscsi = None
         self._iscsi_url = None
-        if device[:8] == 'iscsi://':
+        if _has_libiscsi and device[:8] == 'iscsi://':
             self.open()
         else:
             raise NotImplementedError('No backend implemented for %s' % device)
