@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-from pyscsi.pyscsi.scsi import SCSI
-from mock_device import MockDevice
+from mock_device import MockDevice, MockSCSI
 from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE10
@@ -10,6 +8,7 @@ from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSense10
 
 
 class MockModeSenseEAA(MockDevice):
+
     def execute(self, cdb, dataout, datain, sense):
         datain[0] = 21    # mode data length
         datain[2] = 97    # medium type
@@ -89,117 +88,109 @@ class MockModeSenseDisconnect(MockDevice):
 
 def main():
     # SMC ElementAddressAssignment
-    dev = MockModeSenseEAA()
-    dev.opcodes = smc
-    s = SCSI(dev)
-    i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT).result
-    assert i['medium_type'] == 97
-    assert i['device_specific_parameter'] == 98
+    with MockSCSI(MockModeSenseEAA(smc)) as s:
+        i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT).result
+        assert i['medium_type'] == 97
+        assert i['device_specific_parameter'] == 98
 
-    assert len(i['mode_pages']) == 1
+        assert len(i['mode_pages']) == 1
 
-    assert i['mode_pages'][0]['ps'] == 1
-    assert i['mode_pages'][0]['spf'] == 0
-    assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
-    assert i['mode_pages'][0]['first_medium_transport_element_address'] == 257
-    assert i['mode_pages'][0]['num_medium_transport_elements'] == 258
-    assert i['mode_pages'][0]['first_storage_element_address'] == 259
-    assert i['mode_pages'][0]['num_storage_elements'] == 260
-    assert i['mode_pages'][0]['first_import_element_address'] == 261
-    assert i['mode_pages'][0]['num_import_elements'] == 262
-    assert i['mode_pages'][0]['first_data_transfer_element_address'] == 263
-    assert i['mode_pages'][0]['num_data_transfer_elements'] == 264
+        assert i['mode_pages'][0]['ps'] == 1
+        assert i['mode_pages'][0]['spf'] == 0
+        assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
+        assert i['mode_pages'][0]['first_medium_transport_element_address'] == 257
+        assert i['mode_pages'][0]['num_medium_transport_elements'] == 258
+        assert i['mode_pages'][0]['first_storage_element_address'] == 259
+        assert i['mode_pages'][0]['num_storage_elements'] == 260
+        assert i['mode_pages'][0]['first_import_element_address'] == 261
+        assert i['mode_pages'][0]['num_import_elements'] == 262
+        assert i['mode_pages'][0]['first_data_transfer_element_address'] == 263
+        assert i['mode_pages'][0]['num_data_transfer_elements'] == 264
 
-    d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
-    assert d == i
+        d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
+        assert d == i
 
-    # SPC Control
-    dev = MockModeSenseControl()
-    dev.opcodes = smc
-    s = SCSI(dev)
-    i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.CONTROL).result
-    assert i['medium_type'] == 0
-    assert i['device_specific_parameter'] == 0x90
+        # SPC Control
+        s.device = MockModeSenseControl(smc)
+        i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.CONTROL).result
+        assert i['medium_type'] == 0
+        assert i['device_specific_parameter'] == 0x90
 
-    assert len(i['mode_pages']) == 1
+        assert len(i['mode_pages']) == 1
 
-    assert i['mode_pages'][0]['ps'] == 1
-    assert i['mode_pages'][0]['spf'] == 0
-    assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.CONTROL
-    assert i['mode_pages'][0]['tst'] == 4
-    assert i['mode_pages'][0]['tmf_only'] == 1
-    assert i['mode_pages'][0]['dpicz'] == 1
-    assert i['mode_pages'][0]['d_sense'] == 1
-    assert i['mode_pages'][0]['gltsd'] == 1
-    assert i['mode_pages'][0]['rlec'] == 1
-    assert i['mode_pages'][0]['queue_algorithm_modifier'] == 9
-    assert i['mode_pages'][0]['nuar'] == 1
-    assert i['mode_pages'][0]['qerr'] == 3
-    assert i['mode_pages'][0]['vs'] == 1
-    assert i['mode_pages'][0]['rac'] == 1
-    assert i['mode_pages'][0]['ua_intlck_ctrl'] == 3
-    assert i['mode_pages'][0]['swp'] == 1
-    assert i['mode_pages'][0]['ato'] == 1
-    assert i['mode_pages'][0]['tas'] == 1
-    assert i['mode_pages'][0]['atmpe'] == 1
-    assert i['mode_pages'][0]['rwwp'] == 1
-    assert i['mode_pages'][0]['autoload_mode'] == 7
-    assert i['mode_pages'][0]['busy_timeout_period'] == 500
-    assert i['mode_pages'][0]['extended_self_test_completion_time'] == 700
+        assert i['mode_pages'][0]['ps'] == 1
+        assert i['mode_pages'][0]['spf'] == 0
+        assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.CONTROL
+        assert i['mode_pages'][0]['tst'] == 4
+        assert i['mode_pages'][0]['tmf_only'] == 1
+        assert i['mode_pages'][0]['dpicz'] == 1
+        assert i['mode_pages'][0]['d_sense'] == 1
+        assert i['mode_pages'][0]['gltsd'] == 1
+        assert i['mode_pages'][0]['rlec'] == 1
+        assert i['mode_pages'][0]['queue_algorithm_modifier'] == 9
+        assert i['mode_pages'][0]['nuar'] == 1
+        assert i['mode_pages'][0]['qerr'] == 3
+        assert i['mode_pages'][0]['vs'] == 1
+        assert i['mode_pages'][0]['rac'] == 1
+        assert i['mode_pages'][0]['ua_intlck_ctrl'] == 3
+        assert i['mode_pages'][0]['swp'] == 1
+        assert i['mode_pages'][0]['ato'] == 1
+        assert i['mode_pages'][0]['tas'] == 1
+        assert i['mode_pages'][0]['atmpe'] == 1
+        assert i['mode_pages'][0]['rwwp'] == 1
+        assert i['mode_pages'][0]['autoload_mode'] == 7
+        assert i['mode_pages'][0]['busy_timeout_period'] == 500
+        assert i['mode_pages'][0]['extended_self_test_completion_time'] == 700
 
-    d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
-    assert d == i
+        d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
+        assert d == i
 
-    # SPC Control Ext 1
-    dev = MockModeSenseControlExt1()
-    dev.opcodes = smc
-    s = SCSI(dev)
-    i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.CONTROL, sub_page_code=1).result
-    assert i['medium_type'] == 0
-    assert i['device_specific_parameter'] == 0x90
+        # SPC Control Ext 1
+        s.device = MockModeSenseControlExt1(smc)
+        i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.CONTROL, sub_page_code=1).result
+        assert i['medium_type'] == 0
+        assert i['device_specific_parameter'] == 0x90
 
-    assert len(i['mode_pages']) == 1
+        assert len(i['mode_pages']) == 1
 
-    assert i['mode_pages'][0]['ps'] == 1
-    assert i['mode_pages'][0]['spf'] == 1
-    assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.CONTROL
-    assert i['mode_pages'][0]['sub_page_code'] == 1
-    assert i['mode_pages'][0]['tcmos'] == 1
-    assert i['mode_pages'][0]['scsip'] == 1
-    assert i['mode_pages'][0]['ialuae'] == 1
-    assert i['mode_pages'][0]['initial_command_priority'] == 15
-    assert i['mode_pages'][0]['maximum_sense_data_length'] == 29
+        assert i['mode_pages'][0]['ps'] == 1
+        assert i['mode_pages'][0]['spf'] == 1
+        assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.CONTROL
+        assert i['mode_pages'][0]['sub_page_code'] == 1
+        assert i['mode_pages'][0]['tcmos'] == 1
+        assert i['mode_pages'][0]['scsip'] == 1
+        assert i['mode_pages'][0]['ialuae'] == 1
+        assert i['mode_pages'][0]['initial_command_priority'] == 15
+        assert i['mode_pages'][0]['maximum_sense_data_length'] == 29
 
-    d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
-    assert d == i
+        d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
+        assert d == i
 
-    # SPC Disconnect
-    dev = MockModeSenseDisconnect()
-    dev.opcodes = smc
-    s = SCSI(dev)
-    i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.DISCONNECT_RECONNECT).result
-    assert i['medium_type'] == 0
-    assert i['device_specific_parameter'] == 0x90
+        # SPC Disconnect
+        s.device = MockModeSenseDisconnect(smc)
+        i = s.modesense10(page_code=MODESENSE10.PAGE_CODE.DISCONNECT_RECONNECT).result
+        assert i['medium_type'] == 0
+        assert i['device_specific_parameter'] == 0x90
 
-    assert len(i['mode_pages']) == 1
+        assert len(i['mode_pages']) == 1
 
-    assert i['mode_pages'][0]['ps'] == 1
-    assert i['mode_pages'][0]['spf'] == 0
-    assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.DISCONNECT_RECONNECT
-    assert i['mode_pages'][0]['buffer_full_ratio'] == 122
-    assert i['mode_pages'][0]['buffer_empty_ratio'] == 123
-    assert i['mode_pages'][0]['bus_inactivity_limit'] == 2371
-    assert i['mode_pages'][0]['disconnect_time_limit'] == 2372
-    assert i['mode_pages'][0]['connect_time_limit'] == 2373
-    assert i['mode_pages'][0]['maximum_burst_size'] == 2374
-    assert i['mode_pages'][0]['emdp'] == 1
-    assert i['mode_pages'][0]['fair_arbitration'] == 7
-    assert i['mode_pages'][0]['dimm'] == 1
-    assert i['mode_pages'][0]['dtdc'] == 7
-    assert i['mode_pages'][0]['first_burst_size'] == 2375
+        assert i['mode_pages'][0]['ps'] == 1
+        assert i['mode_pages'][0]['spf'] == 0
+        assert i['mode_pages'][0]['page_code'] == MODESENSE10.PAGE_CODE.DISCONNECT_RECONNECT
+        assert i['mode_pages'][0]['buffer_full_ratio'] == 122
+        assert i['mode_pages'][0]['buffer_empty_ratio'] == 123
+        assert i['mode_pages'][0]['bus_inactivity_limit'] == 2371
+        assert i['mode_pages'][0]['disconnect_time_limit'] == 2372
+        assert i['mode_pages'][0]['connect_time_limit'] == 2373
+        assert i['mode_pages'][0]['maximum_burst_size'] == 2374
+        assert i['mode_pages'][0]['emdp'] == 1
+        assert i['mode_pages'][0]['fair_arbitration'] == 7
+        assert i['mode_pages'][0]['dimm'] == 1
+        assert i['mode_pages'][0]['dtdc'] == 7
+        assert i['mode_pages'][0]['first_burst_size'] == 2375
 
-    d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
-    assert d == i
+        d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
+        assert d == i
 
 if __name__ == "__main__":
     main()
