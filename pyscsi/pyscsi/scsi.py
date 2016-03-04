@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
@@ -35,6 +36,7 @@ from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
+from pyscsi.pyscsi.scsi_cdb_report_supported_opcodes import ReportSupportedOperationCodes
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -51,6 +53,7 @@ class SCSI(object):
     """
     def __init__(self,
                  dev,
+                 read_write=False,
                  blocksize=0):
         """
         initialize a new instance
@@ -58,7 +61,14 @@ class SCSI(object):
         :param dev: a SCSIDevice object
         :param blocksize:  integer defining a blocksize
         """
-        self.device = dev
+        if dev[:5] == '/dev/':
+            from pyscsi.pyscsi.scsi_device import SCSIDevice
+            self.device = SCSIDevice(dev, read_write)
+        elif dev[:8] == 'iscsi://':
+            from pyscsi.pyscsi.iscsi_device import ISCSIDevice
+            self.device = ISCSIDevice(dev)
+        else:
+            raise NotImplementedError('No backend implemented for %s' % dev)
         self._blocksize = blocksize
         self.__init_opcode()
 
@@ -67,10 +77,19 @@ class SCSI(object):
         """
         call the instance again with new device
 
-        :param dev: a SCSIDevice object
+        :param dev: a SCSIDevice or ISCSIDevice object
         """
         self.device = dev
         self.__init_opcode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self,
+                 exc_type,
+                 exc_val,
+                 exc_tb):
+        self.device.close()
 
     def __init_opcode(self):
         """
@@ -221,10 +240,12 @@ class SCSI(object):
         Returns a InitializeElementStatusWithRange Instance
 
         :param xfer: two byte indicating the address of the starting element
-        :param elements: two byte representing a range of elements that should be initialized
+        :param elements: two byte representing a range of elements that should be
+                         initialized
         :param kwargs: a dict with key/value pairs
                        range = 0, a integer indicating if elements should be ignored
-                       fast = 0, a integer indicating if  elements should be scanned for media presence
+                       fast = 0, a integer indicating if  elements should be scanned for
+                                 media presence
         :return: a InitializeElementStatusWithRange instance
         """
         opcode = self.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE
@@ -718,4 +739,24 @@ class SCSI(object):
                              **kwargs)
         self.execute(cmd)
         SCSI.unmarshall(cmd)
+        return cmd
+
+    def reportsupportedopcodes(self,
+                               **kwargs):
+        """
+        Return a ReportSupportedOperationCodes Instance
+
+        :param kwargs: a dict with key/value pairs
+                       opcode,
+                       reporting_options,
+                       rctp,
+                       requested_opcode,
+                       requested_service_action,
+                       alloclen=96, size of requested datain
+        :return: a ReportSupportedOperationCodes instance
+        """
+        opcode = next(get_opcode(self.device.opcodes, 'A3'))
+        cmd = ReportSupportedOperationCodes(opcode=opcode,
+                                            **kwargs)
+        self.execute(cmd)
         return cmd
