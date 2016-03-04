@@ -11,16 +11,12 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 
 
 def main(device):
-    try:
-        sd = SCSIDevice(device)
-        s = SCSI(sd)
+    with SCSI(device) as s:
         print 'ReportLuns'
         print '==========================================\n'
         r = s.reportluns().result
         for k, v in r.iteritems():
             print('%s - %s' % (k, v))
-    except Exception as e:
-        print (e.message)
 
 
 if __name__ == "__main__":

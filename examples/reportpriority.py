@@ -11,21 +11,13 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 
 
 def main(device):
-    try:
-        sd = SCSIDevice(device)
-        s = SCSI(sd)
+    with SCSI(device) as s:
         s.testunitready()
-    except Exception as e:
-        print (e)
-    else:
         print ('ReportPriority')
         print ('==========================================\n')
-        try:
-            r = s.reportpriority().result
-            for k, v in r.iteritems():
-                print('%s - %s' % (k, v))
-        except Exception as e:
-                print (e)
+        r = s.reportpriority().result
+        for k, v in r.iteritems():
+            print('%s - %s' % (k, v))
 
 
 if __name__ == "__main__":
