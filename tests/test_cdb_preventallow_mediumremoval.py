@@ -10,7 +10,7 @@ def main():
         m = s.preventallowmediumremoval(prevent=3)
         cdb = m.cdb
         assert cdb[0] == s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value
-        assert cdb[8] == 0x03
+        assert cdb[4] == 0x03
         cdb = m.unmarshall_cdb(cdb)
         assert cdb['opcode'] == s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value
         assert cdb['prevent'] == 3
