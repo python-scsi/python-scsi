@@ -59,13 +59,16 @@ class SCSICommand(_new_base_class):
         self.page_code = None
         self.opcode = opcode
 
+    def __repr__(self):
+        return self.__class__.__name__
+
     @staticmethod
     def init_cdb(opcode):
         """
         init a byte array representing a command descriptor block with fixed length
         depending on the Opcode
 
-        :param opcode: a byte
+        :param opcode: a OpCode object
         :return: a byte array
         """
         if 0x00 <= opcode.value <= 0x1f:
@@ -212,6 +215,10 @@ class SCSICommand(_new_base_class):
         self._opcode = value
 
     def print_cdb(self):
+        """
+        simple helper to print out the cdb as hex values
+        """
+
         for b in self._cdb:
             print('0x%02X ' % b)
 
@@ -221,7 +228,6 @@ class SCSICommand(_new_base_class):
         Marshall an SCSICommand cdb
 
         :param cdb: a dict with key:value pairs representing a code descriptor block
-        :param cdb_len:
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(len(SCSICommand._cdb))
@@ -249,8 +255,7 @@ class SCSICommand(_new_base_class):
         """
         Build a SCSICommand CDB
 
-        :param cdb_length: the length of the cdb
-        :param kwargs: medium transfer address
+        :param kwargs: keyword argument dict, content depends on SCSICommand subclass
         :return: a byte array representing a code descriptor block
         """
         cdb = {key: kwargs[key] for key in kwargs.keys()}
@@ -259,5 +264,12 @@ class SCSICommand(_new_base_class):
     def unmarshall(self, **kwargs):
         """
         wrapper method for unmarshall_datain method.
+
+        :param kwargs: keyword argument dict, content depends on SCSICommand subclass
         """
-        self.result = self.unmarshall_datain(self.datain, **kwargs)
+        try:
+            if getattr(self,
+                       'unmarshall_datain'):
+                self.result = self.unmarshall_datain(self.datain, **kwargs)
+        except AttributeError as e:
+            raise NotImplementedError('%s has no method to unmarshall datain data' % self)
