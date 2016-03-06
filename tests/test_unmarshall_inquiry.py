@@ -134,7 +134,8 @@ class MockExtendedInquiry(MockDevice):
 
 def main():
     with MockSCSI(MockInquiryStandard(sbc)) as s:
-        i = s.inquiry().result
+        cmd = s.inquiry()
+        i = cmd.result
         assert i['peripheral_qualifier'] == 1
         assert i['peripheral_device_type'] == 5
         assert i['rmb'] == 1
@@ -166,8 +167,9 @@ def main():
         d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i))
         assert d == i
 
-        s.device = MockLBP(sbc)
-        i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
+    with MockSCSI(MockLBP(sbc)) as s:
+        cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING)
+        i = cmd.result
         assert i['peripheral_qualifier'] == 0
         assert i['peripheral_qualifier'] == 0
         assert i['threshold_exponent'] == 0x12
@@ -182,8 +184,9 @@ def main():
         d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
         assert d == i
 
-        s.device = MockUSN(sbc)
-        i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
+    with MockSCSI(MockUSN(sbc)) as s:
+        cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER)
+        i = cmd.result
         assert i['peripheral_qualifier'] == 0
         assert i['peripheral_qualifier'] == 0
         assert i['unit_serial_number'].decode("utf-8") == "ABCD"
@@ -191,8 +194,9 @@ def main():
         d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
         assert d == i
 
-        s.device = MockReferrals(sbc)
-        i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.REFERRALS).result
+    with MockSCSI(MockReferrals(sbc)) as s:
+        cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.REFERRALS)
+        i = cmd.result
         assert i['peripheral_qualifier'] == 0
         assert i['peripheral_qualifier'] == 0
         assert i['user_data_segment_size'] == 23
@@ -201,8 +205,9 @@ def main():
         d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
         assert d == i
 
-        s.device = MockExtendedInquiry(sbc)
-        i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.EXTENDED_INQUIRY_DATA).result
+    with MockSCSI(MockExtendedInquiry(sbc)) as s:
+        cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.EXTENDED_INQUIRY_DATA)
+        i = cmd.result
         assert i['peripheral_qualifier'] == 0
         assert i['peripheral_qualifier'] == 0
         assert i['activate_microcode'] == 1
@@ -235,7 +240,8 @@ def main():
         assert d == i
 
         s.device = MockDevId(sbc)
-        i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION).result
+        cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION)
+        i = cmd.result
         assert i['peripheral_qualifier'] == 0
         assert i['peripheral_qualifier'] == 0
         dd = i['designator_descriptors']
