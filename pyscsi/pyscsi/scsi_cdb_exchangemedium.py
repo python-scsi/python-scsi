@@ -17,7 +17,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI ExchangeMedium command and definitions
@@ -59,67 +58,11 @@ class ExchangeMedium(SCSICommand):
                              opcode,
                              0,
                              0)
-        self.cdb = self.build_cdb(xfer,
-                                  source,
-                                  dest1,
-                                  dest2,
-                                  inv1,
-                                  inv2)
 
-    def build_cdb(self,
-                  xfer,
-                  source,
-                  dest1,
-                  dest2,
-                  inv1,
-                  inv2):
-        """
-        Build a ExchangeMedium CDB
-
-        :param xfer: medium transfer address
-        :param source: source address
-        :param dest1: first destination address
-        :param dest2: second destination address
-        :param inv1: value indicating if first destination should be inverted
-        :param inv2: value indicating if scond destination should be inverted
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'medium_transport_address': xfer,
-               'source_address': source,
-               'first_destination_address': dest1,
-               'second_destination_address': dest2,
-               'inv1': inv1,
-               'inv2': inv2, }
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a ExchangeMedium cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    ExchangeMedium._cdb_bits,
-                    result)
-
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a ExchangeMedium cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(12)
-        encode_dict(cdb,
-                    ExchangeMedium._cdb_bits,
-                    result)
-
-        return result
-
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  medium_transport_address=xfer,
+                                  source_address=source,
+                                  first_destination_address=dest1,
+                                  second_destination_address=dest2,
+                                  inv1=inv1,
+                                  inv2=inv2)

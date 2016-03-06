@@ -29,14 +29,14 @@ class ReportPriority(SCSICommand):
     """
     A class to hold information from a ReportPriority command to a scsi device
     """
-    _cdb_bits =  {'opcode': [0xff, 0],
-                  'service_action': [0x1f, 1],
-                  'priority_reported': [0xc0, 2],
-                  'alloc_len': [0xffffffff, 6], }
+    _cdb_bits =        {'opcode': [0xff, 0],
+                        'service_action': [0x1f, 1],
+                        'priority_reported': [0xc0, 2],
+                        'alloc_len': [0xffffffff, 6], }
 
-    _data_bits = {'current_priority': [0x0f, 0],
-                  'rtpi': [0xffff, 2],
-                  'adlen': [0xffff, 6], }
+    _data_bits =       {'current_priority': [0x0f, 0],
+                        'rtpi': [0xffff, 2],
+                        'adlen': [0xffff, 6], }
 
     def __init__(self,
                  opcode,
@@ -54,34 +54,13 @@ class ReportPriority(SCSICommand):
                              0,
                              alloclen)
 
-        self.cdb = self.build_cdb(priority,
-                                  alloclen)
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  service_action=self.opcode.serviceaction.REPORT_PRIORITY,
+                                  priority_reported=priority,
+                                  alloc_len=alloclen)
 
-    def build_cdb(self,
-                  priority,
-                  alloclen):
-        """
-        Build a ReportPriority CDB
-
-        :param priority: specifies information to be returned in data_in buffer
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'service_action': self.opcode.serviceaction.REPORT_PRIORITY,
-               'priority_reported': priority,
-               'alloc_len': alloclen, }
-
-        return self.marshall_cdb(cdb)
-
-    def unmarshall(self):
-        """
-        wrapper method for the unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain)
-
-    @staticmethod
-    def unmarshall_datain(data):
+    @classmethod
+    def unmarshall_datain(cls, data):
         """
         Unmarshall the ReportPriority datain.
 
@@ -94,7 +73,7 @@ class ReportPriority(SCSICommand):
         _descriptors = []
         while len(_data):
             _r = {}
-            _dict = dict(ReportPriority._datain_bits.copy)
+            _dict = dict(cls._datain_bits.copy)
             _dict.update({'transport_id': [hex(scsi_ba_to_int(_data[6:7])), 8], })
             decode_bits(_data[:8 + scsi_ba_to_int(_data[6:7])],
                         _dict,
@@ -104,8 +83,8 @@ class ReportPriority(SCSICommand):
         result.update({'priority_descriptors': _descriptors, })
         return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls, data):
         """
         Marshall the ReportPriority datain.
 
@@ -119,38 +98,10 @@ class ReportPriority(SCSICommand):
 
         for l in data['priority_descriptors']:
             _r = bytearray(len(l))
-            _dict = dict(ReportPriority._datain_bits.copy)
+            _dict = dict(cls._datain_bits.copy)
             _dict.update({'transport_id': [hex(scsi_ba_to_int(len(l) - 8)), 8], })
             encode_dict(l, _dict, _r)
             result += _r
 
         result[:4] = scsi_int_to_ba(len(result), 4)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a ReportPriority cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    ReportPriority._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a ReportPriority cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(12)
-        encode_dict(cdb,
-                    ReportPriority._cdb_bits,
-                    result)
         return result

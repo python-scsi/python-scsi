@@ -14,14 +14,17 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-
-from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
 import pyscsi.pyscsi.scsi_enum_inquiry as inquiry_enums
+from pyscsi.pyscsi.scsi_command import SCSICommand
+import pyscsi.utils.converter as convert
 
 #
 # SCSI Inquiry command and definitions
 #
+
+# we get a generator for all inquiry enums, so we can add them to the class
+_enums = ((key, inquiry_enums.__dict__[key]) for key in inquiry_enums.__dict__.keys()
+          if key in inquiry_enums.__all__)
 
 
 class Inquiry(SCSICommand):
@@ -169,6 +172,11 @@ class Inquiry(SCSICommand):
     _ata_identify_gen_conf_bits =        {'ata_device': [0x80, 1],
                                           'respose_incomplete': [0x02, 0], }
 
+    # HACK: we update the baseclass with enums for the subclass, if there is a better way
+    #       to add this to the subclass we should use it instead :-)
+    for enum in _enums:
+        setattr(SCSICommand, enum[0], enum[1])
+
     def __init__(self,
                  opcode,
                  evpd=0,
@@ -187,32 +195,14 @@ class Inquiry(SCSICommand):
                              0,
                              alloclen)
         self._evpd = evpd
-        self.cdb = self.build_cdb(evpd,
-                                  page_code,
-                                  alloclen)
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  evpd=evpd,
+                                  page_code=page_code,
+                                  alloc_len=alloclen)
 
-    def build_cdb(self,
-                  evpd,
-                  page_code,
-                  alloclen):
-        """
-        method to create a byte array for a Command Descriptor Block with a proper length
-
-        :param evpd: the byte to enable or disable vital product data
-        :param page_code: the page code for the vpd page
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {
-            'opcode': self.opcode.value,
-            'evpd': evpd,
-            'page_code': page_code,
-            'alloc_len': alloclen
-        }
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def marshall_designator(_type,
+    @classmethod
+    def marshall_designator(cls,
+                            _type,
                             data):
         """
         static helper method to marshall designator data
@@ -221,85 +211,88 @@ class Inquiry(SCSICommand):
         :param data: a dict with designator data
         :return: a byte array
         """
-        if _type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+        if _type == cls.DESIGNATOR.VENDOR_SPECIFIC:
             return data['vendor_specific']
 
-        if _type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+        if _type == cls.DESIGNATOR.T10_VENDOR_ID:
             return data['t10_vendor_id'] + data['vendor_specific_id']
 
-        if _type == inquiry_enums.DESIGNATOR.EUI_64:
+        if _type == cls.DESIGNATOR.EUI_64:
             if 'identifier_extension' in data:
                 return data['identifier_extension'] + \
-                    scsi_int_to_ba(data['ieee_company_id'], 3) + \
+                    convert.scsi_int_to_ba(data['ieee_company_id'], 3) + \
                     data['vendor_specific_extension_id']
             if 'directory_id' in data:
-                return scsi_int_to_ba(data['ieee_company_id'], 3) + \
+                return convert.scsi_int_to_ba(data['ieee_company_id'], 3) + \
                     data['vendor_specific_extension_id'] + \
                     data['directory_id']
 
-            return scsi_int_to_ba(data['ieee_company_id'], 3) + \
+            return convert.scsi_int_to_ba(data['ieee_company_id'], 3) + \
                 data['vendor_specific_extension_id']
 
-        if _type == inquiry_enums.DESIGNATOR.NAA:
+        if _type == cls.DESIGNATOR.NAA:
             _r = bytearray(16)
-            decode_bits(data, Inquiry._naa_type_bits, _r)
-            if data['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
-                encode_dict(data,
-                            Inquiry._naa_ieee_extended_bits,
-                            _r)
+            convert.decode_bits(data,
+                                cls._naa_type_bits,
+                                _r)
+            if data['naa'] == cls.NAA.IEEE_EXTENDED:
+                convert.encode_dict(data,
+                                    cls._naa_ieee_extended_bits,
+                                    _r)
                 return _r[:8]
-            if data['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
-                encode_dict(data,
-                            Inquiry._naa_locally_assigned_bits,
-                            _r)
+            if data['naa'] == cls.NAA.LOCALLY_ASSIGNED:
+                convert.encode_dict(data,
+                                    cls._naa_locally_assigned_bits,
+                                    _r)
                 return _r[:8]
-            if data['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
-                encode_dict(data,
-                            Inquiry._naa_ieee_registered_bits,
-                            _r)
+            if data['naa'] == cls.NAA.IEEE_REGISTERED:
+                convert.encode_dict(data,
+                                    cls._naa_ieee_registered_bits,
+                                    _r)
                 return _r[:8]
-            if data['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
-                encode_dict(data,
-                            Inquiry._naa_ieee_registered_extended_bits,
-                            _r)
+            if data['naa'] == cls.NAA.IEEE_REGISTERED_EXTENDED:
+                convert.encode_dict(data,
+                                    cls._naa_ieee_registered_extended_bits,
+                                    _r)
                 return _r[:16]
 
-        if _type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+        if _type == cls.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
             _r = bytearray(4)
-            encode_dict(data,
-                        Inquiry._relative_port_bits,
-                        _r)
+            convert.encode_dict(data,
+                                cls._relative_port_bits,
+                                _r)
             return _r
 
-        if _type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
+        if _type == cls.DESIGNATOR.TARGET_PORTAL_GROUP:
             _r = bytearray(4)
-            encode_dict(data,
-                        Inquiry._target_portal_group_bits,
-                        _r)
+            convert.encode_dict(data,
+                                cls._target_portal_group_bits,
+                                _r)
             return _r
 
-        if _type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
+        if _type == cls.DESIGNATOR.LOGICAL_UNIT_GROUP:
             _r = bytearray(4)
-            encode_dict(data,
-                        Inquiry._logical_unit_group_bits,
-                        _r)
+            convert.encode_dict(data,
+                                cls._logical_unit_group_bits,
+                                _r)
             return _r
 
-        if _type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+        if _type == cls.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
             return data['md5_logical_identifier']
 
-        if _type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+        if _type == cls.DESIGNATOR.SCSI_NAME_STRING:
             return ['scsi_name_string']
 
-        if _type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+        if _type == cls.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
             _r = bytearray(8)
-            encode_dict(data,
-                        Inquiry._pci_express_routing_id_bits,
-                        _r)
+            convert.encode_dict(data,
+                                cls._pci_express_routing_id_bits,
+                                _r)
             return _r
 
-    @staticmethod
-    def marshall_designation_descriptor(data):
+    @classmethod
+    def marshall_designation_descriptor(cls,
+                                        data):
         """
         static helper method to marshall designation desciptor data
 
@@ -307,17 +300,18 @@ class Inquiry(SCSICommand):
         :return: a byte array
         """
         _r = bytearray(4)
-        encode_dict(data,
-                    Inquiry._designator_bits,
-                    _r)
+        convert.encode_dict(data,
+                            cls._designator_bits,
+                            _r)
 
-        _r += Inquiry.marshall_designator(data['designator_type'],
-                                          data['designator'])
+        _r += cls.marshall_designator(data['designator_type'],
+                                      data['designator'])
         _r[3] = len(_r) - 4
         return _r
 
-    @staticmethod
-    def unmarshall_designator(_type,
+    @classmethod
+    def unmarshall_designator(cls,
+                              _type,
                               data):
         """
         static helper method to unmarshall designator data
@@ -327,107 +321,100 @@ class Inquiry(SCSICommand):
         :return: a dict
         """
         _d = {}
-        if _type == inquiry_enums.DESIGNATOR.VENDOR_SPECIFIC:
+        if _type == cls.DESIGNATOR.VENDOR_SPECIFIC:
             _d['vendor_specific'] = data
 
-        if _type == inquiry_enums.DESIGNATOR.T10_VENDOR_ID:
+        if _type == cls.DESIGNATOR.T10_VENDOR_ID:
             _d['t10_vendor_id'] = data[:8]
             _d['vendor_specific_id'] = data[8:]
 
-        if _type == inquiry_enums.DESIGNATOR.EUI_64:
+        if _type == cls.DESIGNATOR.EUI_64:
             if len(data) == 8:
-                _d['ieee_company_id'] = scsi_ba_to_int(data[:3])
+                _d['ieee_company_id'] = convert.scsi_ba_to_int(data[:3])
                 _d['vendor_specific_extension_id'] = data[3:8]
             if len(data) == 12:
-                _d['ieee_company_id'] = scsi_ba_to_int(data[:3])
+                _d['ieee_company_id'] = convert.scsi_ba_to_int(data[:3])
                 _d['vendor_specific_extension_id'] = data[3:8]
                 _d['directory_id'] = data[8:]
             if len(data) == 16:
                 _d['identifier_extension'] = data[:8]
-                _d['ieee_company_id'] = scsi_ba_to_int(data[8:11])
+                _d['ieee_company_id'] = convert.scsi_ba_to_int(data[8:11])
                 _d['vendor_specific_extension_id'] = data[11:]
 
-        if _type == inquiry_enums.DESIGNATOR.NAA:
-            decode_bits(data,
-                        Inquiry._naa_type_bits,
-                        _d)
-            if _d['naa'] == inquiry_enums.NAA.IEEE_EXTENDED:
-                decode_bits(data,
-                            Inquiry._naa_ieee_extended_bits,
-                            _d)
-            if _d['naa'] == inquiry_enums.NAA.LOCALLY_ASSIGNED:
-                decode_bits(data,
-                            Inquiry._naa_locally_assigned_bits,
-                            _d)
-            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED:
-                decode_bits(data,
-                            Inquiry._naa_ieee_registered_bits,
-                            _d)
-            if _d['naa'] == inquiry_enums.NAA.IEEE_REGISTERED_EXTENDED:
-                decode_bits(data,
-                            Inquiry._naa_ieee_registered_extended_bits,
-                            _d)
+        if _type == cls.DESIGNATOR.NAA:
+            convert.decode_bits(data,
+                                cls._naa_type_bits,
+                                _d)
+            if _d['naa'] == cls.NAA.IEEE_EXTENDED:
+                convert.decode_bits(data,
+                                    cls._naa_ieee_extended_bits,
+                                    _d)
+            if _d['naa'] == cls.NAA.LOCALLY_ASSIGNED:
+                convert.decode_bits(data,
+                                    cls._naa_locally_assigned_bits,
+                                    _d)
+            if _d['naa'] == cls.NAA.IEEE_REGISTERED:
+                convert.decode_bits(data,
+                                    cls._naa_ieee_registered_bits,
+                                    _d)
+            if _d['naa'] == cls.NAA.IEEE_REGISTERED_EXTENDED:
+                convert.decode_bits(data,
+                                    cls._naa_ieee_registered_extended_bits,
+                                    _d)
 
-        if _type == inquiry_enums.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
-            decode_bits(data,
-                        Inquiry._relative_port_bits,
-                        _d)
+        if _type == cls.DESIGNATOR.RELATIVE_TARGET_PORT_IDENTIFIER:
+            convert.decode_bits(data,
+                                cls._relative_port_bits,
+                                _d)
 
-        if _type == inquiry_enums.DESIGNATOR.TARGET_PORTAL_GROUP:
-            decode_bits(data,
-                        Inquiry._target_portal_group_bits,
-                        _d)
+        if _type == cls.DESIGNATOR.TARGET_PORTAL_GROUP:
+            convert.decode_bits(data,
+                                cls._target_portal_group_bits,
+                                _d)
 
-        if _type == inquiry_enums.DESIGNATOR.LOGICAL_UNIT_GROUP:
-            decode_bits(data,
-                        Inquiry._logical_unit_group_bits,
-                        _d)
+        if _type == cls.DESIGNATOR.LOGICAL_UNIT_GROUP:
+            convert.decode_bits(data,
+                                cls._logical_unit_group_bits,
+                                _d)
 
-        if _type == inquiry_enums.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
+        if _type == cls.DESIGNATOR.MD5_LOGICAL_IDENTIFIER:
             _d['md5_logical_identifier'] = data[0:16]
 
-        if _type == inquiry_enums.DESIGNATOR.SCSI_NAME_STRING:
+        if _type == cls.DESIGNATOR.SCSI_NAME_STRING:
             _d['scsi_name_string'] = data
 
-        if _type == inquiry_enums.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
-            decode_bits(data,
-                        Inquiry._pci_express_routing_id_bits,
-                        _d)
+        if _type == cls.DESIGNATOR.PCI_EXPRESS_ROUTING_ID:
+            convert.decode_bits(data,
+                                cls._pci_express_routing_id_bits,
+                                _d)
         return _d
 
-    def unmarshall(self):
-        """
-        wrapper method for unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain,
-                                             self._evpd)
-
-    @staticmethod
-    def unmarshall_ata_information(data):
+    @classmethod
+    def unmarshall_ata_information(cls, data):
         result = {}
         _sig = data[36:41]
         _identify = data[44:]
-        decode_bits(data,
-                    Inquiry._ata_information_bits,
-                    result)
+        convert.decode_bits(data,
+                            cls._ata_information_bits,
+                            result)
         _r = {}
-        decode_bits(_sig,
-                    Inquiry._ata_signature_bits,
-                    _r)
+        convert.decode_bits(_sig,
+                            cls._ata_signature_bits,
+                            _r)
         result.update({'signature': _r})
-        decode_bits(_identify,
-                    Inquiry._ata_identify_bits,
-                    _r)
+        convert.decode_bits(_identify,
+                            cls._ata_identify_bits,
+                            _r)
         _gc = {}
-        decode_bits(_identify[:2],
-                    Inquiry._ata_identify_gen_conf_bits,
-                    _gc)
+        convert.decode_bits(_identify[:2],
+                            cls._ata_identify_gen_conf_bits,
+                            _gc)
         _r['general_config'] = _gc
         result.update({'identify': _r})
         return result
 
-    @staticmethod
-    def unmarshall_datain(data, evpd=0):
+    @classmethod
+    def unmarshall_datain(cls, data, evpd=0):
         """
         Unmarshall the Inquiry datain buffer
 
@@ -436,87 +423,88 @@ class Inquiry(SCSICommand):
         :return result: a dict
         """
         result = {}
-        decode_bits(data,
-                    Inquiry._datain_bits,
-                    result)
+        convert.decode_bits(data,
+                            cls._datain_bits,
+                            result)
 
         if evpd == 0:
-            decode_bits(data,
-                        Inquiry._standard_bits,
-                        result)
+
+            convert.decode_bits(data,
+                                cls._standard_bits,
+                                result)
             return result
 
-        decode_bits(data,
-                    Inquiry._pagecode_bits,
-                    result)
-        data = data[:4 + scsi_ba_to_int(data[2:4])]
-        if result['page_code'] == inquiry_enums.VPD.SUPPORTED_VPD_PAGES:
+        convert.decode_bits(data,
+                            cls._pagecode_bits,
+                            result)
+        data = data[:4 + convert.scsi_ba_to_int(data[2:4])]
+        if result['page_code'] == cls.VPD.SUPPORTED_VPD_PAGES:
             vpd_pages = []
             for i in data[4:]:
                 vpd_pages.append(i)
             result.update({'vpd_pages': vpd_pages})
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.BLOCK_LIMITS:
-            decode_bits(data,
-                        Inquiry._block_limits_bits,
-                        result)
+        if result['page_code'] == cls.VPD.BLOCK_LIMITS:
+            convert.decode_bits(data,
+                                cls._block_limits_bits,
+                                result)
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.BLOCK_DEVICE_CHARACTERISTICS:
-            decode_bits(data,
-                        Inquiry._block_dev_char_bits,
-                        result)
+        if result['page_code'] == cls.VPD.BLOCK_DEVICE_CHARACTERISTICS:
+            convert.decode_bits(data,
+                                cls._block_dev_char_bits,
+                                result)
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
-            decode_bits(data,
-                        Inquiry._logical_block_provisioning_bits,
-                        result)
+        if result['page_code'] == cls.VPD.LOGICAL_BLOCK_PROVISIONING:
+            convert.decode_bits(data,
+                                cls._logical_block_provisioning_bits,
+                                result)
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.REFERRALS:
-            decode_bits(data,
-                        Inquiry._referrals_bits,
-                        result)
+        if result['page_code'] == cls.VPD.REFERRALS:
+            convert.decode_bits(data,
+                                cls._referrals_bits,
+                                result)
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
+        if result['page_code'] == cls.VPD.UNIT_SERIAL_NUMBER:
             result.update({'unit_serial_number': data[4:]})
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
-            decode_bits(data,
-                        Inquiry._extended_bits,
-                        result)
+        if result['page_code'] == cls.VPD.EXTENDED_INQUIRY_DATA:
+            convert.decode_bits(data,
+                                cls._extended_bits,
+                                result)
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.ATA_INFORMATION:
-            result.update(Inquiry.unmarshall_ata_information(data))
+        if result['page_code'] == cls.VPD.ATA_INFORMATION:
+            result.update(cls.unmarshall_ata_information(data))
             return result
 
-        if result['page_code'] == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
+        if result['page_code'] == cls.VPD.DEVICE_IDENTIFICATION:
             data = data[4:]
             _d = []
             while len(data):
                 _bc = data[3] + 4
 
                 _dd = {}
-                decode_bits(data,
-                            Inquiry._designator_bits,
-                            _dd)
+                convert.decode_bits(data,
+                                    cls._designator_bits,
+                                    _dd)
                 if _dd['piv'] == 0 or (_dd['association'] != 1 and _dd['association'] != 2):
                     del _dd['protocol_identifier']
-                _dd['designator'] = Inquiry.unmarshall_designator(_dd['designator_type'],
-                                                                  data[4:4 + data[3]])
+                _dd['designator'] = cls.unmarshall_designator(_dd['designator_type'],
+                                                              data[4:4 + data[3]])
                 _d.append(_dd)
                 data = data[_bc:]
 
             result.update({'designator_descriptors': _d})
             return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls, data):
         """
         Marshall the Inquiry datain.
 
@@ -525,70 +513,42 @@ class Inquiry(SCSICommand):
         """
         if 'page_code' not in data:
             result = bytearray(96)
-            encode_dict(data,
-                        Inquiry._datain_bits,
-                        result)
-            encode_dict(data,
-                        Inquiry._standard_bits,
-                        result)
+            convert.encode_dict(data,
+                                cls._datain_bits,
+                                result)
+            convert.encode_dict(data,
+                                cls._standard_bits,
+                                result)
             return result
 
         result = bytearray(4)
-        encode_dict(data,
-                    Inquiry._datain_bits,
-                    result)
-        encode_dict(data,
-                    Inquiry._pagecode_bits,
-                    result)
-        if data['page_code'] == inquiry_enums.VPD.LOGICAL_BLOCK_PROVISIONING:
+        convert.encode_dict(data,
+                            cls._datain_bits,
+                            result)
+        convert.encode_dict(data,
+                            cls._pagecode_bits,
+                            result)
+        if data['page_code'] == cls.VPD.LOGICAL_BLOCK_PROVISIONING:
             result += bytearray(4)
-            encode_dict(data,
-                        Inquiry._logical_block_provisioning_bits,
-                        result)
-        if data['page_code'] == inquiry_enums.VPD.UNIT_SERIAL_NUMBER:
+            convert.encode_dict(data,
+                                cls._logical_block_provisioning_bits,
+                                result)
+        if data['page_code'] == cls.VPD.UNIT_SERIAL_NUMBER:
             result += data['unit_serial_number']
-        if data['page_code'] == inquiry_enums.VPD.REFERRALS:
+        if data['page_code'] == cls.VPD.REFERRALS:
             result += bytearray(12)
-            encode_dict(data,
-                        Inquiry._referrals_bits,
-                        result)
-        if data['page_code'] == inquiry_enums.VPD.EXTENDED_INQUIRY_DATA:
+            convert.encode_dict(data,
+                                cls._referrals_bits,
+                                result)
+        if data['page_code'] == cls.VPD.EXTENDED_INQUIRY_DATA:
             result += bytearray(60)
-            encode_dict(data,
-                        Inquiry._extended_bits,
-                        result)
-        if data['page_code'] == inquiry_enums.VPD.DEVICE_IDENTIFICATION:
+            convert.encode_dict(data,
+                                cls._extended_bits,
+                                result)
+        if data['page_code'] == cls.VPD.DEVICE_IDENTIFICATION:
             for _dd in data['designator_descriptors']:
-                _r = Inquiry.marshall_designation_descriptor(_dd)
+                _r = cls.marshall_designation_descriptor(_dd)
                 result += _r
 
-        result[2:4] = scsi_int_to_ba(len(result) - 4, 2)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall an Inquiry cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    Inquiry._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall an Inquiry cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(12)
-        encode_dict(cdb,
-                    Inquiry._cdb_bits,
-                    result)
+        result[2:4] = convert.scsi_int_to_ba(len(result) - 4, 2)
         return result

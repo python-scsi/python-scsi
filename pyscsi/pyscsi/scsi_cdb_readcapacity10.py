@@ -46,26 +46,12 @@ class ReadCapacity10(SCSICommand):
                              0,
                              alloclen)
 
-        self.cdb = self.build_cdb()
+        self.cdb = self.build_cdb(opcode=self.opcode.value)
 
-    def build_cdb(self):
-        """
-        Build a ReadCapacity10 CDB
 
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value, }
-
-        return self.marshall_cdb(cdb)
-
-    def unmarshall(self):
-        """
-        wrapper method for the unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain)
-
-    @staticmethod
-    def unmarshall_datain(data):
+    @classmethod
+    def unmarshall_datain(cls,
+                          data):
         """
         Unmarshall the ReadCapacity10 datain.
 
@@ -74,12 +60,13 @@ class ReadCapacity10(SCSICommand):
         """
         result = {}
         decode_bits(data,
-                    ReadCapacity10._datain_bits,
+                    cls._datain_bits,
                     result)
         return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls,
+                        data):
         """
         Marshall the ReadCapacity10 datain.
 
@@ -88,34 +75,6 @@ class ReadCapacity10(SCSICommand):
         """
         result = bytearray(8)
         encode_dict(data,
-                    ReadCapacity10._datain_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a ReadCapacity10 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    ReadCapacity10._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a ReadCapacity10 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(10)
-        encode_dict(cdb,
-                    ReadCapacity10._cdb_bits,
+                    cls._datain_bits,
                     result)
         return result

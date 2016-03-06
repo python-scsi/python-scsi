@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI TestUnitReady command
@@ -41,40 +40,4 @@ class TestUnitReady(SCSICommand):
                              0,
                              0)
 
-        self.cdb = self.build_cdb()
-
-    def build_cdb(self):
-        """
-        Build a TestUnitReady CDB
-        """
-        cdb = {'opcode': self.opcode.value, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a TestUnitReady cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    TestUnitReady._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a TestUnitReady cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(6)
-        encode_dict(cdb,
-                    TestUnitReady._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value)

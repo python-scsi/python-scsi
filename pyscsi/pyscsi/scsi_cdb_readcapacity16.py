@@ -27,19 +27,19 @@ class ReadCapacity16(SCSICommand):
     """
     A class to hold information from a ReadCapacity(16) command to a scsi device
     """
-    _cdb_bits =    {'opcode': [0xff, 0],
-                    'service_action': [0x1f, 1],
-                    'alloc_len': [0xffffffff, 10], }
+    _cdb_bits =       {'opcode': [0xff, 0],
+                       'service_action': [0x1f, 1],
+                       'alloc_len': [0xffffffff, 10], }
 
-    _datain_bits = {'returned_lba': [0xffffffffffffffff, 0],
-                    'block_length': [0xffffffff, 8],
-                    'p_type': [0x0e, 12],
-                    'prot_en': [0x01, 12],
-                    'p_i_exponent': [0xf0, 13],
-                    'lbppbe': [0x0f, 13],
-                    'lbpme': [0x80, 14],
-                    'lbprz': [0x40, 14],
-                    'lowest_aligned_lba': [0x3fff, 14], }
+    _datain_bits =    {'returned_lba': [0xffffffffffffffff, 0],
+                       'block_length': [0xffffffff, 8],
+                       'p_type': [0x0e, 12],
+                       'prot_en': [0x01, 12],
+                       'p_i_exponent': [0xf0, 13],
+                       'lbppbe': [0x0f, 13],
+                       'lbpme': [0x80, 14],
+                       'lbprz': [0x40, 14],
+                       'lowest_aligned_lba': [0x3fff, 14], }
 
     def __init__(self,
                  opcode,
@@ -55,30 +55,13 @@ class ReadCapacity16(SCSICommand):
                              0,
                              alloclen)
 
-        self.cdb = self.build_cdb(alloclen)
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  service_action=self.opcode.serviceaction.READ_CAPACITY_16,
+                                  alloc_len=alloclen)
 
-    def build_cdb(self,
-                  alloclen):
-        """
-        Build a ReadCapacity16 CDB
-
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'service_action': self.opcode.serviceaction.READ_CAPACITY_16,
-               'alloc_len': alloclen, }
-
-        return self.marshall_cdb(cdb)
-
-    def unmarshall(self):
-        """
-        wrapper method for the unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain)
-
-    @staticmethod
-    def unmarshall_datain(data):
+    @classmethod
+    def unmarshall_datain(cls,
+                          data):
         """
         Unmarshall the ReadCapacity16 datain.
 
@@ -87,12 +70,13 @@ class ReadCapacity16(SCSICommand):
         """
         result = {}
         decode_bits(data,
-                    ReadCapacity16._datain_bits,
+                    cls._datain_bits,
                     result)
         return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls,
+                        data):
         """
         Marshall the ReadCapacity16 datain.
 
@@ -101,34 +85,6 @@ class ReadCapacity16(SCSICommand):
         """
         result = bytearray(32)
         encode_dict(data,
-                    ReadCapacity16._datain_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a ReadCapacity16 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    ReadCapacity16._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a ReadCapacity16 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(16)
-        encode_dict(cdb,
-                    ReadCapacity16._cdb_bits,
+                    cls._datain_bits,
                     result)
         return result
