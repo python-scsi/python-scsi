@@ -29,6 +29,13 @@ class SCSICommand(_new_base_class):
     The base class for a derived scsi command class
     """
     _cdb_bits = {}
+    _cdb = None
+    _sense = None
+    _datain = None
+    _dataout = None
+    _result = None
+    _page_code = None
+    _opcode = None
 
     def __init__(self,
                  opcode,
@@ -41,37 +48,38 @@ class SCSICommand(_new_base_class):
         :param dataout_alloclen: integer representing the size of the data_out buffer
         :param datain_alloclen: integer representing the size of the data_in buffer
         """
-        self._sense = bytearray(32)
-        self._dataout = bytearray(dataout_alloclen)
-        self._datain = bytearray(datain_alloclen)
-        self._result = {}
-        self._cdb = None
-        self._page_code = None
-        self._opcode = opcode
+        # we need the _cdb_bits and _cdb values in staticmethods so we have to set it
+        # on the class and not on the instance of the class. that might be wrong ...
+        SCSICommand._cdb_bits = self._cdb_bits
+        SCSICommand._cdb = SCSICommand.init_cdb(opcode)
+        self.sense = bytearray(32)
+        self.dataout = bytearray(dataout_alloclen)
+        self.datain = bytearray(datain_alloclen)
+        self.result = {}
+        self.page_code = None
+        self.opcode = opcode
 
-    @classmethod
-    def init_cdb(cls,
-                 opcode):
+    @staticmethod
+    def init_cdb(opcode):
         """
-        init a byte array representing a command descriptor block with fixed length depending on the Opcode
+        init a byte array representing a command descriptor block with fixed length
+        depending on the Opcode
 
         :param opcode: a byte
         :return: a byte array
         """
-        if opcode < 0x20:
+        if 0x00 <= opcode.value <= 0x1f:
             cdb = bytearray(6)
-        elif opcode < 0x60:
+        elif 0x20 <= opcode.value <= 0x5f:
             cdb = bytearray(10)
-        elif opcode < 0x80:
+        elif 0x00 <= opcode.value <= 0x1f:
             raise SCSICommand.OpcodeException
-        elif opcode < 0xa0:
+        elif 0x80 <= opcode.value <= 0x9f:
             cdb = bytearray(16)
-        elif opcode < 0xc0:
+        elif 0xa0 <= opcode.value <= 0xbf:
             cdb = bytearray(12)
         else:
             raise SCSICommand.OpcodeException
-
-        cdb[0] = opcode
         return cdb
 
     @property
@@ -207,31 +215,49 @@ class SCSICommand(_new_base_class):
         for b in self._cdb:
             print('0x%02X ' % b)
 
-    @classmethod
-    def marshall_cdb(cls, cdb, cdb_len=12):
+    @staticmethod
+    def marshall_cdb(cdb):
         """
-        Marshall an Inquiry cdb
+        Marshall an SCSICommand cdb
 
         :param cdb: a dict with key:value pairs representing a code descriptor block
         :param cdb_len:
         :return result: a byte array representing a code descriptor block
         """
-        result = bytearray(cdb_len)
+        result = bytearray(len(SCSICommand._cdb))
         encode_dict(cdb,
-                    cls._cdb_bits,
+                    SCSICommand._cdb_bits,
                     result)
         return result
 
-    @classmethod
-    def unmarshall_cdb(cls, cdb):
+    @staticmethod
+    def unmarshall_cdb(cdb):
         """
-        Unmarshall an Inquiry cdb
+        Unmarshall an SCSICommand cdb
 
         :param cdb: a byte array representing a code descriptor block
         :return result: a dict
         """
         result = {}
         decode_bits(cdb,
-                    cls._cdb_bits,
+                    SCSICommand._cdb_bits,
                     result)
         return result
+
+    def build_cdb(self,
+                  **kwargs):
+        """
+        Build a SCSICommand CDB
+
+        :param cdb_length: the length of the cdb
+        :param kwargs: medium transfer address
+        :return: a byte array representing a code descriptor block
+        """
+        cdb = {key: kwargs[key] for key in kwargs.keys()}
+        return SCSICommand.marshall_cdb(cdb)
+
+    def unmarshall(self, **kwargs):
+        """
+        wrapper method for unmarshall_datain method.
+        """
+        self.result = self.unmarshall_datain(self.datain, **kwargs)
