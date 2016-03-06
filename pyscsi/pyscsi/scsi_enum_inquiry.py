@@ -17,6 +17,9 @@
 
 from pyscsi.utils.enum import Enum
 
+__all__ = ['PROVISIONING_TYPE', 'QUALIFIER', 'DEVICE_TYPE',
+           'VERSION', 'TPGS', 'NOMINAL_FORM_FACTOR', 'PROTOCOL_IDENTIFIER',
+           'CODE_SET', 'ASSOCIATION', 'DESIGNATOR', 'NAA', 'VPD', ]
 #
 # Provisioning type
 #
