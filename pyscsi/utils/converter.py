@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-
-
 from __future__ import print_function
+
+__all_ = ['scsi_int_to_ba', 'scsi_ba_to_int', 'decode_bits',
+          'encode_dict', 'print_data', 'get_opcode', ]
 
 
 def scsi_int_to_ba(to_convert=0,
@@ -126,7 +127,7 @@ def encode_dict(data_dict,
     :param result: a buffer containing the bits encoded
     """
     for key in data_dict.keys():
-        if not key in check_dict:
+        if key not in check_dict:
             continue
         value = data_dict[key]
 
