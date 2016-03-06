@@ -4,10 +4,8 @@ from __future__ import print_function
 import sys
 
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.pyscsi.scsi_device import SCSIDevice
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
-from pyscsi.utils.enum import Enum
 
 
 def usage():
@@ -15,7 +13,8 @@ def usage():
 
 
 def inquiry_standard(s):
-    i = s.inquiry().result
+    cmd = s.inquiry()
+    i = cmd.result
     print('Standard INQUIRY')
     print('================')
     print('PQual=%d  Device_type=%d  RMB=%d  version=0x%02x  %s' % (
@@ -46,9 +45,8 @@ def inquiry_standard(s):
         i['clocking'],
         i['qas'],
         i['ius']))
-    print('  length=%d  Peripheral device type: %s' % (
-        i['additional_length'] + 5,
-        INQUIRY.DEVICE_TYPE[i['peripheral_device_type']]))
+    print('  length=%d  Peripheral device type: %s' % (i['additional_length'] + 5,
+                                                       cmd.DEVICE_TYPE[i['peripheral_device_type']]))
     print('Vendor identification:', i['t10_vendor_identification'][:32].decode(encoding="utf-8",
                                                                                errors="strict"))
     print('Product identification:', i['product_identification'][:32].decode(encoding="utf-8",
@@ -58,19 +56,20 @@ def inquiry_standard(s):
 
 
 def inquiry_supported_vpd_pages(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.SUPPORTED_VPD_PAGES).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.SUPPORTED_VPD_PAGES)
+    i = cmd.result
     print('Supported VPD Pages, page_code=0x00')
     print('===================================')
-    print('PQual=%d  Peripheral device type: %s' % (
-        i['peripheral_qualifier'],
-        INQUIRY.DEVICE_TYPE[i['peripheral_device_type']]))
+    print('PQual=%d  Peripheral device type: %s' % (i['peripheral_qualifier'],
+                                                    cmd.DEVICE_TYPE[i['peripheral_device_type']]))
     print('  Supported VPD pages:')
     for pg in i['vpd_pages']:
-        print( '    0x%02x: %s' % (pg, INQUIRY.VPD[pg]))
+        print('    0x%02x: %s' % (pg, cmd.VPD[pg]))
 
 
 def inquiry_block_limits(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_LIMITS).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_LIMITS)
+    i = cmd.result
     print('Block Limits, page_code=0xb0 (SBC)')
     print('==================================')
     print('  Maximum compare and write length:', i['max_caw_len'])
@@ -86,7 +85,8 @@ def inquiry_block_limits(s):
 
 
 def inquiry_block_dev_char(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.BLOCK_DEVICE_CHARACTERISTICS)
+    i = cmd.result
     print('Block Device Characteristics, page_code=0xb1 (SBC)')
     print('==================================================')
     print('  Nominal rotation rate: %d rpm' % (i['medium_rotation_rate']))
@@ -94,53 +94,53 @@ def inquiry_block_dev_char(s):
     print('  WABEREQ=%d' % (i['wabereq']))
     print('  WACEREQ=%d' % (i['wacereq']))
     print('  Nominal form factor %s inches' % (
-        INQUIRY.NOMINAL_FORM_FACTOR[i['nominal_form_factor']]))
+        cmd.NOMINAL_FORM_FACTOR[i['nominal_form_factor']]))
     print('  VBULS=%d' % (i['vbuls']))
 
 
 def inquiry_logical_block_prov(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.LOGICAL_BLOCK_PROVISIONING)
+    i = cmd.result
     print('Logical Block Provisioning, page_code=0xb2 (SBC)')
     print('================================================')
-    print('  Threshold=%d blocks  [%s]' % (
-        1 << i['threshold_exponent'], 
-        'NO LOGICAL BLOCK PROVISIONING SUPPORT' if not i['threshold_exponent'] else 'exponent=%d' % (
-            i['threshold_exponent'])))
-    print('  LBPU=%d  LBPWS=%d  LBPWS10=%d  LBPRZ=%d  ANC_SUP=%d  DP=%d' % (
-        i['lbpu'],
-        i['lpbws'],
-        i['lbpws10'],
-        i['lbprz'],
-        i['anc_sup'],
-        i['dp']))
-    print('  Provisioning Type=%d  [%s]' % (
-        i['provisioning_type'],
-        INQUIRY.PROVISIONING_TYPE[i['provisioning_type']]))
+    print('  Threshold=%d blocks  [%s]' % (1 << i['threshold_exponent'],
+                                           'NO LOGICAL BLOCK PROVISIONING SUPPORT' if not
+                                           i['threshold_exponent'] else 'exponent=%d' % (
+                                           i['threshold_exponent'])))
+    print('  LBPU=%d  LBPWS=%d  LBPWS10=%d  LBPRZ=%d  ANC_SUP=%d  DP=%d' % (i['lbpu'],
+                                                                            i['lpbws'],
+                                                                            i['lbpws10'],
+                                                                            i['lbprz'],
+                                                                            i['anc_sup'],
+                                                                            i['dp']))
+    print('  Provisioning Type=%d  [%s]' % (i['provisioning_type'],
+                                            cmd.PROVISIONING_TYPE[i['provisioning_type']]))
 
 
 def inquiry_unit_serial_number(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.UNIT_SERIAL_NUMBER)
+    i = cmd.result
     print('Unit Serial Number, page_code=0x80')
     print('==================================')
     print('  Unit serial number: %s' % (i['unit_serial_number']))
 
 
 def inquiry_device_identification(s):
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION, alloclen=16383).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.DEVICE_IDENTIFICATION, alloclen=16383)
+    i = cmd.result
     print('Device Identification, page_code=0x83')
     print('=====================================')
     _d = i['designator_descriptors']
     for idx in range(len(_d)):
         print('  Designation descriptor, descriptor length: %d' %
-                                                    (_d[idx]['designator_length'] + 4))
-        print('    designator type:%d [%s]  code set:%d [%s]' % (
-            _d[idx]['designator_type'],
-            INQUIRY.DESIGNATOR[_d[idx]['designator_type']],
-            _d[idx]['code_set'],
-            INQUIRY.CODE_SET[_d[idx]['code_set']]))
-        print('    association:%d [%s]' % (
-            _d[idx]['association'],
-            INQUIRY.ASSOCIATION[_d[idx]['association']]))
+              (_d[idx]['designator_length'] + 4))
+        print('    designator type:%d [%s]  code set:%d [%s]' %
+              (_d[idx]['designator_type'],
+               cmd.DESIGNATOR[_d[idx]['designator_type']],
+               _d[idx]['code_set'],
+               cmd.CODE_SET[_d[idx]['code_set']]))
+        print('    association:%d [%s]' % (_d[idx]['association'],
+                                           cmd.ASSOCIATION[_d[idx]['association']]))
         for k, v in _d[idx]['designator'].iteritems():
             print('      %s: %s' % (k, v))
 
@@ -158,7 +158,8 @@ def inquiry_ata_information(s):
     }
     print('ATA Information, page_code=0x89')
     print('=============================================\n')
-    i = s.inquiry(evpd=1, page_code=INQUIRY.VPD.ATA_INFORMATION).result
+    cmd = s.inquiry(evpd=1, page_code=INQUIRY.VPD.ATA_INFORMATION)
+    i = cmd.result
     print('SAT Vendor Identification:', i['sat_vendor_identification'].decode(encoding="utf-8",
                                                                               errors="strict"))
     print('SAT Product Identification:', i['sat_product_identification'].decode(encoding="utf-8",
@@ -211,11 +212,10 @@ def main():
         return usage()
 
     device = sys.argv[1]
-    #with SCSIDevice(device) as sd:
     with SCSI(device) as s:
 
         try:
-            i = s.testunitready()
+            s.testunitready()
 
             if not evpd:
                 inquiry_standard(s)
@@ -251,7 +251,8 @@ def main():
 
             print('No pretty print( for this page, page_code=0x%02x' % page_code)
             print('=============================================\n')
-            i = s.inquiry(evpd=1, page_code=page_code).result
+            cmd = s.inquiry(evpd=1, page_code=page_code)
+            i = cmd.result
             for k, v in i.iteritems():
                 print('%s - %s' % (k, v))
         except SCSICheckCondition as ex:
