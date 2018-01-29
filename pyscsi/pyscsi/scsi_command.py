@@ -1,6 +1,8 @@
 # coding: utf-8
 
+# Copyright:
 # Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright (C) 2016 by Markus Rosjat<markus.rosjat@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -270,6 +272,6 @@ class SCSICommand(_new_base_class):
         try:
             if getattr(self,
                        'unmarshall_datain'):
-                self.result = self.unmarshall_datain(self.datain, **kwargs)
-        except AttributeError as e:
+                self.result = self.unmarshall_datain(self.datain)
+        except AttributeError:
             raise NotImplementedError('%s has no method to unmarshall datain data' % self)

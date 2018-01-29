@@ -53,7 +53,6 @@ class SCSI(object):
     """
     def __init__(self,
                  dev,
-                 read_write=False,
                  blocksize=0):
         """
         initialize a new instance
@@ -61,14 +60,7 @@ class SCSI(object):
         :param dev: a SCSIDevice object
         :param blocksize:  integer defining a blocksize
         """
-        if dev[:5] == '/dev/':
-            from pyscsi.pyscsi.scsi_device import SCSIDevice
-            self.device = SCSIDevice(dev, read_write)
-        elif dev[:8] == 'iscsi://':
-            from pyscsi.pyscsi.iscsi_device import ISCSIDevice
-            self.device = ISCSIDevice(dev)
-        else:
-            raise NotImplementedError('No backend implemented for %s' % dev)
+        self.device = dev
         self._blocksize = blocksize
         self.__init_opcode()
 
@@ -117,10 +109,7 @@ class SCSI(object):
         :param cmd: a SCSICommand object
         """
         try:
-            self.device.execute(cmd.cdb,
-                                cmd.dataout,
-                                cmd.datain,
-                                cmd.sense)
+            self.device.execute(cmd)
         except Exception as e:
             raise e
 
@@ -196,10 +185,9 @@ class SCSI(object):
         """
         Returns a Inquiry Instance
 
-        :param kwargs: a dict with key/value pairs
-                       evpd = 0, a byte indicating if vital product data is supported
-                       page_code = 0, a byte representing a page code for vpd
-                       alloc_len = 96, the size of the data_in buffer
+        :param evpd: a byte indicating if vital product data is supported
+        :param page_code: a byte representing a page code for vpd
+        :param alloclen: the size of the data_in buffer
         :return: a Inquiry instance
         """
         opcode = self.device.opcodes.INQUIRY
@@ -299,7 +287,8 @@ class SCSI(object):
                        llbaa = 0, long LBA accepted can be 0 or 1
                        dbd = 0, disable block descriptor can be 0 or 1.
                        pc = 0, page control field, a value between 0 and 3
-                       alloclen = 0, the max number of bytes allocated for the data_in buffer
+                       alloclen = 0, the max number of bytes allocated for
+                       the data_in buffer
         :return: a ModeSense10 instance
         """
         opcode = self.device.opcodes.MODE_SENSE_10
