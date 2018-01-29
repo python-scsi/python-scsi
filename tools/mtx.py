@@ -11,6 +11,7 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
+from pyscsi.utils import init_device
 
 
 def status(scsi, dte, se):
@@ -104,7 +105,7 @@ def main():
         usage()
         exit(1)
 
-    scsi = SCSI(SCSIDevice(device))
+    scsi = SCSI(init_device(device))
     i = scsi.inquiry().result
     if i['peripheral_device_type'] != INQUIRY.DEVICE_TYPE.MEDIA_CHANGER_DEVICE:
         print '%s is not a MediaChanger device' % device
@@ -148,6 +149,6 @@ def main():
     usage()
     exit(1)
 
+
 if __name__ == "__main__":
     main()
-

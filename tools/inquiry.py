@@ -6,7 +6,7 @@ import sys
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
-
+from pyscsi.utils import init_device
 
 def usage():
     print('Usage: inquiry.py [-p <page-code>] [--help] <device>')
@@ -211,7 +211,8 @@ def main():
     if len(sys.argv) < 2:
         return usage()
 
-    device = sys.argv[1]
+    device = init_device(sys.argv[1])
+
     with SCSI(device) as s:
 
         try:

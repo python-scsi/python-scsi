@@ -6,6 +6,7 @@ import sys
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
 from pyscsi.pyscsi.scsi_enum_getlbastatus import P_STATUS
+from pyscsi.utils import init_device
 
 
 def usage():
@@ -30,7 +31,7 @@ def main():
 
     device = sys.argv[1]
 
-    sd = SCSIDevice(device)
+    sd = init_device(device)
     s = SCSI(sd)
 
     r = s.readcapacity16().result

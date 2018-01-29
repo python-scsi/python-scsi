@@ -2,6 +2,7 @@
 # coding: utf-8
 import sys
 from pyscsi.pyscsi.scsi import SCSI
+from pyscsi.utils import init_device
 
 
 def ba_to_int(ba):
@@ -37,6 +38,5 @@ def main(device):
             print('crc32 of header: %s' % ba_to_hex(r[88:92]))
 
 
-
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(init_device(sys.argv[1]))

@@ -7,7 +7,7 @@
 import sys
 
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.utils import init_device
 
 
 def main(device):
@@ -21,4 +21,4 @@ def main(device):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(init_device(sys.argv[1]))

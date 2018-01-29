@@ -9,6 +9,7 @@ import sys
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
+from pyscsi.utils import init_device
 
 
 def usage():
@@ -37,7 +38,7 @@ def main():
 
     device = sys.argv[1]
 
-    sd = SCSIDevice(device)
+    sd = init_device(device)
     s = SCSI(sd)
     i = s.modesense6(page_code=MODESENSE6.PAGE_CODE.CONTROL).result
 
@@ -54,6 +55,7 @@ def main():
         return
 
     print 'SWP is %s' % ("ON" if i['mode_pages'][0]['swp'] else "OFF")
+
 
 if __name__ == "__main__":
     main()
