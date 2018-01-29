@@ -17,7 +17,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI PreventAllowMediumRemoval command and definitions
@@ -29,7 +28,7 @@ class PreventAllowMediumRemoval(SCSICommand):
     A class to hold information from a PositionToElement command to a scsi device
     """
     _cdb_bits = {'opcode': [0xff, 0],
-                 'prevent': [0x03, 8], }
+                 'prevent': [0x03, 4], }
 
     def __init__(self,
                  opcode,
@@ -45,44 +44,5 @@ class PreventAllowMediumRemoval(SCSICommand):
                              0,
                              0)
 
-        self.cdb = self.build_cdb(prevent)
-
-    def build_cdb(self,
-                  prevent):
-        """
-        Build a PreventAllowMediumRemoval CDB
-
-        :param prevent: prevent can have a value between 0 and 3
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'prevent': prevent, }
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a PreventAllowMediumRemoval cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    PreventAllowMediumRemoval._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a PreventAllowMediumRemoval cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(10)
-        encode_dict(cdb,
-                    PreventAllowMediumRemoval._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  prevent=prevent)

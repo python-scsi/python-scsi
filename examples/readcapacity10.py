@@ -3,20 +3,17 @@
 
 import sys
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.utils import init_device
 
 
 def main(device):
-    try:
-        sd = SCSIDevice(device)
-        s = SCSI(sd)
+    with SCSI(device) as s:
         print 'ReadCapacity10'
         print '==========================================\n'
         r = s.readcapacity10().result
         for k, v in r.iteritems():
             print '%s - %s' % (k, v)
-    except Exception as e:
-        print (e.message)
+
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(init_device(sys.argv[1]))

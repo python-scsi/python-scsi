@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-from pyscsi.pyscsi.scsi import SCSI
-from mock_device import MockDevice
+from mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 
@@ -21,23 +19,20 @@ class MockReadCapacity16(MockDevice):
 
 
 def main():
-    dev = MockReadCapacity16()
-    dev.opcodes = sbc
-    s = SCSI(dev)
+    with MockSCSI(MockReadCapacity16(sbc)) as s:
+        i = s.readcapacity16().result
+        assert i['returned_lba'] == 281474976710656
+        assert i['block_length'] == 4096
+        assert i['p_type'] == 4
+        assert i['prot_en'] == 1
+        assert i['p_i_exponent'] == 8
+        assert i['lbppbe'] == 8
+        assert i['lbpme'] == 1
+        assert i['lbprz'] == 1
+        assert i['lowest_aligned_lba'] == 8193
 
-    i = s.readcapacity16().result
-    assert i['returned_lba'] == 281474976710656
-    assert i['block_length'] == 4096
-    assert i['p_type'] == 4
-    assert i['prot_en'] == 1
-    assert i['p_i_exponent'] == 8
-    assert i['lbppbe'] == 8
-    assert i['lbpme'] == 1
-    assert i['lbprz'] == 1
-    assert i['lowest_aligned_lba'] == 8193
-
-    d = ReadCapacity16.unmarshall_datain(ReadCapacity16.marshall_datain(i))
-    assert d == i
+        d = ReadCapacity16.unmarshall_datain(ReadCapacity16.marshall_datain(i))
+        assert d == i
 
 if __name__ == "__main__":
     main()

@@ -7,26 +7,18 @@
 import sys
 
 from pyscsi.pyscsi.scsi import SCSI
-from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.utils import init_device
 
 
 def main(device):
-    try:
-        sd = SCSIDevice(device)
-        s = SCSI(sd)
+    with SCSI(device) as s:
         s.testunitready()
-    except Exception as e:
-        print (e)
-    else:
         print ('ReportPriority')
         print ('==========================================\n')
-        try:
-            r = s.reportpriority().result
-            for k, v in r.iteritems():
-                print('%s - %s' % (k, v))
-        except Exception as e:
-                print (e)
+        r = s.reportpriority().result
+        for k, v in r.iteritems():
+            print('%s - %s' % (k, v))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(init_device(sys.argv[1]))

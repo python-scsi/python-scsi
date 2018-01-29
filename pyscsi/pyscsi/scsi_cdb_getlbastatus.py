@@ -27,10 +27,10 @@ class GetLBAStatus(SCSICommand):
     """
     A class to hold information from a GetLBAStatus command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'service_action': [0x1f, 1],
-                 'lba': [0xffffffffffffffff, 2],
-                 'alloc_len': [0xffffffff, 10], }
+    _cdb_bits =    {'opcode': [0xff, 0],
+                    'service_action': [0x1f, 1],
+                    'lba': [0xffffffffffffffff, 2],
+                    'alloc_len': [0xffffffff, 10], }
     _datain_bits = {'lba': [0xffffffffffffffff, 0],
                     'num_blocks': [0xffffffff, 8],
                     'p_status': [0x0f, 12], }
@@ -50,33 +50,14 @@ class GetLBAStatus(SCSICommand):
                              opcode,
                              0,
                              alloclen)
-        self.cdb = self.build_cdb(lba,
-                                  alloclen)
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  service_action=self.opcode.serviceaction.GET_LBA_STATUS,
+                                  lba=lba,
+                                  alloc_len=alloclen, )
 
-    def build_cdb(self,
-                  lba,
-                  alloclen):
-        """
-        Build a GetLBAStatus CDB
-
-        :param lba: starting local block address
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'service_action': self.opcode.serviceaction.GET_LBA_STATUS,
-               'lba': lba,
-               'alloc_len': alloclen, }
-        return self.marshall_cdb(cdb)
-
-    def unmarshall(self):
-        """
-        wrapper method for unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain)
-
-    @staticmethod
-    def unmarshall_datain(data):
+    @classmethod
+    def unmarshall_datain(cls,
+                          data):
         """
         Unmarshall the GetLBAStatus datain.
 
@@ -89,7 +70,7 @@ class GetLBAStatus(SCSICommand):
         while len(_data):
             _r = {}
             decode_bits(_data[:16],
-                        GetLBAStatus._datain_bits,
+                        cls._datain_bits,
                         _r)
 
             _lbas.append(_r)
@@ -98,8 +79,8 @@ class GetLBAStatus(SCSICommand):
         result.update({'lbas': _lbas})
         return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls, data):
         """
         Marshall the GetLBAStatus datain.
 
@@ -107,47 +88,17 @@ class GetLBAStatus(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(8)
-        if not 'lbas' in data:
+        if 'lbas' not in data:
             result[:4] = scsi_int_to_ba(len(result) - 4, 4)
             return result
 
         for l in data['lbas']:
             _r = bytearray(16)
             encode_dict(l,
-                        GetLBAStatus._datain_bits,
+                        cls._datain_bits,
                         _r)
 
             result += _r
 
         result[:4] = scsi_int_to_ba(len(result) - 4, 4)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a GetLBAStatus cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    GetLBAStatus._cdb_bits,
-                    result)
-
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a GetLBAStatus cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(16)
-        encode_dict(cdb,
-                    GetLBAStatus._cdb_bits,
-                    result)
-
         return result

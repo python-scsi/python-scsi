@@ -17,7 +17,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI InitializeElementStatusWithRange command and definitions
@@ -26,7 +25,8 @@ from pyscsi.utils.converter import encode_dict, decode_bits
 
 class InitializeElementStatusWithRange(SCSICommand):
     """
-    A class to hold information from a InitializeElementStatusWithRange command to a scsi device
+    A class to hold information from a InitializeElementStatusWithRange command
+    to a scsi device
     """
     _cdb_bits = {'opcode': [0xff, 0],
                  'fast': [0x02, 1],
@@ -46,68 +46,18 @@ class InitializeElementStatusWithRange(SCSICommand):
         :param opcode: a OpCode instance
         :param xfer: starting element address
         :param elements: number of elements
-        :param rng: range  indicates if all elements should be checked, if set to 1 xfer and elements are ignored
-        :param fast: fast , if set to 1 scan for media presence only. If set to 0 scan elements for all relevant
-                     status.
+        :param rng: range  indicates if all elements should be checked, if set to 1 xfer
+                    and elements are ignored
+        :param fast: fast , if set to 1 scan for media presence only. If set to 0 scan
+                     elements for all relevant status.
         """
         SCSICommand.__init__(self,
                              opcode,
                              0,
                              0)
 
-        self.cdb = self.build_cdb(xfer,
-                                  elements,
-                                  rng,
-                                  fast)
-
-    def build_cdb(self,
-                  xfer,
-                  elements,
-                  rng,
-                  fast):
-        """
-        Build a InitializeElementStatusWithRange CDB
-
-        :param xfer: starting element address
-        :param elements: number of elements
-        :param rng: range can be 0 or 1
-        :param fast: fast can be 0 or 1
-        :return: a byte array representing a code descriptor block
-        """
-        cdb = {'opcode': self.opcode.value,
-               'fast': fast,
-               'range': rng,
-               'starting_element_address': xfer,
-               'number_of_elements': elements, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a InitializeElementStatusWithRange cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    InitializeElementStatusWithRange._cdb_bits,
-                    result)
-
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a InitializeElementStatusWithRange cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(10)
-        encode_dict(cdb,
-                    InitializeElementStatusWithRange._cdb_bits,
-                    result)
-
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  starting_element_address=xfer,
+                                  number_of_elements=elements,
+                                  range=rng,
+                                  fast=fast)

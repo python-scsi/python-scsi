@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI WriteSame10 command and definitions
@@ -66,64 +65,10 @@ class WriteSame10(SCSICommand):
                              blocksize,
                              0)
         self.dataout = data
-        self.cdb = self.build_cdb(lba,
-                                  nb,
-                                  wrprotect,
-                                  anchor,
-                                  unmap,
-                                  group)
-
-    def build_cdb(self,
-                  lba,
-                  nb,
-                  wrprotect,
-                  anchor,
-                  unmap,
-                  group):
-        """
-        Build a WriteSame10 CDB
-
-        :param lba: logical block address
-        :param nb: number of logical blocks
-        :param wrprotect: value to specify write protection information
-        :param anchor: anchor can have a value of 0 or 1
-        :param unmap: unmap can have a value of 0 or 1
-        :param group: group number, can be 0 or greater
-        """
-        cdb = {'opcode': self.opcode.value,
-               'lba': lba,
-               'nb': nb,
-               'wrprotect': wrprotect,
-               'anchor': anchor,
-               'unmap': unmap,
-               'group': group, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a WriteSame10 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    WriteSame10._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a WriteSame10 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(10)
-        encode_dict(cdb,
-                    WriteSame10._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  lba=lba,
+                                  nb=nb,
+                                  wrprotect=wrprotect,
+                                  anchor=anchor,
+                                  unmap=unmap,
+                                  group=group)

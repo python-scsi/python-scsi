@@ -43,7 +43,8 @@ class WriteSame16(SCSICommand):
         :param wrprotect: value to specify write protection information
         :param anchor: anchor can have a value of 0 or 1
         :param unmap: unmap can have a value of 0 or 1
-        :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
+        :param ndob: Value can be 0 or 1, use logical block data from data out buffer
+                     (data arg) if set to 1.
         :param group: group number, can be 0 or greater
         """
         if not ndob and blocksize == 0:
@@ -54,69 +55,11 @@ class WriteSame16(SCSICommand):
                              0 if ndob else blocksize,
                              0)
         self.dataout = None if ndob else data
-        self.cdb = self.build_cdb(lba,
-                                  nb,
-                                  wrprotect,
-                                  anchor,
-                                  unmap,
-                                  ndob,
-                                  group)
-
-    def build_cdb(self,
-                  lba,
-                  nb,
-                  wrprotect,
-                  anchor,
-                  unmap,
-                  ndob,
-                  group):
-        """
-        Build a WriteSame16 CDB
-
-        :param lba: logical block address
-        :param nb: number of logical blocks
-        :param wrprotect: value to specify write protection information
-        :param anchor: anchor can have a value of 0 or 1
-        :param unmap: unmap can have a value of 0 or 1
-        :param ndob: Value can be 0 or 1, use logical block data from data out buffer (data arg) if set to 1.
-        :param group: group number, can be 0 or greater
-        """
-        cdb = {'opcode': self.opcode.value,
-               'lba': lba,
-               'nb': nb,
-               'wrprotect': wrprotect,
-               'anchor': anchor,
-               'unmap': unmap,
-               'ndob': ndob,
-               'group': group, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a WriteSame16 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    WriteSame16._cdb_bits,
-                    result)
-
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a WriteSame16 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(16)
-        encode_dict(cdb,
-                    WriteSame16._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  lba=lba,
+                                  nb=nb,
+                                  wrprotect=wrprotect,
+                                  anchor=anchor,
+                                  unmap=unmap,
+                                  ndob=ndob,
+                                  group=group)

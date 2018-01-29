@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI Write12 command and definitions
@@ -41,7 +40,10 @@ class Write12(SCSICommand):
                  lba,
                  tl,
                  data,
-                 **kwargs):
+                 wrprotect=0,
+                 dpo=0,
+                 fua=0,
+                 group=0):
         """
         initialize a new instance
 
@@ -50,7 +52,10 @@ class Write12(SCSICommand):
         :param lba: Logical Block Address
         :param tl: transfer length
         :param data: a byte array with data
-        :param kwargs: a list of keyword args including wrprotect, dpo, fua and group (all needed in the cdb)
+        :param wrprotect=0:
+        :param dpo=0:
+        :param fua=0:
+        :param group=0:
         """
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
@@ -60,61 +65,10 @@ class Write12(SCSICommand):
                              blocksize * tl,
                              0)
         self.dataout = data
-        self.cdb = self.build_cdb(lba,
-                                  tl,
-                                  **kwargs)
-
-    def build_cdb(self,
-                  lba,
-                  tl,
-                  wrprotect=0,
-                  dpo=0,
-                  fua=0,
-                  group=0):
-        """
-        Build a Write12 CDB
-
-        :param lba: Logical Block Address
-        :param tl: transfer length
-        :param wrprotect: value to specify write protection information
-        :param dpo: disable page out, can have a value 0f 0 or 1
-        :param fua: force until access, can have a value of 0 or 1
-        :param group: group number, can be 0 or greater
-        """
-        cdb = {'opcode': self.opcode.value,
-               'lba': lba,
-               'tl': tl,
-               'wrprotect': wrprotect,
-               'dpo': dpo,
-               'fua': fua,
-               'group': group, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a Write12 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    Write12._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a Write12 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(12)
-        encode_dict(cdb,
-                    Write12._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  lba=lba,
+                                  tl=tl,
+                                  wrprotect=wrprotect,
+                                  dpo=dpo,
+                                  fua=fua,
+                                  group=group)

@@ -14,10 +14,21 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+from pyscsi.pyscsi.scsi import SCSI
+
+
+class MockSCSI(SCSI):
+
+    def __init__(self, dev):
+        self.device = dev
+        pass
 
 
 class MockDevice(object):
     _opcodes = None
+
+    def __init__(self, opcodes):
+        self.opcodes = opcodes
 
     @property
     def opcodes(self):
@@ -28,4 +39,10 @@ class MockDevice(object):
         self._opcodes = value
 
     def execute(self, cdb, dataout, datain, sense):
+        pass
+
+    def open(self):
+        pass
+
+    def close(self):
         pass

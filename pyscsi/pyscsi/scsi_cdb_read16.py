@@ -16,7 +16,6 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
 
 #
 # SCSI Read16 command and definitions
@@ -41,7 +40,11 @@ class Read16(SCSICommand):
                  blocksize,
                  lba,
                  tl,
-                 **kwargs):
+                 rdprotect=0,
+                 dpo=0,
+                 fua=0,
+                 rarc=0,
+                 group=0):
         """
         initialize a new instance
 
@@ -49,7 +52,11 @@ class Read16(SCSICommand):
         :param blocksize: a blocksize
         :param lba: Logical Block Address
         :param tl: transfer length
-        :param kwargs: a list of keyword args including rdprotect, dpo, fua, rarc and group (all needed in the cdb)
+        :param rdprotect=0:
+        :param dpo=0:
+        :param fua=0:
+        :param rarc=0:
+        :param group=0:
         """
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
@@ -59,64 +66,11 @@ class Read16(SCSICommand):
                              0,
                              blocksize * tl)
 
-        self.cdb = self.build_cdb(lba,
-                                  tl,
-                                  **kwargs)
-
-    def build_cdb(self,
-                  lba,
-                  tl,
-                  rdprotect=0,
-                  dpo=0,
-                  fua=0,
-                  rarc=0,
-                  group=0):
-        """
-        Build a Read16 CDB
-
-        :param lba: Logical Block Address
-        :param tl: transfer length
-        :param rdprotect: value to specify checking the returning status for the read command
-        :param dpo: disable page out, can have a value 0f 0 or 1
-        :param fua: force until access, can have a value of 0 or 1
-        :param rarc: rebuild assist recovery control, can have a value of 0 or 1
-        :param group: group number, can be 0 or greater
-        """
-        cdb = {'opcode': self.opcode.value,
-               'lba': lba,
-               'tl': tl,
-               'rdprotect': rdprotect,
-               'dpo': dpo,
-               'fua': fua,
-               'rarc': rarc,
-               'group': group, }
-
-        return self.marshall_cdb(cdb)
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a Read16 cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    Read16._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a Read16 cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(16)
-        encode_dict(cdb,
-                    Read16._cdb_bits,
-                    result)
-        return result
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  lba=lba,
+                                  tl=tl,
+                                  rdprotect=rdprotect,
+                                  dpo=dpo,
+                                  fua=fua,
+                                  rarc=rarc,
+                                  group=group)

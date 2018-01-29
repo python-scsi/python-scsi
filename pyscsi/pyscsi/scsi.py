@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
@@ -35,6 +36,7 @@ from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
+from pyscsi.pyscsi.scsi_cdb_report_supported_opcodes import ReportSupportedOperationCodes
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -67,10 +69,19 @@ class SCSI(object):
         """
         call the instance again with new device
 
-        :param dev: a SCSIDevice object
+        :param dev: a SCSIDevice or ISCSIDevice object
         """
         self.device = dev
         self.__init_opcode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self,
+                 exc_type,
+                 exc_val,
+                 exc_tb):
+        self.device.close()
 
     def __init_opcode(self):
         """
@@ -98,24 +109,7 @@ class SCSI(object):
         :param cmd: a SCSICommand object
         """
         try:
-            self.device.execute(cmd.cdb,
-                                cmd.dataout,
-                                cmd.datain,
-                                cmd.sense)
-        except Exception as e:
-            raise e
-
-    @staticmethod
-    def unmarshall(cmd):
-        """
-        wrapper method to call a SCSICommand.umarshall method if defined in the Command
-
-        :param cmd: a SCSICommand object
-        """
-        try:
-            if getattr(cmd,
-                       'unmarshall'):
-                cmd.unmarshall()
+            self.device.execute(cmd)
         except Exception as e:
             raise e
 
@@ -181,25 +175,28 @@ class SCSI(object):
                            lba,
                            **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def inquiry(self,
-                **kwargs):
+                evpd=0,
+                page_code=0,
+                alloclen=96):
         """
         Returns a Inquiry Instance
 
-        :param kwargs: a dict with key/value pairs
-                       evpd = 0, a byte indicating if vital product data is supported
-                       page_code = 0, a byte representing a page code for vpd
-                       alloc_len = 96, the size of the data_in buffer
+        :param evpd: a byte indicating if vital product data is supported
+        :param page_code: a byte representing a page code for vpd
+        :param alloclen: the size of the data_in buffer
         :return: a Inquiry instance
         """
         opcode = self.device.opcodes.INQUIRY
         cmd = Inquiry(opcode,
-                      **kwargs)
+                      evpd=evpd,
+                      page_code=page_code,
+                      alloclen=alloclen)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall(evpd=evpd)
         return cmd
 
     def initializeelementstatus(self):
@@ -221,10 +218,12 @@ class SCSI(object):
         Returns a InitializeElementStatusWithRange Instance
 
         :param xfer: two byte indicating the address of the starting element
-        :param elements: two byte representing a range of elements that should be initialized
+        :param elements: two byte representing a range of elements that should be
+                         initialized
         :param kwargs: a dict with key/value pairs
                        range = 0, a integer indicating if elements should be ignored
-                       fast = 0, a integer indicating if  elements should be scanned for media presence
+                       fast = 0, a integer indicating if  elements should be scanned for
+                                 media presence
         :return: a InitializeElementStatusWithRange instance
         """
         opcode = self.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE
@@ -252,7 +251,7 @@ class SCSI(object):
                           data,
                           **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def modesense6(self,
@@ -274,7 +273,7 @@ class SCSI(object):
                          page_code,
                          **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def modesense10(self,
@@ -288,7 +287,8 @@ class SCSI(object):
                        llbaa = 0, long LBA accepted can be 0 or 1
                        dbd = 0, disable block descriptor can be 0 or 1.
                        pc = 0, page control field, a value between 0 and 3
-                       alloclen = 0, the max number of bytes allocated for the data_in buffer
+                       alloclen = 0, the max number of bytes allocated for
+                       the data_in buffer
         :return: a ModeSense10 instance
         """
         opcode = self.device.opcodes.MODE_SENSE_10
@@ -296,7 +296,7 @@ class SCSI(object):
                           page_code,
                           **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def modeselect10(self,
@@ -316,7 +316,7 @@ class SCSI(object):
                            data,
                            **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def opencloseimportexportelement(self,
@@ -466,7 +466,7 @@ class SCSI(object):
         cmd = ReadCapacity10(opcode=opcode,
                              **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def readcapacity16(self,
@@ -482,7 +482,7 @@ class SCSI(object):
         cmd = ReadCapacity16(opcode=opcode,
                              **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def readelementstatus(self,
@@ -508,7 +508,7 @@ class SCSI(object):
                                 num,
                                 **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def movemedium(self,
@@ -700,7 +700,7 @@ class SCSI(object):
         cmd = ReportLuns(opcode=opcode,
                          **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
         return cmd
 
     def reportpriority(self,
@@ -717,5 +717,25 @@ class SCSI(object):
         cmd = ReportPriority(opcode=opcode,
                              **kwargs)
         self.execute(cmd)
-        SCSI.unmarshall(cmd)
+        cmd.unmarshall()
+        return cmd
+
+    def reportsupportedopcodes(self,
+                               **kwargs):
+        """
+        Return a ReportSupportedOperationCodes Instance
+
+        :param kwargs: a dict with key/value pairs
+                       opcode,
+                       reporting_options,
+                       rctp,
+                       requested_opcode,
+                       requested_service_action,
+                       alloclen=96, size of requested datain
+        :return: a ReportSupportedOperationCodes instance
+        """
+        opcode = next(get_opcode(self.device.opcodes, 'A3'))
+        cmd = ReportSupportedOperationCodes(opcode=opcode,
+                                            **kwargs)
+        self.execute(cmd)
         return cmd

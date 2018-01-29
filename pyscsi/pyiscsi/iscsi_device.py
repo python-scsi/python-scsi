@@ -1,8 +1,7 @@
 # coding: utf-8
 
 # Copyright:
-#  Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
-#  Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
+#  Copyright (C) 2018 by Markus Rosjat<markus.rosjat@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -16,23 +15,26 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
+
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
+import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
+from pyscsi.pyiscsi.iscsi_url import ISCSIUrl
+
 
 try:
-    import linux_sgio
-    _has_sgio = True
+    import libiscsi._libiscsi as _iscsi
+    _has_iscsi = True
 except ImportError as e:
-    _has_sgio = False
+    _has_iscsi = False
 
 # make a new base class with the metaclass this should solve the problem with the
 # python 2 and python 3 metaclass definitions
 _new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
 
-class SCSIDevice(_new_base_class):
+class ISCSIDevice(_new_base_class):
     """
-    The scsi device class
+    The iscsi device class
 
     By default it gets the SPC opcodes assigned so it's always possible to issue
     a inquiry command to the device. This is important since the the Command will
@@ -51,28 +53,22 @@ class SCSIDevice(_new_base_class):
     """
 
     def __init__(self,
-                 device,
-                 readwrite=False):
+                 device):
         """
-        initialize a  new instance of a SCSIDevice
-        :param device: the file descriptor
-        :param readwrite: access type
+        initialize a  new instance of a ISCSIDevice
+
+        :param device: a url string
         """
         self._opcodes = scsi_enum_command.spc
         self._file_name = device
-        self._read_write = readwrite
-        self._fd = None
-
-        if _has_sgio and device[:5] == '/dev/':
-            self.open()
+        self._iscsi = None
+        self._iscsi_url = None
+        if _has_iscsi and device[:8] == 'iscsi://':
+            self.open(device)
         else:
             raise NotImplementedError('No backend implemented for %s' % device)
 
     def __enter__(self):
-        """
-
-        :return:
-        """
         return self
 
     def __exit__(self,
@@ -86,58 +82,63 @@ class SCSIDevice(_new_base_class):
         :param exc_tb:
         :return:
         """
+        # we may need to do more teardown here ?
         self.close()
 
-    def __repr__(self):
+    def open(self, device):
         """
 
-        :return:
         """
-        return self.__class__.__name__
-
-    def open(self):
-        """
-
-        :param dev:
-        :param read_write:
-        :return:
-        """
-        self._fd = linux_sgio.open(self._file_name,
-                                   bool(self._read_write))
+        self._iscsi = _iscsi.iscsi_create_context(device)
+        self._iscsi_url = ISCSIUrl(self._iscsi,
+                                   self._file_name)
+        _iscsi.iscsi_set_targetname(self._iscsi,
+                                    self._iscsi_url.target)
+        _iscsi.iscsi_set_session_type(self._iscsi,
+                                        _iscsi.ISCSI_SESSION_NORMAL)
+        _iscsi.iscsi_set_header_digest(self._iscsi,
+                                         _iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+        _iscsi.iscsi_full_connect_sync(self._iscsi,
+                                       self._iscsi_url.portal,
+                                       self._iscsi_url.lun)
 
     def close(self):
-        linux_sgio.close(self._fd)
+        # we may need to do more teardown here ?
+        _iscsi.iscsi_destroy_context(self._iscsi)
 
-    def execute(self,
-                cdb,
-                dataout,
-                datain,
-                sense):
+    def execute(self, cmd):
         """
         execute a scsi command
-        :param cdb: a byte array representing a command descriptor block
-        :param dataout: a byte array to hold received data from the ioctl call
-        :param datain: a byte array to hold data passed to the ioctl call
-        :param sense: a byte array to hold sense data
+        :param cmd: a scsi command
         """
-        _dir = linux_sgio.DXFER_NONE
-        if len(datain) and len(dataout):
-            raise NotImplemented('Indirect IO is not supported')
-        elif len(datain):
-            _dir = linux_sgio.DXFER_FROM_DEV
-        elif len(dataout):
-            _dir = linux_sgio.DXFER_TO_DEV
-
-        status = linux_sgio.execute(self._fd,
-                                    _dir,
-                                    cdb,
-                                    dataout,
-                                    datain,
-                                    sense)
-        if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
-            raise self.CheckCondition(sense)
-        if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
-            raise self.SCSISGIOError
+        _dir = _iscsi.SCSI_XFER_NONE
+        _xferlen = 0
+        if len(cmd.datain):
+            _dir = _iscsi.SCSI_XFER_READ
+            _xferlen = len(cmd.datain)
+        if len(cmd.dataout):
+            _dir = _iscsi.SCSI_XFER_WRITE
+            _xferlen = len(cmd.dataout)
+        _task = _iscsi.scsi_create_task(cmd.cdb,
+                                          _dir,
+                                          _xferlen)
+        if len(cmd.datain):
+            _iscsi.scsi_task_add_data_in_buffer(_task,
+                                                cmd.datain)
+        if len(cmd.dataout):
+            _iscsi.scsi_task_add_data_out_buffer(_task,
+                                                 cmd.dataout)
+        _iscsi.iscsi_scsi_command_sync(self._iscsi,
+                                       self._iscsi_url.lun,
+                                         _task,
+                                         None)
+        _status = _iscsi.scsi_task_get_status(_task,
+                                                None)
+        if _status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            raise self.CheckCondition(cmd.sense)
+        if _status == scsi_enum_command.SCSI_STATUS.GOOD:
+            return
+        raise self.SCSISGIOError
 
     @property
     def opcodes(self):

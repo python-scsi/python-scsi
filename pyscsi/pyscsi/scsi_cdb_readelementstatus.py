@@ -23,6 +23,11 @@ import pyscsi.pyscsi.scsi_enum_readelementstatus as readelementstatus_enums
 # SCSI ReadElementStatus command and definitions
 #
 
+# we get a generator for all inquiry enums, so we can add them to the class
+_enums = ((key, readelementstatus_enums.__dict__[key])
+          for key in readelementstatus_enums.__dict__.keys()
+          if key in readelementstatus_enums.__all__)
+
 
 class ReadElementStatus(SCSICommand):
     """
@@ -66,6 +71,11 @@ class ReadElementStatus(SCSICommand):
                                        'access': [0x08, 2],
                                        'impexp': [0x02, 2], }
 
+    # HACK: we update the baseclass with enums for the subclass, if there is a better way
+    #       to add this to the subclass we should use it instead :-)
+    for enum in _enums:
+        setattr(SCSICommand, enum[0], enum[1])
+
     def __init__(self,
                  opcode,
                  start,
@@ -92,52 +102,17 @@ class ReadElementStatus(SCSICommand):
                              0,
                              alloclen)
 
-        self.cdb = self.build_cdb(start,
-                                  num,
-                                  element_type,
-                                  voltag,
-                                  curdata,
-                                  dvcid,
-                                  alloclen)
+        self.cdb = self.build_cdb(opcode=self.opcode.value,
+                                  voltag=voltag,
+                                  element_type=element_type,
+                                  starting_element_address=start,
+                                  num_elements=num,
+                                  curdata=curdata,
+                                  dvcid=dvcid,
+                                  alloc_len=alloclen)
 
-    def build_cdb(self,
-                  start,
-                  num,
-                  element_type,
-                  voltag,
-                  curdata,
-                  dvcid,
-                  alloclen):
-        """
-        Build a ReadElementStatus CDB
-
-        :param start: first element to return
-        :param num: number of elements to return
-        :param element_type: type of element to return data for
-        :param voltag: volume tag, can have a value of 0 or 1
-        :param curdata: current data, can have a value of 0 or 1
-        :param dvcid: device id, can have a value of 0 or 1
-        :param alloclen: the max number of bytes allocated for the data_in buffer
-        """
-        cdb = {'opcode': self.opcode.value,
-               'voltag': voltag,
-               'element_type': element_type,
-               'starting_element_address': start,
-               'num_elements': num,
-               'curdata': curdata,
-               'dvcid': dvcid,
-               'alloc_len': alloclen, }
-
-        return self.marshall_cdb(cdb)
-
-    def unmarshall(self):
-        """
-        wrapper method for the unmarshall_datain method.
-        """
-        self.result = self.unmarshall_datain(self.datain)
-
-    @staticmethod
-    def unmarshall_datain(data):
+    @classmethod
+    def unmarshall_datain(cls, data):
         """
         Unmarshall the ReadElementStatus datain buffer.
 
@@ -147,7 +122,7 @@ class ReadElementStatus(SCSICommand):
         result = {}
         _esd = []
         decode_bits(data,
-                    ReadElementStatus._datain_bits,
+                    cls._datain_bits,
                     result)
 
         #
@@ -162,7 +137,7 @@ class ReadElementStatus(SCSICommand):
             _edl = scsi_ba_to_int(data[2:4])
 
             decode_bits(data,
-                        ReadElementStatus._element_status_page_bits,
+                        cls._element_status_page_bits,
                         _r)
             _d = data[8:8 + _bc]
             _ed = []
@@ -170,7 +145,7 @@ class ReadElementStatus(SCSICommand):
                 _rr = {}
 
                 decode_bits(_d,
-                            ReadElementStatus._element_status_descriptor_bits,
+                            cls._element_status_descriptor_bits,
                             _rr)
                 _dd = _d[12:]
                 if _r['pvoltag']:
@@ -180,17 +155,17 @@ class ReadElementStatus(SCSICommand):
                     _rr.update({'alternate_volume_tag': _dd[0:36]})
                     _dd = _dd[36:]  # this is not going to used again so we may just delete it?
 
-                if _r['element_type'] == readelementstatus_enums.ELEMENT_TYPE.DATA_TRANSFER:
+                if _r['element_type'] == cls.ELEMENT_TYPE.DATA_TRANSFER:
                     decode_bits(_d,
-                                ReadElementStatus._data_transfer_descriptor_bits,
+                                cls._data_transfer_descriptor_bits,
                                 _rr)
-                if _r['element_type'] == readelementstatus_enums.ELEMENT_TYPE.STORAGE:
+                if _r['element_type'] == cls.ELEMENT_TYPE.STORAGE:
                     decode_bits(_d,
-                                ReadElementStatus._storage_descriptor_bits,
+                                cls._storage_descriptor_bits,
                                 _rr)
-                if _r['element_type'] == readelementstatus_enums.ELEMENT_TYPE.IMPORT_EXPORT:
+                if _r['element_type'] == cls.ELEMENT_TYPE.IMPORT_EXPORT:
                     decode_bits(_d,
-                                ReadElementStatus._import_export_descriptor_bits,
+                                cls._import_export_descriptor_bits,
                                 _rr)
                 _ed.append(_rr)
                 _d = _d[_edl:]
@@ -200,8 +175,8 @@ class ReadElementStatus(SCSICommand):
         result.update({'element_status_pages': _esd})
         return result
 
-    @staticmethod
-    def marshall_datain(data):
+    @classmethod
+    def marshall_datain(cls, data):
         """
         Marshall the ReadCapacity16 datain.
 
@@ -210,13 +185,13 @@ class ReadElementStatus(SCSICommand):
         """
         result = bytearray(8)
         encode_dict(data,
-                    ReadElementStatus._datain_bits,
+                    cls._datain_bits,
                     result)
 
         for _esp in data['element_status_pages']:
             _r = bytearray(8)
             encode_dict(_esp,
-                        ReadElementStatus._element_status_page_bits,
+                        cls._element_status_page_bits,
                         _r)
 
             _edl = 12 + 4
@@ -228,19 +203,19 @@ class ReadElementStatus(SCSICommand):
             for _ed in _esp['element_descriptors']:
                 _rr = bytearray(12)
                 encode_dict(_ed,
-                            ReadElementStatus._element_status_descriptor_bits,
+                            cls._element_status_descriptor_bits,
                             _rr)
-                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.DATA_TRANSFER:
+                if _esp['element_type'] == cls.ELEMENT_TYPE.DATA_TRANSFER:
                     encode_dict(_ed,
-                                ReadElementStatus._data_transfer_descriptor_bits,
+                                cls._data_transfer_descriptor_bits,
                                 _rr)
-                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.STORAGE:
+                if _esp['element_type'] == cls.ELEMENT_TYPE.STORAGE:
                     encode_dict(_ed,
-                                ReadElementStatus._storage_descriptor_bits,
+                                cls._storage_descriptor_bits,
                                 _rr)
-                if _esp['element_type'] == readelementstatus_enums.ELEMENT_TYPE.IMPORT_EXPORT:
+                if _esp['element_type'] == cls.ELEMENT_TYPE.IMPORT_EXPORT:
                     encode_dict(_ed,
-                                ReadElementStatus._import_export_descriptor_bits,
+                                cls._import_export_descriptor_bits,
                                 _rr)
                 _r += _rr
                 if _esp['pvoltag']:
@@ -257,32 +232,4 @@ class ReadElementStatus(SCSICommand):
             result += _r
 
         result[5:8] = scsi_int_to_ba(len(result) - 8, 3)
-        return result
-
-    @staticmethod
-    def unmarshall_cdb(cdb):
-        """
-        Unmarshall a ReadElementStatus cdb
-
-        :param cdb: a byte array representing a code descriptor block
-        :return result: a dict
-        """
-        result = {}
-        decode_bits(cdb,
-                    ReadElementStatus._cdb_bits,
-                    result)
-        return result
-
-    @staticmethod
-    def marshall_cdb(cdb):
-        """
-        Marshall a ReadElementStatus cdb
-
-        :param cdb: a dict with key:value pairs representing a code descriptor block
-        :return result: a byte array representing a code descriptor block
-        """
-        result = bytearray(12)
-        encode_dict(cdb,
-                    ReadElementStatus._cdb_bits,
-                    result)
         return result
