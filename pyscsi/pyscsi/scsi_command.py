@@ -272,6 +272,6 @@ class SCSICommand(_new_base_class):
         try:
             if getattr(self,
                        'unmarshall_datain'):
-                self.result = self.unmarshall_datain(self.datain)
+                self.result = self.unmarshall_datain(self.datain, **kwargs)
         except AttributeError:
             raise NotImplementedError('%s has no method to unmarshall datain data' % self)
