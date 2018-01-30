@@ -9,81 +9,81 @@ from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSense10
 
 class MockModeSenseEAA(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
-        datain[0] = 21    # mode data length
-        datain[2] = 97    # medium type
-        datain[3] = 98    # device specific parameter
-        datain[4] = 0x01  # LONGLBA
-        datain[6] = 0     # block descriptor length
+    def execute(self, cmd):
+        cmd.datain[0] = 21    # mode data length
+        cmd.datain[2] = 97    # medium type
+        cmd.datain[3] = 98    # device specific parameter
+        cmd.datain[4] = 0x01  # LONGLBA
+        cmd.datain[6] = 0     # block descriptor length
 
-        datain[8] = 0x9d  # PS=1 SPF=0 PAGECODE=0x1d
-        datain[9] = 16    # Parameter List Length
+        cmd.datain[8] = 0x9d  # PS=1 SPF=0 PAGECODE=0x1d
+        cmd.datain[9] = 16    # Parameter List Length
 
-        datain[10:12] = bytearray([1, 1])  # First Medium Transfer Element
-        datain[12:14] = bytearray([1, 2])  # Num Medium Transfer Elements
-        datain[14:16] = bytearray([1, 3])  # First Storage Element
-        datain[16:18] = bytearray([1, 4])  # Num Storage Elements
-        datain[18:20] = bytearray([1, 5])  # First Import Element
-        datain[20:22] = bytearray([1, 6])  # Num Import Elements
-        datain[22:24] = bytearray([1, 7])  # First Data Transport Element
-        datain[24:26] = bytearray([1, 8])  # Num Data Transport Elements
+        cmd.datain[10:12] = bytearray([1, 1])  # First Medium Transfer Element
+        cmd.datain[12:14] = bytearray([1, 2])  # Num Medium Transfer Elements
+        cmd.datain[14:16] = bytearray([1, 3])  # First Storage Element
+        cmd.datain[16:18] = bytearray([1, 4])  # Num Storage Elements
+        cmd.datain[18:20] = bytearray([1, 5])  # First Import Element
+        cmd.datain[20:22] = bytearray([1, 6])  # Num Import Elements
+        cmd.datain[22:24] = bytearray([1, 7])  # First Data Transport Element
+        cmd.datain[24:26] = bytearray([1, 8])  # Num Data Transport Elements
 
 
 class MockModeSenseControl(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
-        datain[0] = 15    # mode data length
-        datain[2] = 0     # medium type: BLOCK_DEVICE
-        datain[3] = 0x90  # device specific parameter
-        datain[6] = 0     # block descriptor length
+    def execute(self, cmd):
+        cmd.datain[0] = 15    # mode data length
+        cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
+        cmd.datain[3] = 0x90  # device specific parameter
+        cmd.datain[6] = 0     # block descriptor length
 
-        datain[8] = 0x8a  # PS=1 SPF=0 PAGECODE=0x0a
-        datain[9] = 10    # Parameter List Length
+        cmd.datain[8] = 0x8a  # PS=1 SPF=0 PAGECODE=0x0a
+        cmd.datain[9] = 10    # Parameter List Length
 
-        datain[10] = 0x9f  # tst:4 tmdf_only:1 dpicz:1 d_Sense:1 gltsd:1 rlec:1
-        datain[11] = 0x9e  # qam:9 nuar:1 qerr:3
-        datain[12] = 0xf8  # vs:1 rac:1 uaic:3 swp:1
-        datain[13] = 0xf7  # ato:1 tas:1 atmpe:1 rwwp:1 am:7
-        datain[16:18] = scsi_int_to_ba(500, 2)  # busy timeout:500
-        datain[18:20] = scsi_int_to_ba(700, 2)  # ext:700
+        cmd.datain[10] = 0x9f  # tst:4 tmdf_only:1 dpicz:1 d_Sense:1 gltsd:1 rlec:1
+        cmd.datain[11] = 0x9e  # qam:9 nuar:1 qerr:3
+        cmd.datain[12] = 0xf8  # vs:1 rac:1 uaic:3 swp:1
+        cmd.datain[13] = 0xf7  # ato:1 tas:1 atmpe:1 rwwp:1 am:7
+        cmd.datain[16:18] = scsi_int_to_ba(500, 2)  # busy timeout:500
+        cmd.datain[18:20] = scsi_int_to_ba(700, 2)  # ext:700
 
 
 class MockModeSenseControlExt1(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
-        datain[0] = 15    # mode data length
-        datain[2] = 0     # medium type: BLOCK_DEVICE
-        datain[3] = 0x90  # device specific parameter
-        datain[6] = 0     # block descriptor length
+    def execute(self, cmd):
+        cmd.datain[0] = 15    # mode data length
+        cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
+        cmd.datain[3] = 0x90  # device specific parameter
+        cmd.datain[6] = 0     # block descriptor length
 
-        datain[8] = 0xca                       # PS=1 SPF=1 PAGECODE=0x0a
-        datain[9] = 1                          # subpage:1
-        datain[10:12] = scsi_int_to_ba(0x1c, 2)  # page length
+        cmd.datain[8] = 0xca                       # PS=1 SPF=1 PAGECODE=0x0a
+        cmd.datain[9] = 1                          # subpage:1
+        cmd.datain[10:12] = scsi_int_to_ba(0x1c, 2)  # page length
 
-        datain[12] = 0x07  # tcmod:1 scsip:1 ialuae:1
-        datain[13] = 0x0f  # icp:15
-        datain[14] = 29   # msdl:29
+        cmd.datain[12] = 0x07  # tcmod:1 scsip:1 ialuae:1
+        cmd.datain[13] = 0x0f  # icp:15
+        cmd.datain[14] = 29   # msdl:29
 
 
 class MockModeSenseDisconnect(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
-        datain[0] = 15    # mode data length
-        datain[2] = 0     # medium type: BLOCK_DEVICE
-        datain[3] = 0x90  # device specific parameter
-        datain[6] = 0     # block descriptor length
+    def execute(self, cmd):
+        cmd.datain[0] = 15    # mode data length
+        cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
+        cmd.datain[3] = 0x90  # device specific parameter
+        cmd.datain[6] = 0     # block descriptor length
 
-        datain[8] = 0x82  # PS=1 SPF=0 PAGECODE=0x02
-        datain[9] = 0x0e
+        cmd.datain[8] = 0x82  # PS=1 SPF=0 PAGECODE=0x02
+        cmd.datain[9] = 0x0e
 
-        datain[10] = 122                          # bfr:122
-        datain[11] = 123                          # ber:123
-        datain[12:14] = scsi_int_to_ba(2371, 2)   # bil
-        datain[14:16] = scsi_int_to_ba(2372, 2)  # dtl
-        datain[16:18] = scsi_int_to_ba(2373, 2)  # ctl
-        datain[18:20] = scsi_int_to_ba(2374, 2)  # mbs
-        datain[20] = 0xff                        # emdp:1 fa:7 dimm:1 dtdc:7
-        datain[22:24] = scsi_int_to_ba(2375, 2)  # fbs
+        cmd.datain[10] = 122                          # bfr:122
+        cmd.datain[11] = 123                          # ber:123
+        cmd.datain[12:14] = scsi_int_to_ba(2371, 2)   # bil
+        cmd.datain[14:16] = scsi_int_to_ba(2372, 2)  # dtl
+        cmd.datain[16:18] = scsi_int_to_ba(2373, 2)  # ctl
+        cmd.datain[18:20] = scsi_int_to_ba(2374, 2)  # mbs
+        cmd.datain[20] = 0xff                        # emdp:1 fa:7 dimm:1 dtdc:7
+        cmd.datain[22:24] = scsi_int_to_ba(2375, 2)  # fbs
 
 
 def main():
@@ -191,6 +191,7 @@ def main():
 
         d = ModeSense10.unmarshall_datain(ModeSense10.marshall_datain(i))
         assert d == i
+
 
 if __name__ == "__main__":
     main()

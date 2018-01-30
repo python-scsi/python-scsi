@@ -9,7 +9,7 @@ from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 
 class MockReadElementStatus(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
+    def execute(self, cmd):
         # element status header data
         data = bytearray(8)
         data[0:2] = scsi_int_to_ba(12, 2)  # first element address reported
@@ -63,7 +63,7 @@ class MockReadElementStatus(MockDevice):
         data += _d
 
         data[5:8] = scsi_int_to_ba(len(data) - 8, 3)
-        datain[:len(data)] = data[:]
+        cmd.datain[:len(data)] = data[:]
 
 
 def main():
@@ -123,6 +123,7 @@ def main():
 
         d = ReadElementStatus.unmarshall_datain(ReadElementStatus.marshall_datain(i))
         assert d == i
+
 
 if __name__ == "__main__":
     main()

@@ -38,7 +38,7 @@ class MockDevice(object):
     def opcodes(self, value):
         self._opcodes = value
 
-    def execute(self, cdb, dataout, datain, sense):
+    def execute(self, cmd):
         pass
 
     def open(self):

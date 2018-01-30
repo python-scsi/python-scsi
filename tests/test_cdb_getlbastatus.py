@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from mock_device import MockDevice, MockSCSI
@@ -25,6 +24,7 @@ def main():
 
         d = GetLBAStatus.unmarshall_cdb(GetLBAStatus.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

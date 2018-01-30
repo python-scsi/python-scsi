@@ -7,11 +7,11 @@ from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 
 class MockReadCapacity10(MockDevice):
 
-    def execute(self, cdb, dataout, datain, sense):
+    def execute(self, cmd):
         # lba
-        datain[0:4] = [0x00, 0x01, 0x00, 0x00]
+        cmd.datain[0:4] = [0x00, 0x01, 0x00, 0x00]
         # block size
-        datain[4:8] = [0x00, 0x00, 0x10, 0x00]
+        cmd.datain[4:8] = [0x00, 0x00, 0x10, 0x00]
 
 
 def main():
@@ -22,6 +22,7 @@ def main():
 
         d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
         assert d == i
+
 
 if __name__ == "__main__":
     main()
