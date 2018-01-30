@@ -108,34 +108,28 @@ class SCSIDevice(_new_base_class):
     def close(self):
         linux_sgio.close(self._fd)
 
-    def execute(self,
-                cdb,
-                dataout,
-                datain,
-                sense):
+    def execute(self, cmd):
         """
         execute a scsi command
-        :param cdb: a byte array representing a command descriptor block
-        :param dataout: a byte array to hold received data from the ioctl call
-        :param datain: a byte array to hold data passed to the ioctl call
-        :param sense: a byte array to hold sense data
+
+        :param cmd: a SCSICommand
         """
         _dir = linux_sgio.DXFER_NONE
-        if len(datain) and len(dataout):
+        if len(cmd.datain) and len(cmd.dataout):
             raise NotImplemented('Indirect IO is not supported')
-        elif len(datain):
+        elif len(cmd.datain):
             _dir = linux_sgio.DXFER_FROM_DEV
-        elif len(dataout):
+        elif len(cmd.dataout):
             _dir = linux_sgio.DXFER_TO_DEV
 
         status = linux_sgio.execute(self._fd,
                                     _dir,
-                                    cdb,
-                                    dataout,
-                                    datain,
-                                    sense)
+                                    cmd.cdb,
+                                    cmd.dataout,
+                                    cmd.datain,
+                                    cmd.sense)
         if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
-            raise self.CheckCondition(sense)
+            raise self.CheckCondition(cmd.sense)
         if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
             raise self.SCSISGIOError
 
