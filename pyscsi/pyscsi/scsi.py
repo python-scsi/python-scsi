@@ -36,7 +36,6 @@ from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
-from pyscsi.pyscsi.scsi_cdb_report_supported_opcodes import ReportSupportedOperationCodes
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -719,23 +718,4 @@ class SCSI(object):
         self.execute(cmd)
         cmd.unmarshall()
         return cmd
-
-    def reportsupportedopcodes(self,
-                               **kwargs):
-        """
-        Return a ReportSupportedOperationCodes Instance
-
-        :param kwargs: a dict with key/value pairs
-                       opcode,
-                       reporting_options,
-                       rctp,
-                       requested_opcode,
-                       requested_service_action,
-                       alloclen=96, size of requested datain
-        :return: a ReportSupportedOperationCodes instance
-        """
-        opcode = next(get_opcode(self.device.opcodes, 'A3'))
-        cmd = ReportSupportedOperationCodes(opcode=opcode,
-                                            **kwargs)
-        self.execute(cmd)
-        return cmd
+ 
