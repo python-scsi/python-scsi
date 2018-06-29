@@ -36,6 +36,9 @@ It is also available as a downloadable zip archive from:
 
 Building and installing
 =======================
+Preparing dependencies:
+    $ apt install swig libiscsi-dev
+    
 Building the module:
 
     $ python setup.py build
