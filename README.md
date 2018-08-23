@@ -38,7 +38,7 @@ Building and installing
 =======================
 This module depends on [libiscsi](https://github.com/sahlberg/libiscsi) and [SWIG](http://www.swig.org) libraries. You must first install these libraries before you can build this module. In debian families, you can install these dependencies via:
 
-    $ apt install swig libiscsi-dev
+    $ apt install swig libiscsi-dev python3-dev
     
 Building the module:
 
