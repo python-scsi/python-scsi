@@ -954,7 +954,7 @@ class SCSICheckCondition(Exception):
 
         if self.response_code == SENSE_FORMAT_CURRENT_FIXED:
             self.data = self.unmarshall_fixed_format_sense_data(sense)
-            self.ascq = self.data['additional_sense_code'] << 8 + self.data['additional_sense_code_qualifier']
+            self.ascq = (self.data['additional_sense_code'] << 8) + self.data['additional_sense_code_qualifier']
 
     def __str__(self):
         if self.show_data:
