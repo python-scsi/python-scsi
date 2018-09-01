@@ -235,7 +235,7 @@ static PyObject *linux_sgio_execute( PyObject *self, PyObject *args )
 
   io_hdr.sbp       = sense_buf.buf;
   io_hdr.mx_sb_len = sense_buf.len;
-  io_hdr.timeout   = 20000;
+  io_hdr.timeout   = 1800000;
 
   /* Call ioctl(2).
    *  Raise a Python exception if the call fails.
