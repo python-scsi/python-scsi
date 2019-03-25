@@ -18,6 +18,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
+import os
 
 try:
     import linux_sgio
@@ -29,6 +30,8 @@ except ImportError as e:
 # python 2 and python 3 metaclass definitions
 _new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
+def get_inode(file) -> int:
+    return os.stat(file).st_ino
 
 class SCSIDevice(_new_base_class):
     """
@@ -52,16 +55,21 @@ class SCSIDevice(_new_base_class):
 
     def __init__(self,
                  device,
-                 readwrite=False):
+                 readwrite=False,
+                 detect_replugged=True):
         """
         initialize a  new instance of a SCSIDevice
         :param device: the file descriptor
         :param readwrite: access type
+        :param detect_replugged: detects device unplugged and plugged events and ensure executions will not fail
+        silently due to replugged events
         """
         self._opcodes = scsi_enum_command.spc
         self._file_name = device
         self._read_write = readwrite
         self._fd = None
+        self._ino = None
+        self._detect_replugged = detect_replugged
 
         if _has_sgio and device[:5] == '/dev/':
             self.open()
@@ -95,6 +103,10 @@ class SCSIDevice(_new_base_class):
         """
         return self.__class__.__name__
 
+    def _is_replugged(self) -> bool:
+        ino = get_inode(self._file_name)
+        return ino != self._ino
+
     def open(self):
         """
 
@@ -104,6 +116,7 @@ class SCSIDevice(_new_base_class):
         """
         self._fd = linux_sgio.open(self._file_name,
                                    bool(self._read_write))
+        self._ino = get_inode(self._file_name)
 
     def close(self):
         linux_sgio.close(self._fd)
@@ -114,6 +127,12 @@ class SCSIDevice(_new_base_class):
 
         :param cmd: a SCSICommand
         """
+        if self._detect_replugged and self._is_replugged():
+            try:
+                self.close()
+            finally:
+                self.open()
+
         _dir = linux_sgio.DXFER_NONE
         if len(cmd.datain) and len(cmd.dataout):
             raise NotImplemented('Indirect IO is not supported')
