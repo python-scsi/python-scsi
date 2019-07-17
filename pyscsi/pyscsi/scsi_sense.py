@@ -44,6 +44,8 @@ sense_key_dict =  {0x00: 'No Sense',
                    0x0e: 'Miscompare',
                    0x0f: 'Completed', }
 
+vendor_specific_sense_asc = vendor_specific_sense_ascq = range(0x80, 0xFF + 1)
+
 # dict with additional sense data
 sense_ascq_dict = {0x0001: 'FILEMARK DETECTED',
                    0x0002: 'END-OF-PARTITION/MEDIUM DETECTED',
@@ -954,14 +956,26 @@ class SCSICheckCondition(Exception):
 
         if self.response_code == SENSE_FORMAT_CURRENT_FIXED:
             self.data = self.unmarshall_fixed_format_sense_data(sense)
-            self.ascq = (self.data['additional_sense_code'] << 8) + self.data['additional_sense_code_qualifier']
+            self.asc = self.data['additional_sense_code']
+            self.ascq = self.data['additional_sense_code_qualifier']
+
+    def _ascq(self):
+        return (self.asc << 8) + self.ascq
+
+    def _describe_ascq(self):
+        if self.asc in vendor_specific_sense_asc:
+            return 'Vendor specific ASC'
+        if self.ascq in vendor_specific_sense_ascq:
+            return 'Vendor specific ASCQ'
+        return sense_ascq_dict[self._ascq()]
 
     def __str__(self):
         if self.show_data:
             self.print_data()
+
         return "Check Condition: %s(0x%02X) ASC+Q:%s(0x%04X)" % (
             sense_key_dict[self.data['sense_key']], self.data['sense_key'],
-            sense_ascq_dict[self.ascq], self.ascq)
+            self._describe_ascq(), self._ascq())
 
     def print_data(self):
         for k, v in self.data.iteritems():
