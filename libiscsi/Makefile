@@ -12,4 +12,4 @@ libiscsi_wrap.o: libiscsi_wrap.c
 	${CC} -c ${CFLAGS} -fPIC ${INCLUDE} $$(python${PYVER}-config --cflags) libiscsi_wrap.c
 
 clean:
-	rm -f *.o *.so *.pyc *.c
+	rm -f *.o *.so *.pyc *.c libiscsi.py
