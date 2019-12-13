@@ -12,8 +12,8 @@ from pyscsi.utils import init_device
 
 def main(device):
     with SCSI(device) as s:
-        print 'ReportLuns'
-        print '==========================================\n'
+        print('ReportLuns')
+        print('==========================================\n')
         r = s.reportluns().result
         for k, v in r.iteritems():
             print('%s - %s' % (k, v))

@@ -13,7 +13,7 @@ from pyscsi.utils import init_device
 
 
 def usage():
-    print 'Usage: swp.py [--help] [--on|--off] <device>'
+    print('Usage: swp.py [--help] [--on|--off] <device>')
 
 
 def main():
@@ -45,16 +45,16 @@ def main():
     if swp_on:
         i['mode_pages'][0]['swp'] = 1
         s.modeselect6(i)
-        print 'Set SWP ON'
+        print('Set SWP ON')
         return
 
     if swp_off:
         i['mode_pages'][0]['swp'] = 0
         s.modeselect6(i)
-        print 'Set SWP OFF'
+        print('Set SWP OFF')
         return
 
-    print 'SWP is %s' % ("ON" if i['mode_pages'][0]['swp'] else "OFF")
+    print('SWP is %s' % ("ON" if i['mode_pages'][0]['swp'] else "OFF"))
 
 
 if __name__ == "__main__":

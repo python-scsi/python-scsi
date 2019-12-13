@@ -10,7 +10,7 @@ from pyscsi.utils import init_device
 
 
 def usage():
-    print 'Usage: getlbastatus.py [--help] [-l <lba>] <device>'
+    print('Usage: getlbastatus.py [--help] [-l <lba>] <device>')
 
 
 def main():
@@ -36,16 +36,16 @@ def main():
 
     r = s.readcapacity16().result
     if not r['lbpme']:
-        print 'LUN is fully provisioned.'
+        print('LUN is fully provisioned.')
         return
 
     r = s.getlbastatus(lba).result
     for i in range(len(r['lbas'])):
-        print 'LBA:%d-%d %s' % (
+        print('LBA:%d-%d %s' % (
             r['lbas'][i]['lba'],
             r['lbas'][i]['lba'] + r['lbas'][i]['num_blocks'] - 1,
             P_STATUS[r['lbas'][i]['p_status']]
-        )
+        ))
 
 
 if __name__ == "__main__":

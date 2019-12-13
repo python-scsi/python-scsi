@@ -29,20 +29,20 @@ def status(scsi, dte, se):
 
     for element in dte:
         if element['full']:
-            print 'Data Transfer Element: %d:Full VolumeTag:%s' % (
+            print('Data Transfer Element: %d:Full VolumeTag:%s' % (
                 element['element_address'] - _fdte,
-                element['primary_volume_tag'][0:32])
+                element['primary_volume_tag'][0:32]))
         else:
-            print 'Data Transfer Element: %d:Empty' % (
-                element['element_address'] - _fdte)
+            print('Data Transfer Element: %d:Empty' % (
+                element['element_address'] - _fdte))
     for element in se:
         if element['full']:
-            print '      Storage Element: %d:Full VolumeTag:%s' % (
+            print('      Storage Element: %d:Full VolumeTag:%s' % (
                 element['element_address'] - _fse + len(dte),
-                element['primary_volume_tag'][0:32])
+                element['primary_volume_tag'][0:32]))
         else:
-            print '      Storage Element: %d:Empty' % (
-                element['element_address'] - _fse + len(dte))
+            print('      Storage Element: %d:Empty' % (
+                element['element_address'] - _fse + len(dte)))
 
 
 def load(scsi, mte, dte, se, storage_element, data_transfer_element):
@@ -62,7 +62,7 @@ def load(scsi, mte, dte, se, storage_element, data_transfer_element):
     res = scsi.movemedium(_fmte,
                           storage_element + _fse - _fdte,
                           data_transfer_element + _fdte).result
-    print 'Loaded Storage Element %d into Data Transfer drive %d' % (storage_element, data_transfer_element)
+    print('Loaded Storage Element %d into Data Transfer drive %d' % (storage_element, data_transfer_element))
 
 
 def unload(scsi, mte, dte, se, storage_element, data_transfer_element):
@@ -82,14 +82,14 @@ def unload(scsi, mte, dte, se, storage_element, data_transfer_element):
     res = scsi.movemedium(_fmte,
                           data_transfer_element + _fdte,
                           storage_element + _fse - _fdte).result
-    print 'Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element)
+    print('Unloaded Data Transfer drive %d into Storage Element %d ' % (data_transfer_element, storage_element))
 
 
 def usage():
-    print 'Usage:'
-    print 'mtx.py -f <device> status'
-    print 'mtx.py -f <device> load <src> <dst>'
-    print 'mtx.py -f <device> unload <dst> <src>'
+    print('Usage:')
+    print('mtx.py -f <device> status')
+    print('mtx.py -f <device> load <src> <dst>')
+    print('mtx.py -f <device> unload <dst> <src>')
 
 
 def main():
@@ -108,7 +108,7 @@ def main():
     scsi = SCSI(init_device(device))
     i = scsi.inquiry().result
     if i['peripheral_device_type'] != INQUIRY.DEVICE_TYPE.MEDIA_CHANGER_DEVICE:
-        print '%s is not a MediaChanger device' % device
+        print('%s is not a MediaChanger device' % device)
         exit(1)
 
     eaa = scsi.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT).result['mode_pages'][0]
