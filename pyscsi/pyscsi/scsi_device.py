@@ -30,8 +30,11 @@ except ImportError as e:
 # python 2 and python 3 metaclass definitions
 _new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
-def get_inode(file) -> int:
+
+def get_inode(file):
+    #  type: (str) -> int
     return os.stat(file).st_ino
+
 
 class SCSIDevice(_new_base_class):
     """
@@ -103,7 +106,8 @@ class SCSIDevice(_new_base_class):
         """
         return self.__class__.__name__
 
-    def _is_replugged(self) -> bool:
+    def _is_replugged(self):
+        #  type: (SCSIDevice) -> bool
         ino = get_inode(self._file_name)
         return ino != self._ino
 
