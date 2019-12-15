@@ -3,7 +3,7 @@
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -23,6 +23,7 @@ def main():
 
         d = ReadCapacity16.unmarshall_cdb(ReadCapacity16.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

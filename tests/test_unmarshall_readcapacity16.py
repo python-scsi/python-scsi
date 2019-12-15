@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 

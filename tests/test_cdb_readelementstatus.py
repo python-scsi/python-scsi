@@ -4,7 +4,7 @@ from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -31,6 +31,7 @@ def main():
 
         d = ReadElementStatus.unmarshall_cdb(ReadElementStatus.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

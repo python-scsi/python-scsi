@@ -3,7 +3,7 @@
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -40,6 +40,7 @@ def main():
 
         d = Inquiry.unmarshall_cdb(Inquiry.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

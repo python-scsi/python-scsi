@@ -2,7 +2,7 @@
 # coding: utf-8
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -21,6 +21,7 @@ def main():
 
         d = TestUnitReady.unmarshall_cdb(TestUnitReady.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

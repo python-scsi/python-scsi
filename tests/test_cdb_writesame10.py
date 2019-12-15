@@ -3,7 +3,7 @@
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_cdb_writesame10 import WriteSame10
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -72,6 +72,7 @@ def main():
 
         d = WriteSame10.unmarshall_cdb(WriteSame10.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

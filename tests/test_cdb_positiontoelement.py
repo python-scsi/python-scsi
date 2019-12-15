@@ -2,7 +2,7 @@
 # coding: utf-8
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_ba_to_int
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_cdb_positiontoelement import PositionToElement
 
 
@@ -23,6 +23,7 @@ def main():
 
         d = PositionToElement.unmarshall_cdb(PositionToElement.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()

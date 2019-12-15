@@ -3,7 +3,7 @@
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_cdb_write16 import Write16
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 
 def main():
@@ -52,6 +52,7 @@ def main():
 
         d = Write16.unmarshall_cdb(Write16.marshall_cdb(cdb))
         assert d == cdb
+
 
 if __name__ == "__main__":
     main()
