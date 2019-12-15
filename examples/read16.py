@@ -19,7 +19,6 @@ def ba_to_hex(ba):
 def main(device):
     with SCSI(device, blocksize=512) as s:
         r = s.read16(1, 1,).datain
-        print(r)
         print('Read16 - GPT Header')
         print('==========================================\n')
         print('signature: %s' % r[:8])
