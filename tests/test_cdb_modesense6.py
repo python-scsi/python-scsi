@@ -3,7 +3,7 @@
 from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6
-from .mock_device import MockDevice, MockSCSI
+from mock_device import MockDevice, MockSCSI
 
 
 def main():

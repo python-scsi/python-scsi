@@ -3,7 +3,7 @@
 
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import sbc
-from .mock_device import MockDevice, MockSCSI
+from mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 
 

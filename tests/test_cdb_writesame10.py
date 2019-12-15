@@ -3,7 +3,7 @@
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_cdb_writesame10 import WriteSame10
-from .mock_device import MockDevice, MockSCSI
+from mock_device import MockDevice, MockSCSI
 
 
 def main():
