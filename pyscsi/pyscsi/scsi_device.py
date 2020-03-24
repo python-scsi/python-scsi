@@ -26,17 +26,13 @@ try:
 except ImportError as e:
     _has_sgio = False
 
-# make a new base class with the metaclass this should solve the problem with the
-# python 2 and python 3 metaclass definitions
-_new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
-
 
 def get_inode(file):
     #  type: (str) -> int
     return os.stat(file).st_ino
 
 
-class SCSIDevice(_new_base_class):
+class SCSIDevice(metaclass=ExMETA):
     """
     The scsi device class
 
