@@ -46,6 +46,7 @@ from cpython.bytearray cimport PyByteArray_FromStringAndSize
 
 from libc.errno cimport errno
 from libc.stdlib cimport calloc
+from posix.ioctl cimport ioctl
 
 cdef extern from "scsi/sg.h":
     cdef enum:
@@ -87,12 +88,6 @@ cdef extern from "scsi/sg.h":
         int resid
         unsigned int duration
         unsigned int info
-
-
-# Fake definition for ioctl() to make sure that it can be called with
-# our custom buffer. See https://github.com/cython/cython/issues/3457 .
-cdef extern from "sys/ioctl.h":
-    cdef int ioctl(int, unsigned long, sg_io_hdr_t*)
 
 
 class CheckConditionError(Exception):
