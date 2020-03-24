@@ -1,3 +1,4 @@
+# cython: language_level=3
 # ========================================================================== **
 #                                sgiomodule.c
 #
@@ -121,7 +122,7 @@ def execute(
         raise MemoryError()
 
     # Prepare the sg device I/O header structure.
-    io_hdr.interface_id = 'S'
+    io_hdr.interface_id = b'S'
     io_hdr.cmd_len = len(cdb)
     io_hdr.iovec_count = 0
     io_hdr.cmdp = cdb

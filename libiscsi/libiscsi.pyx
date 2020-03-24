@@ -1,3 +1,4 @@
+# cython: language_level=3
 #
 #  Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 #  Copyright (C) 2020 by Diego Elio Pettenò <flameeyes@flameeyes.com>
