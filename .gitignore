@@ -1,5 +1,6 @@
 *.so
 *~
+.mypy_cache/
 /build/
 /libiscsi/libiscsi.c
 /linux_sgio/linux_sgio.c
