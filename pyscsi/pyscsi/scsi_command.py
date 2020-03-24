@@ -21,12 +21,8 @@
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 from pyscsi.utils.converter import encode_dict, decode_bits
 
-# make a new base class with the metaclass this should solve the problem with the
-# python 2 and python 3 metaclass definitions
-_new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
-
-class SCSICommand(_new_base_class):
+class SCSICommand(metaclass=ExMETA):
     """
     The base class for a derived scsi command class
     """

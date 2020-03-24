@@ -26,12 +26,8 @@ try:
 except ImportError as e:
     _has_iscsi = False
 
-# make a new base class with the metaclass this should solve the problem with the
-# python 2 and python 3 metaclass definitions
-_new_base_class = ExMETA('SCSIDeviceCommandExceptionMeta', (object,), {})
 
-
-class ISCSIDevice(_new_base_class):
+class ISCSIDevice(metaclass=ExMETA):
     """
     The iscsi device class
 

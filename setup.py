@@ -40,5 +40,6 @@ setup(
     author_email='ronniesahlberg@gmail.com',
     description='Module for calling SCSI devices from Python',
     packages=find_packages(),
-    ext_modules=cythonize(configured_extensions)
+    ext_modules=cythonize(configured_extensions),
+    python_requires="~=3.7",
 )
