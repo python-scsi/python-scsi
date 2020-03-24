@@ -34,7 +34,7 @@ else:
 
 setup(
     name='PYSCSI',
-    version='1.0',
+    version='2',
     license='LGPLv2.1',
     author='Ronnie Sahlberg',
     author_email='ronniesahlberg@gmail.com',
