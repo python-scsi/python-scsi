@@ -1,28 +1,28 @@
 # ========================================================================== **
 #                                sgiomodule.c
-# 
+#
 # Copyright:
 #  Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 #  Copyright (C) 2014 by Christopher R. Hertel <crh@ubiqx.org>
 #  Copyright (C) 2016-2020 by Diego Elio Pettenò <flameeyes@flameeyes.com>
-# 
+#
 # Description: A Python binding for the Linux SCSI Generic (sg) Driver.
-# 
+#
 # -------------------------------------------------------------------------- **
 # License:
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU Lesser General Public License as published
 #  by the Free Software Foundation; either version 2.1 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #  GNU Lesser General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with this program; if not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # -------------------------------------------------------------------------- **
 # References:
 #  + Linux SCSI Generic (sg) Driver: http://sg.danny.cz/sg/
@@ -32,13 +32,13 @@
 #      https://docs.python.org/2/extending/extending.html
 #  + Python Extension Programming with C:
 #      http://www.tutorialspoint.com/python/python_further_extensions.htm
-# 
+#
 # See Also:
 #  + The Linux SCSI Generic (sg) HOWTO:
 #      (Though out of date, this Linux 2.4 doc provides useful info.)
 #      http://www.tldp.org/HOWTO/SCSI-Generic-HOWTO/index.html
-# 
-# 
+#
+#
 # ========================================================================== **
 #
 
@@ -72,7 +72,7 @@ cdef extern from "scsi/sg.h":
         unsigned char mx_sb_len
         unsigned short int iovec_count
         unsigned int dxfer_len
-        void * dxferp
+        unsigned char * dxferp
         unsigned char * cmdp
         unsigned char * sbp
         unsigned int timeout
@@ -92,7 +92,7 @@ cdef extern from "scsi/sg.h":
 
 class CheckConditionError(Exception):
     """The target is reporting an error.
-    
+
     Send a Request Sense command to retrieve error information.
 
     See https://en.wikipedia.org/wiki/SCSI_check_condition for details.
@@ -116,10 +116,8 @@ def execute(
     cdef sg_io_hdr_t io_hdr
     cdef unsigned char *sense = <unsigned char *> calloc(
         32, sizeof(unsigned char))
-    cdef unsigned char *input = <unsigned char *> calloc(
-        len(data_in) + 1, sizeof(unsigned char))
-
-    if not sense or not input:
+    cdef unsigned char[:] input_view = data_in
+    if not sense:
         raise MemoryError()
 
     # Prepare the sg device I/O header structure.
@@ -137,11 +135,11 @@ def execute(
     elif len(data_out):
         io_hdr.dxfer_direction = SG_DXFER_TO_DEV
         io_hdr.dxfer_len = len(data_out)
-        io_hdr.dxferp = <void*>data_out
+        io_hdr.dxferp = data_out
     elif len(data_in):
         io_hdr.dxfer_direction = SG_DXFER_FROM_DEV
         io_hdr.dxfer_len = len(data_in)
-        io_hdr.dxferp = input
+        io_hdr.dxferp = &input_view[0]
     else:
         io_hdr.dxfer_len = 0
         io_hdr.dxferp = NULL
@@ -156,11 +154,6 @@ def execute(
             raise CheckConditionError(sense)
         else:
             raise UnspecifiedError()
-
-    input_array = PyByteArray_FromStringAndSize(
-        <char*>input, io_hdr.resid)
-    for idx in range(len(input_array)):
-        data_in[idx] = input_array[idx]
 
     # Return the actual transfer written.
     return io_hdr.resid
