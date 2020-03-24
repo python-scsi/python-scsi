@@ -18,11 +18,10 @@
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
-from pyscsi.pyiscsi.iscsi_url import ISCSIUrl
 
 
 try:
-    import libiscsi._libiscsi as _iscsi
+    import libiscsi
     _has_iscsi = True
 except ImportError as e:
     _has_iscsi = False
@@ -89,22 +88,16 @@ class ISCSIDevice(_new_base_class):
         """
 
         """
-        self._iscsi = _iscsi.iscsi_create_context(device)
-        self._iscsi_url = ISCSIUrl(self._iscsi,
-                                   self._file_name)
-        _iscsi.iscsi_set_targetname(self._iscsi,
-                                    self._iscsi_url.target)
-        _iscsi.iscsi_set_session_type(self._iscsi,
-                                        _iscsi.ISCSI_SESSION_NORMAL)
-        _iscsi.iscsi_set_header_digest(self._iscsi,
-                                         _iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
-        _iscsi.iscsi_full_connect_sync(self._iscsi,
-                                       self._iscsi_url.portal,
+        self._iscsi = libisci.Context(device)
+        self._iscsi_url = libiscsi.URL(self._iscsi, self._file_name)
+        self._iscsi.set_targetname(self._iscsi_url.target)
+        self._iscsi.set_session_type(libiscsi.ISCSI_SESSION_NORMAL)
+        self._iscsi.set_header_digest(libiscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+        self._iscsi.full_connect_sync(self._iscsi_url.portal,
                                        self._iscsi_url.lun)
 
     def close(self):
-        # we may need to do more teardown here ?
-        _iscsi.iscsi_destroy_context(self._iscsi)
+        self._iscsi.disconnect()
 
     def execute(self, cmd):
         """

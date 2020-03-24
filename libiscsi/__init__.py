@@ -1,1 +1,1 @@
-from libiscsi import *
+from ._libiscsi import *
