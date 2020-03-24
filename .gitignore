@@ -1,0 +1,6 @@
+*.so
+*~
+/build/
+/libiscsi/libiscsi.c
+/linux_sgio/linux_sgio.c
+__pycache__/
