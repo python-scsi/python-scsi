@@ -19,14 +19,14 @@
 
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
-from pyscsi.utils.converter import encode_dict, decode_bits
+from pyscsi.utils.converter import CheckDict, encode_dict, decode_bits
 
 
 class SCSICommand(metaclass=ExMETA):
     """
     The base class for a derived scsi command class
     """
-    _cdb_bits = {}
+    _cdb_bits: CheckDict = {}
     _cdb = None
     _sense = None
     _datain = None
