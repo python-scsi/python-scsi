@@ -6,19 +6,29 @@ from subprocess import check_call as _call
 from subprocess import CalledProcessError
 
 from distutils.command.build import build as _build
-from distutils.core import setup, Extension
+from setuptools import Extension, setup
+
+try:
+    from Cython.Build import cythonize
+
+    src_extension = ".pyx"
+except ImportError:
+    src_extension = ".c"
+
+    def cythonize(extensions):
+        return extensions
 
 
 # some helpers
-linux_sgio_path = _path.relpath(_path.join(_path.dirname(__file__), "linux_sgio"))
 libiscsi_path = _path.relpath(_path.join(_path.dirname(__file__), "libiscsi"))
 
 libiscsi_cmd = "make -C %s" % libiscsi_path
 
-# First we are going to build our ext_modules list. We asume that a normal install will build both Extentions!
-# to exclude them use the new build switches --without-sgio and without-libiscsi
+# First we are going to build our ext_modules list. We assume that a
+# normal install will build both Extentions!  To exclude them use the
+# new build switches --without-sgio and without-libiscsi
 linux_sgio_module = Extension(name='linux_sgio.linux_sgio',
-                              sources=['linux_sgio/sgiomodule.c'])
+                              sources=['linux_sgio/linux_sgio' + src_extension])
 
 libiscsi_module = Extension(name='libiscsi._libiscsi',
                             sources=['libiscsi/libiscsi_wrap.c'],
@@ -158,7 +168,7 @@ setup_dict = {'name': 'PYSCSI',
               'author_email': 'ronniesahlberg@gmail.com',
               'description': 'Module for calling SCSI devices from Python',
               'packages': ['pyscsi', 'pyscsi.pyscsi', 'pyscsi.pyiscsi', 'pyscsi.utils', 'linux_sgio', 'libiscsi'],
-              'ext_modules': [linux_sgio_module, libiscsi_module],
+              'ext_modules': cythonize([linux_sgio_module]),
               'cmdclass': {'build': PyScsiBuildCommand, }, }
 
 # TODO: we might want to do a more sane check if we can build and install PYSCSI, LINUX_SGIO and LIBISCSI

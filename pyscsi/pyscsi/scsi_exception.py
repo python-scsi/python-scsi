@@ -60,11 +60,7 @@ class SCSIDeviceExceptionMeta(type):
         class CheckCondition(SCSICheckCondition):
             pass
 
-        class SCSISGIOError(Exception):
-            pass
-
         attributes.update({'CheckCondition': CheckCondition})
-        attributes.update({'SCSISGIOError': SCSISGIOError})
 
         return type.__new__(mcs,
                             cls,
