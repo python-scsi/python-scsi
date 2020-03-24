@@ -2,8 +2,7 @@
 
 import sys
 
-from distutils.command.build import build as _build
-from setuptools import Extension, setup
+from setuptools import Extension, find_packages, setup
 
 try:
     from Cython.Build import cythonize
@@ -21,14 +20,14 @@ if '--without-sgio' in sys.argv:
     sys.argv.remove('--without-sgio')
 else:
     configured_extensions.append(
-        Extension(name='linux_sgio.linux_sgio',
+        Extension(name='linux_sgio',
                   sources=['linux_sgio/linux_sgio' + src_extension]))
 
 if '--without-libiscsi' in sys.argv:
     sys.argv.remove('--without-libiscsi')
 else:
     configured_extensions.append(
-        Extension(name='libiscsi._libiscsi',
+        Extension(name='libiscsi',
                   sources=['libiscsi/libiscsi' + src_extension],
                   libraries=['iscsi']))
 
@@ -40,7 +39,7 @@ setup_dict = {'name': 'PYSCSI',
               'author': 'Ronnie Sahlberg',
               'author_email': 'ronniesahlberg@gmail.com',
               'description': 'Module for calling SCSI devices from Python',
-              'packages': ['pyscsi', 'pyscsi.pyscsi', 'pyscsi.pyiscsi', 'pyscsi.utils', 'linux_sgio', 'libiscsi'],
+              'packages': find_packages(),
               'ext_modules': cythonize(configured_extensions)
 }
 
