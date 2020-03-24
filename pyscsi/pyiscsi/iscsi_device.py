@@ -104,34 +104,26 @@ class ISCSIDevice(_new_base_class):
         execute a scsi command
         :param cmd: a scsi command
         """
-        _dir = _iscsi.SCSI_XFER_NONE
-        _xferlen = 0
+        dir = libiscsi.SCSI_XFER_NONE
+        xferlen = 0
         if len(cmd.datain):
-            _dir = _iscsi.SCSI_XFER_READ
-            _xferlen = len(cmd.datain)
+            dir = libiscsi.SCSI_XFER_READ
+            xferlen = len(cmd.datain)
         if len(cmd.dataout):
-            _dir = _iscsi.SCSI_XFER_WRITE
-            _xferlen = len(cmd.dataout)
-        _task = _iscsi.scsi_create_task(cmd.cdb,
-                                          _dir,
-                                          _xferlen)
-        if len(cmd.datain):
-            _iscsi.scsi_task_add_data_in_buffer(_task,
-                                                cmd.datain)
-        if len(cmd.dataout):
-            _iscsi.scsi_task_add_data_out_buffer(_task,
-                                                 cmd.dataout)
-        _iscsi.iscsi_scsi_command_sync(self._iscsi,
-                                       self._iscsi_url.lun,
-                                         _task,
-                                         None)
-        _status = _iscsi.scsi_task_get_status(_task,
-                                                None)
-        if _status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            dir = libiscsi.SCSI_XFER_WRITE
+            xferlen = len(cmd.dataout)
+        task = libiscsi.Task(cmd.cdb, dir, xferlen)
+        self._iscsi.command(
+            self._iscsi_url.lun,
+            _task,
+            cmd.dataout,
+            cmd.datain)
+        if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            # No sense information propagated.
             raise self.CheckCondition(cmd.sense)
-        if _status == scsi_enum_command.SCSI_STATUS.GOOD:
+        if task.status == scsi_enum_command.SCSI_STATUS.GOOD:
             return
-        raise self.SCSISGIOError
+        raise RuntimeError
 
     @property
     def opcodes(self):

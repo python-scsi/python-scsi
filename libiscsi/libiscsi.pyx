@@ -1,17 +1,17 @@
-# 
+#
 #  Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 #  Copyright (C) 2020 by Diego Elio Pettenò <flameeyes@flameeyes.com>
-# 
+#
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation; either version 2.1 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with this program; if not, see <http://www.gnu.org/licenses/>.
 #
@@ -23,6 +23,15 @@ cdef extern from "iscsi/scsi-lowlevel.h":
         SCSI_XFER_NONE
         SCSI_XFER_READ
         SCSI_XFER_WRITE
+
+    cdef struct scsi_task:
+        pass
+
+    cdef struct scsi_sense:
+        pass
+
+    scsi_task *scsi_create_task(
+        int cdb_size, unsigned char *cdb, int xfer_dir, int expxferlen)
 
 
 cdef extern from "iscsi/iscsi.h":
@@ -56,12 +65,8 @@ cdef extern from "iscsi/iscsi.h":
         int lun
         iscsi_context *iscsi
 
-    cdef struct scsi_task:
-        pass
-
     cdef struct iscsi_data:
-        size_t size
-        unsigned char *data
+        pass
 
     cdef iscsi_context *iscsi_create_context(const char *initiator_name)
     cdef iscsi_url *iscsi_parse_full_url(iscsi_context *iscsi, const char* url)
@@ -70,6 +75,30 @@ cdef extern from "iscsi/iscsi.h":
     cdef int iscsi_set_header_digest(iscsi_context *iscsi, iscsi_header_digest header_digest)
     cdef int iscsi_full_connect_sync(iscsi_context *iscsi, const char *portal, int lun)
     cdef int iscsi_disconnect(iscsi_context *iscsi)
+
+    cdef scsi_task_add_data_in_buffer(scsi_task *task, int len, unsigned char *buf)
+    cdef scsi_task_add_data_out_buffer(scsi_task *task, int len, unsigned char *buf)
+
+    cdef scsi_task *iscsi_scsi_command_sync(
+        iscsi_context *iscsi, int lun, scsi_task *task, iscsi_data *data)
+    cdef int scsi_task_get_status(scsi_task *task, scsi_sense *sense)
+
+
+cdef class Task:
+    cdef scsi_task *_task
+    cdef bint _has_datain
+    cdef unsigned char[:] _datain_view
+    cdef bint _has_dataout
+    cdef unsigned char[:] _dataout_view
+
+    def __init__(self, bytes cdb, scsi_xfer_dir direction, size_t xferlen):
+        self._task = scsi_create_task(len(cdb), cdb, direction, xferlen)
+        self._has_datain = False
+        self._has_dataout = False
+
+    @property
+    def status(self):
+        return scsi_task_get_status(self._task, NULL)
 
 
 cdef class Context:
@@ -99,6 +128,18 @@ cdef class Context:
     def disconnect(self):
         if iscsi_disconnect(self._ctx) < 0:
             raise RuntimeError("Disconnection error.")
+
+    def command(self, int lun, Task task, bytearray data_out, bytearray data_in):
+        # Get the data in/out bytearrays here so that Python can't change them.
+        cdef unsigned char[:] data_out_view = data_out
+        cdef unsigned char[:] data_in_view = data_in
+
+        if len(data_out):
+            scsi_task_add_data_out_buffer(task._task, len(data_out), &data_out_view[0])
+        if len(data_in):
+            scsi_task_add_data_in_buffer(task._task, len(data_in), &data_in_view[0])
+
+        iscsi_scsi_command_sync(self._ctx, lun, task._task, NULL)
 
 
 cdef class URL:
