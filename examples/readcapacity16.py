@@ -11,7 +11,7 @@ def main(device):
         print('ReadCapacity16')
         print('==========================================\n')
         r = s.readcapacity16().result
-        for k, v in r.iteritems():
+        for k, v in r.items():
             print('%s - %s' % (k, v))
 
 
