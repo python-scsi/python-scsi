@@ -21,7 +21,7 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 import os
 
 try:
-    import linux_sgio
+    import sgio
     _has_sgio = True
 except ImportError as e:
     _has_sgio = False
@@ -134,12 +134,12 @@ class SCSIDevice(metaclass=ExMETA):
                 self.open()
 
         try:
-            linux_sgio.execute(
+            sgio.execute(
                 self._file,
                 cmd.cdb,
                 cmd.dataout,
                 cmd.datain)
-        except linux_sgio.CheckConditionError as error:
+        except sgio.CheckConditionError as error:
             self.CheckCondition(error.sense)
 
     @property

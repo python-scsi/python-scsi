@@ -16,13 +16,6 @@ except ImportError:
 
 configured_extensions = []
 
-if '--without-sgio' in sys.argv:
-    sys.argv.remove('--without-sgio')
-elif sys.platform[:5] == 'linux':
-    configured_extensions.append(
-        Extension(name='linux_sgio',
-                  sources=['linux_sgio/linux_sgio' + src_extension]))
-
 if '--without-libiscsi' in sys.argv:
     sys.argv.remove('--without-libiscsi')
 else:
@@ -42,4 +35,7 @@ setup(
     packages=find_packages(),
     ext_modules=cythonize(configured_extensions),
     python_requires="~=3.7",
+    extras_require={
+        "sgio": ["cython-sgio"],
+    }
 )
