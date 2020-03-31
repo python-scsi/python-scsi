@@ -21,7 +21,7 @@ import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 
 
 try:
-    import libiscsi
+    import iscsi
     _has_iscsi = True
 except ImportError as e:
     _has_iscsi = False
@@ -85,10 +85,10 @@ class ISCSIDevice(metaclass=ExMETA):
 
         """
         self._iscsi = libisci.Context(device)
-        self._iscsi_url = libiscsi.URL(self._iscsi, self._file_name)
+        self._iscsi_url = iscsi.URL(self._iscsi, self._file_name)
         self._iscsi.set_targetname(self._iscsi_url.target)
-        self._iscsi.set_session_type(libiscsi.ISCSI_SESSION_NORMAL)
-        self._iscsi.set_header_digest(libiscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+        self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
+        self._iscsi.set_header_digest(iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
         self._iscsi.full_connect_sync(self._iscsi_url.portal,
                                        self._iscsi_url.lun)
 
@@ -100,15 +100,15 @@ class ISCSIDevice(metaclass=ExMETA):
         execute a scsi command
         :param cmd: a scsi command
         """
-        dir = libiscsi.SCSI_XFER_NONE
+        dir = iscsi.SCSI_XFER_NONE
         xferlen = 0
         if len(cmd.datain):
-            dir = libiscsi.SCSI_XFER_READ
+            dir = iscsi.SCSI_XFER_READ
             xferlen = len(cmd.datain)
         if len(cmd.dataout):
-            dir = libiscsi.SCSI_XFER_WRITE
+            dir = iscsi.SCSI_XFER_WRITE
             xferlen = len(cmd.dataout)
-        task = libiscsi.Task(cmd.cdb, dir, xferlen)
+        task = iscsi.Task(cmd.cdb, dir, xferlen)
         self._iscsi.command(
             self._iscsi_url.lun,
             _task,
