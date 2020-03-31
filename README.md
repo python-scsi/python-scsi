@@ -5,11 +5,10 @@ It contains python classes to create and send SCSI commands to devices
 accessible via:
 
 * SGIO: /dev/sg* devices using ioctl(SG_IO)
-  Only available for Linux
+  Depends on [cython-sgio](https://github.com/python-scsi/cython-sgio).
 
 * iSCSI: iscsi://<server>/<iqn>/<lun>
-  Available on all platforms which have libiscsi-python
-  See https://github.com/sahlberg/libiscsi-python
+  Depends on [cython-iscsi](https://github.com/python-scsi/cython-iscsi).
 
 These classes also provide interfaces to marshall/unmarshall both CDBs
 as well as DATA-IN/OUT buffers.
@@ -36,18 +35,14 @@ It is also available as a downloadable zip archive from:
 
 Building and installing
 =======================
-This module depends on [libiscsi](https://github.com/sahlberg/libiscsi) and [SWIG](http://www.swig.org) libraries. You must first install these libraries before you can build this module. In debian families, you can install these dependencies via:
 
-    $ apt install swig libiscsi-dev
-    
-Building the module:
+To build and install from the repository:
 
-    $ python setup.py build
-    
-Installing the module:
+    python-scsi $ pip install .[iscsi,sgio]
 
-    $ python setup.py install
+You can avoid installing the optional dependencies by omitting the "extras":
 
+    python-scsi $ pip install .
 
 Unit testing
 ============
