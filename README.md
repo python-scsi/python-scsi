@@ -1,5 +1,14 @@
 python-scsi
 ===========
+
+#### **NOTE:**
+
+**This branch will be here for posterity, since master will move on to use [cython-sgio](https://github.com/python-scsi/cython-sgio) 
+and [cython-iscsi](https://github.com/python-scsi/cython-iscsi) from now on.
+The old code of linux_sgio and libiscsi is still valid and usable but will be removed from master branch!**
+      
+      
+      
 python-scsi is a SCSI initiator for python.
 It contains python classes to create and send SCSI commands to devices
 accessible via:
