@@ -15,7 +15,7 @@ def main(device):
         print('ReportLuns')
         print('==========================================\n')
         r = s.reportluns().result
-        for k, v in r.iteritems():
+        for k, v in r.items():
             print('%s - %s' % (k, v))
 
 
