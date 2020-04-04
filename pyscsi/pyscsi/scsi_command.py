@@ -54,7 +54,6 @@ class SCSICommand(_new_base_class):
         # on the class and not on the instance of the class. that might be wrong ...
         SCSICommand._cdb_bits = self._cdb_bits
         SCSICommand._cdb = SCSICommand.init_cdb(opcode)
-        self.sense = bytearray(32)
         self.dataout = bytearray(dataout_alloclen)
         self.datain = bytearray(datain_alloclen)
         self.result = {}

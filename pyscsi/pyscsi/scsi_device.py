@@ -21,7 +21,7 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 import os
 
 try:
-    import linux_sgio
+    import sgio
     _has_sgio = True
 except ImportError as e:
     _has_sgio = False
@@ -70,7 +70,7 @@ class SCSIDevice(_new_base_class):
         self._opcodes = scsi_enum_command.spc
         self._file_name = device
         self._read_write = readwrite
-        self._fd = None
+        self._file = None
         self._ino = None
         self._detect_replugged = detect_replugged
 
@@ -118,12 +118,12 @@ class SCSIDevice(_new_base_class):
         :param read_write:
         :return:
         """
-        self._fd = linux_sgio.open(self._file_name,
-                                   bool(self._read_write))
+        self._file = open(self._file_name,
+                          'w+b' if self._read_write else 'rb')
         self._ino = get_inode(self._file_name)
 
     def close(self):
-        linux_sgio.close(self._fd)
+        self._file.close()
 
     def execute(self, cmd):
         """
@@ -137,24 +137,14 @@ class SCSIDevice(_new_base_class):
             finally:
                 self.open()
 
-        _dir = linux_sgio.DXFER_NONE
-        if len(cmd.datain) and len(cmd.dataout):
-            raise NotImplemented('Indirect IO is not supported')
-        elif len(cmd.datain):
-            _dir = linux_sgio.DXFER_FROM_DEV
-        elif len(cmd.dataout):
-            _dir = linux_sgio.DXFER_TO_DEV
-
-        status = linux_sgio.execute(self._fd,
-                                    _dir,
-                                    cmd.cdb,
-                                    cmd.dataout,
-                                    cmd.datain,
-                                    cmd.sense)
-        if status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
-            raise self.CheckCondition(cmd.sense)
-        if status == scsi_enum_command.SCSI_STATUS.SGIO_ERROR:
-            raise self.SCSISGIOError
+        try:
+            sgio.execute(
+                self._file,
+                cmd.cdb,
+                cmd.dataout,
+                cmd.datain)
+        except sgio.CheckConditionError as error:
+            self.CheckCondition(error.sense)
 
     @property
     def opcodes(self):

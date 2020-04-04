@@ -18,11 +18,10 @@
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
-from pyscsi.pyiscsi.iscsi_url import ISCSIUrl
 
 
 try:
-    import libiscsi._libiscsi as _iscsi
+    import iscsi
     _has_iscsi = True
 except ImportError as e:
     _has_iscsi = False
@@ -89,56 +88,42 @@ class ISCSIDevice(_new_base_class):
         """
 
         """
-        self._iscsi = _iscsi.iscsi_create_context(device)
-        self._iscsi_url = ISCSIUrl(self._iscsi,
-                                   self._file_name)
-        _iscsi.iscsi_set_targetname(self._iscsi,
-                                    self._iscsi_url.target)
-        _iscsi.iscsi_set_session_type(self._iscsi,
-                                        _iscsi.ISCSI_SESSION_NORMAL)
-        _iscsi.iscsi_set_header_digest(self._iscsi,
-                                         _iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
-        _iscsi.iscsi_full_connect_sync(self._iscsi,
-                                       self._iscsi_url.portal,
-                                       self._iscsi_url.lun)
+        self._iscsi = libisci.Context(device)
+        self._iscsi_url = iscsi.URL(self._iscsi, self._file_name)
+        self._iscsi.set_targetname(self._iscsi_url.target)
+        self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
+        self._iscsi.set_header_digest(iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+        self._iscsi.full_connect_sync(self._iscsi_url.portal,
+                                      self._iscsi_url.lun)
 
     def close(self):
-        # we may need to do more teardown here ?
-        _iscsi.iscsi_destroy_context(self._iscsi)
+        self._iscsi.disconnect()
 
     def execute(self, cmd):
         """
         execute a scsi command
         :param cmd: a scsi command
         """
-        _dir = _iscsi.SCSI_XFER_NONE
-        _xferlen = 0
+        dir = iscsi.SCSI_XFER_NONE
+        xferlen = 0
         if len(cmd.datain):
-            _dir = _iscsi.SCSI_XFER_READ
-            _xferlen = len(cmd.datain)
+            dir = iscsi.SCSI_XFER_READ
+            xferlen = len(cmd.datain)
         if len(cmd.dataout):
-            _dir = _iscsi.SCSI_XFER_WRITE
-            _xferlen = len(cmd.dataout)
-        _task = _iscsi.scsi_create_task(cmd.cdb,
-                                          _dir,
-                                          _xferlen)
-        if len(cmd.datain):
-            _iscsi.scsi_task_add_data_in_buffer(_task,
-                                                cmd.datain)
-        if len(cmd.dataout):
-            _iscsi.scsi_task_add_data_out_buffer(_task,
-                                                 cmd.dataout)
-        _iscsi.iscsi_scsi_command_sync(self._iscsi,
-                                       self._iscsi_url.lun,
-                                         _task,
-                                         None)
-        _status = _iscsi.scsi_task_get_status(_task,
-                                                None)
-        if _status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            dir = iscsi.SCSI_XFER_WRITE
+            xferlen = len(cmd.dataout)
+        task = iscsi.Task(cmd.cdb, dir, xferlen)
+        self._iscsi.command(
+            self._iscsi_url.lun,
+            task,
+            cmd.dataout,
+            cmd.datain)
+        if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            # No sense information propagated.
             raise self.CheckCondition(cmd.sense)
-        if _status == scsi_enum_command.SCSI_STATUS.GOOD:
+        if task.status == scsi_enum_command.SCSI_STATUS.GOOD:
             return
-        raise self.SCSISGIOError
+        raise RuntimeError
 
     @property
     def opcodes(self):
