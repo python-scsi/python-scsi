@@ -115,7 +115,7 @@ class ISCSIDevice(_new_base_class):
         task = iscsi.Task(cmd.cdb, dir, xferlen)
         self._iscsi.command(
             self._iscsi_url.lun,
-            _task,
+            task,
             cmd.dataout,
             cmd.datain)
         if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
