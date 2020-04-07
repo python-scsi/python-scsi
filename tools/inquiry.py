@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
-from __future__ import print_function
+
 import sys
 
 from pyscsi.pyscsi.scsi import SCSI
@@ -141,7 +141,7 @@ def inquiry_device_identification(s):
                cmd.CODE_SET[_d[idx]['code_set']]))
         print('    association:%d [%s]' % (_d[idx]['association'],
                                            cmd.ASSOCIATION[_d[idx]['association']]))
-        for k, v in _d[idx]['designator'].iteritems():
+        for k, v in _d[idx]['designator'].items():
             print('      %s: %s' % (k, v))
 
 
@@ -254,7 +254,7 @@ def main():
             print('=============================================\n')
             cmd = s.inquiry(evpd=1, page_code=page_code)
             i = cmd.result
-            for k, v in i.iteritems():
+            for k, v in i.items():
                 print('%s - %s' % (k, v))
         except SCSICheckCondition as ex:
             # if you want a print out of the sense data dict uncomment the next line

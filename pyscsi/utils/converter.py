@@ -16,11 +16,15 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-from __future__ import print_function
 
-__all_ = ['scsi_int_to_ba', 'scsi_ba_to_int', 'decode_bits',
-          'encode_dict', 'print_data', 'get_opcode', ]
+from typing import Mapping, Sequence, Tuple, Union
 
+CheckDict = Mapping[
+    str, Union[
+        Sequence[int],
+        Tuple[int, int],
+        Tuple[str, int, int]
+    ]]
 
 def scsi_int_to_ba(to_convert=0,
                    array_size=4):

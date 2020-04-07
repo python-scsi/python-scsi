@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-from __future__ import print_function
+
 from pyscsi.utils.converter import decode_bits
 
 #
@@ -978,7 +978,7 @@ class SCSICheckCondition(Exception):
             self._describe_ascq(), self._ascq())
 
     def print_data(self):
-        for k, v in self.data.iteritems():
+        for k, v in self.data.items():
             print('%s -> 0x%02X' % (k, v))
 
     @staticmethod
