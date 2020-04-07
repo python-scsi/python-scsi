@@ -29,35 +29,35 @@ class CdbInquiryTest(unittest.TestCase):
             # cdb for standard page request
             i = s.inquiry(alloclen=128)
             cdb = i.cdb
-            assert cdb[0] == s.device.opcodes.INQUIRY.value
-            assert cdb[1:3] == bytearray(2)
-            assert scsi_ba_to_int(cdb[3:5]) == 128
-            assert cdb[5] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.INQUIRY.value)
+            self.assertEqual(cdb[1:3], bytearray(2))
+            self.assertEqual(scsi_ba_to_int(cdb[3:5]), 128)
+            self.assertEqual(cdb[5], 0)
             cdb = i.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.INQUIRY.value
-            assert cdb['evpd'] == 0
-            assert cdb['page_code'] == 0
-            assert cdb['alloc_len'] == 128
+            self.assertEqual(cdb['opcode'], s.device.opcodes.INQUIRY.value)
+            self.assertEqual(cdb['evpd'], 0)
+            self.assertEqual(cdb['page_code'], 0)
+            self.assertEqual(cdb['alloc_len'], 128)
 
             d = Inquiry.unmarshall_cdb(Inquiry.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
             # supported vpd pages
             i = s.inquiry(evpd=1, page_code=0x88, alloclen=300)
             cdb = i.cdb
-            assert cdb[0] == s.device.opcodes.INQUIRY.value
-            assert cdb[1] == 0x01
-            assert cdb[2] == 0x88
-            assert scsi_ba_to_int(cdb[3:5]) == 300
-            assert cdb[5] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.INQUIRY.value)
+            self.assertEqual(cdb[1], 0x01)
+            self.assertEqual(cdb[2], 0x88)
+            self.assertEqual(scsi_ba_to_int(cdb[3:5]), 300)
+            self.assertEqual(cdb[5], 0)
             cdb = i.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.INQUIRY.value
-            assert cdb['evpd'] == 1
-            assert cdb['page_code'] == 0x88
-            assert cdb['alloc_len'] == 300
+            self.assertEqual(cdb['opcode'], s.device.opcodes.INQUIRY.value)
+            self.assertEqual(cdb['evpd'], 1)
+            self.assertEqual(cdb['page_code'], 0x88)
+            self.assertEqual(cdb['alloc_len'], 300)
 
             d = Inquiry.unmarshall_cdb(Inquiry.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

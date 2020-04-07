@@ -22,11 +22,11 @@ from pyscsi.pyscsi.scsi_enum_command import spc, sbc, ssc, smc
 
 class OpcodeMapperTest(unittest.TestCase):
     def test_main(self):
-        assert spc.SPC_OPCODE_A4.value == 0xa4
-        assert sbc.SBC_OPCODE_9E.value == 0x9e
-        assert ssc.READ_ELEMENT_STATUS_ATTACHED.value == 0xb4
-        assert smc.MAINTENANCE_IN.value == 0xa3
-        assert smc.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION == 0x07
+        self.assertEqual(spc.SPC_OPCODE_A4.value, 0xa4)
+        self.assertEqual(sbc.SBC_OPCODE_9E.value, 0x9e)
+        self.assertEqual(ssc.READ_ELEMENT_STATUS_ATTACHED.value, 0xb4)
+        self.assertEqual(smc.MAINTENANCE_IN.value, 0xa3)
+        self.assertEqual(smc.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION, 0x07)
 
 if __name__ == '__main__':
     unittest.main()

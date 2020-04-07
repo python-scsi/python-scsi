@@ -33,63 +33,63 @@ class CdbWritesame10Test(unittest.TestCase):
 
             w = s.writesame10(1024, 27, data)
             cdb = w.cdb
-            assert cdb[0] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb[1] == 0
-            assert scsi_ba_to_int(cdb[2:6]) == 1024
-            assert cdb[6] == 0
-            assert scsi_ba_to_int(cdb[7:9]) == 27
-            assert cdb[9] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb[1], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[2:6]), 1024)
+            self.assertEqual(cdb[6], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[7:9]), 27)
+            self.assertEqual(cdb[9], 0)
             cdb = w.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb['wrprotect'] == 0
-            assert cdb['anchor'] == 0
-            assert cdb['unmap'] == 0
-            assert cdb['lba'] == 1024
-            assert cdb['group'] == 0
-            assert cdb['nb'] == 27
+            self.assertEqual(cdb['opcode'], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb['wrprotect'], 0)
+            self.assertEqual(cdb['anchor'], 0)
+            self.assertEqual(cdb['unmap'], 0)
+            self.assertEqual(cdb['lba'], 1024)
+            self.assertEqual(cdb['group'], 0)
+            self.assertEqual(cdb['nb'], 27)
 
             d = WriteSame10.unmarshall_cdb(WriteSame10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
             w = s.writesame10(65536, 27, data, wrprotect=4, anchor=1, group=19)
             cdb = w.cdb
-            assert cdb[0] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb[1] == 0x90
-            assert scsi_ba_to_int(cdb[2:6]) == 65536
-            assert cdb[6] == 0x13
-            assert scsi_ba_to_int(cdb[7:9]) == 27
-            assert cdb[9] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb[1], 0x90)
+            self.assertEqual(scsi_ba_to_int(cdb[2:6]), 65536)
+            self.assertEqual(cdb[6], 0x13)
+            self.assertEqual(scsi_ba_to_int(cdb[7:9]), 27)
+            self.assertEqual(cdb[9], 0)
             cdb = w.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb['wrprotect'] == 4
-            assert cdb['anchor'] == 1
-            assert cdb['unmap'] == 0
-            assert cdb['lba'] == 65536
-            assert cdb['group'] == 19
-            assert cdb['nb'] == 27
+            self.assertEqual(cdb['opcode'], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb['wrprotect'], 4)
+            self.assertEqual(cdb['anchor'], 1)
+            self.assertEqual(cdb['unmap'], 0)
+            self.assertEqual(cdb['lba'], 65536)
+            self.assertEqual(cdb['group'], 19)
+            self.assertEqual(cdb['nb'], 27)
 
             d = WriteSame10.unmarshall_cdb(WriteSame10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
             w = s.writesame10(65536, 27, data, wrprotect=4, unmap=1)
             cdb = w.cdb
-            assert cdb[0] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb[1] == 0x88
-            assert scsi_ba_to_int(cdb[2:6]) == 65536
-            assert cdb[6] == 0
-            assert scsi_ba_to_int(cdb[7:9]) == 27
-            assert cdb[9] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb[1], 0x88)
+            self.assertEqual(scsi_ba_to_int(cdb[2:6]), 65536)
+            self.assertEqual(cdb[6], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[7:9]), 27)
+            self.assertEqual(cdb[9], 0)
             cdb = w.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.WRITE_SAME_10.value
-            assert cdb['wrprotect'] == 4
-            assert cdb['anchor'] == 0
-            assert cdb['unmap'] == 1
-            assert cdb['lba'] == 65536
-            assert cdb['group'] == 0
-            assert cdb['nb'] == 27
+            self.assertEqual(cdb['opcode'], s.device.opcodes.WRITE_SAME_10.value)
+            self.assertEqual(cdb['wrprotect'], 4)
+            self.assertEqual(cdb['anchor'], 0)
+            self.assertEqual(cdb['unmap'], 1)
+            self.assertEqual(cdb['lba'], 65536)
+            self.assertEqual(cdb['group'], 0)
+            self.assertEqual(cdb['nb'], 27)
 
             d = WriteSame10.unmarshall_cdb(WriteSame10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

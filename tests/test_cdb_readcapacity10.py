@@ -28,13 +28,13 @@ class CdbReadcapacity10Test(unittest.TestCase):
         with MockSCSI(MockDevice(sbc)) as s:
             r = s.readcapacity10()
             cdb = r.cdb
-            assert cdb[0] == s.device.opcodes.READ_CAPACITY_10.value
-            assert cdb[1:10] == bytearray(9)
+            self.assertEqual(cdb[0], s.device.opcodes.READ_CAPACITY_10.value)
+            self.assertEqual(cdb[1:10], bytearray(9))
             cdb = r.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.READ_CAPACITY_10.value
+            self.assertEqual(cdb['opcode'], s.device.opcodes.READ_CAPACITY_10.value)
 
             d = ReadCapacity10.unmarshall_cdb(ReadCapacity10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

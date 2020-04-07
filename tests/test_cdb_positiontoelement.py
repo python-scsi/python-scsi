@@ -28,19 +28,19 @@ class CdbPositiontoelementTest(unittest.TestCase):
         with MockSCSI(MockDevice(smc)) as s:
             m = s.positiontoelement(15, 32, invert=1)
             cdb = m.cdb
-            assert cdb[0] == s.device.opcodes.POSITION_TO_ELEMENT.value
-            assert cdb[1] == 0
-            assert scsi_ba_to_int(cdb[2:4]) == 15
-            assert scsi_ba_to_int(cdb[4:6]) == 32
-            assert cdb[8] == 0x01
+            self.assertEqual(cdb[0], s.device.opcodes.POSITION_TO_ELEMENT.value)
+            self.assertEqual(cdb[1], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[2:4]), 15)
+            self.assertEqual(scsi_ba_to_int(cdb[4:6]), 32)
+            self.assertEqual(cdb[8], 0x01)
             cdb = m.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.POSITION_TO_ELEMENT.value
-            assert cdb['medium_transport_address'] == 15
-            assert cdb['destination_address'] == 32
-            assert cdb['invert'] == 1
+            self.assertEqual(cdb['opcode'], s.device.opcodes.POSITION_TO_ELEMENT.value)
+            self.assertEqual(cdb['medium_transport_address'], 15)
+            self.assertEqual(cdb['destination_address'], 32)
+            self.assertEqual(cdb['invert'], 1)
 
             d = PositionToElement.unmarshall_cdb(PositionToElement.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

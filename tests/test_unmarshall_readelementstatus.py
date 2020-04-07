@@ -88,59 +88,59 @@ class UnmarshallReadelementstatusTest(unittest.TestCase):
         with MockSCSI(MockReadElementStatus(smc)) as s:
             i = s.readelementstatus(300, 700, element_type=READELEMENTSTATUS.ELEMENT_TYPE.STORAGE, voltag=1, curdata=1,
                                     dvcid=1).result
-            assert i['first_element_address'] == 12
-            assert i['num_elements'] == 3
+            self.assertEqual(i['first_element_address'], 12)
+            self.assertEqual(i['num_elements'], 3)
 
-            assert len(i['element_status_pages']) == 2
+            self.assertEqual(len(i['element_status_pages']), 2)
 
             page = i['element_status_pages'][0]
-            assert page['element_type'] == 2
-            assert page['pvoltag'] == 0
-            assert page['avoltag'] == 0
-            assert len(page['element_descriptors']) == 1
-            assert page['element_descriptors'][0]['element_address'] == 12
-            assert page['element_descriptors'][0]['access'] == 1
-            assert page['element_descriptors'][0]['except'] == 1
-            assert page['element_descriptors'][0]['full'] == 1
-            assert page['element_descriptors'][0]['additional_sense_code'] == 55
-            assert page['element_descriptors'][0]['additional_sense_code_qualifier'] == 56
-            assert page['element_descriptors'][0]['svalid'] == 1
-            assert page['element_descriptors'][0]['invert'] == 1
-            assert page['element_descriptors'][0]['ed'] == 1
-            assert page['element_descriptors'][0]['medium_type'] == 2
-            assert page['element_descriptors'][0]['source_storage_element_address'] == 27
+            self.assertEqual(page['element_type'], 2)
+            self.assertEqual(page['pvoltag'], 0)
+            self.assertEqual(page['avoltag'], 0)
+            self.assertEqual(len(page['element_descriptors']), 1)
+            self.assertEqual(page['element_descriptors'][0]['element_address'], 12)
+            self.assertEqual(page['element_descriptors'][0]['access'], 1)
+            self.assertEqual(page['element_descriptors'][0]['except'], 1)
+            self.assertEqual(page['element_descriptors'][0]['full'], 1)
+            self.assertEqual(page['element_descriptors'][0]['additional_sense_code'], 55)
+            self.assertEqual(page['element_descriptors'][0]['additional_sense_code_qualifier'], 56)
+            self.assertEqual(page['element_descriptors'][0]['svalid'], 1)
+            self.assertEqual(page['element_descriptors'][0]['invert'], 1)
+            self.assertEqual(page['element_descriptors'][0]['ed'], 1)
+            self.assertEqual(page['element_descriptors'][0]['medium_type'], 2)
+            self.assertEqual(page['element_descriptors'][0]['source_storage_element_address'], 27)
 
             page = i['element_status_pages'][1]
-            assert page['element_type'] == 4
-            assert page['pvoltag'] == 0
-            assert page['avoltag'] == 0
-            assert len(page['element_descriptors']) == 2
-            assert page['element_descriptors'][0]['element_address'] == 13
-            assert page['element_descriptors'][0]['access'] == 1
-            assert page['element_descriptors'][0]['except'] == 1
-            assert page['element_descriptors'][0]['full'] == 0
-            assert page['element_descriptors'][0]['additional_sense_code'] == 55
-            assert page['element_descriptors'][0]['additional_sense_code_qualifier'] == 56
-            assert page['element_descriptors'][0]['svalid'] == 1
-            assert page['element_descriptors'][0]['invert'] == 1
-            assert page['element_descriptors'][0]['ed'] == 1
-            assert page['element_descriptors'][0]['medium_type'] == 7
-            assert page['element_descriptors'][0]['source_storage_element_address'] == 28
+            self.assertEqual(page['element_type'], 4)
+            self.assertEqual(page['pvoltag'], 0)
+            self.assertEqual(page['avoltag'], 0)
+            self.assertEqual(len(page['element_descriptors']), 2)
+            self.assertEqual(page['element_descriptors'][0]['element_address'], 13)
+            self.assertEqual(page['element_descriptors'][0]['access'], 1)
+            self.assertEqual(page['element_descriptors'][0]['except'], 1)
+            self.assertEqual(page['element_descriptors'][0]['full'], 0)
+            self.assertEqual(page['element_descriptors'][0]['additional_sense_code'], 55)
+            self.assertEqual(page['element_descriptors'][0]['additional_sense_code_qualifier'], 56)
+            self.assertEqual(page['element_descriptors'][0]['svalid'], 1)
+            self.assertEqual(page['element_descriptors'][0]['invert'], 1)
+            self.assertEqual(page['element_descriptors'][0]['ed'], 1)
+            self.assertEqual(page['element_descriptors'][0]['medium_type'], 7)
+            self.assertEqual(page['element_descriptors'][0]['source_storage_element_address'], 28)
 
-            assert page['element_descriptors'][1]['element_address'] == 14
-            assert page['element_descriptors'][1]['access'] == 1
-            assert page['element_descriptors'][1]['except'] == 0
-            assert page['element_descriptors'][1]['full'] == 0
-            assert page['element_descriptors'][1]['additional_sense_code'] == 55
-            assert page['element_descriptors'][1]['additional_sense_code_qualifier'] == 56
-            assert page['element_descriptors'][1]['svalid'] == 1
-            assert page['element_descriptors'][1]['invert'] == 0
-            assert page['element_descriptors'][1]['ed'] == 0
-            assert page['element_descriptors'][1]['medium_type'] == 6
-            assert page['element_descriptors'][1]['source_storage_element_address'] == 29
+            self.assertEqual(page['element_descriptors'][1]['element_address'], 14)
+            self.assertEqual(page['element_descriptors'][1]['access'], 1)
+            self.assertEqual(page['element_descriptors'][1]['except'], 0)
+            self.assertEqual(page['element_descriptors'][1]['full'], 0)
+            self.assertEqual(page['element_descriptors'][1]['additional_sense_code'], 55)
+            self.assertEqual(page['element_descriptors'][1]['additional_sense_code_qualifier'], 56)
+            self.assertEqual(page['element_descriptors'][1]['svalid'], 1)
+            self.assertEqual(page['element_descriptors'][1]['invert'], 0)
+            self.assertEqual(page['element_descriptors'][1]['ed'], 0)
+            self.assertEqual(page['element_descriptors'][1]['medium_type'], 6)
+            self.assertEqual(page['element_descriptors'][1]['source_storage_element_address'], 29)
 
             d = ReadElementStatus.unmarshall_datain(ReadElementStatus.marshall_datain(i))
-            assert d == i
+            self.assertEqual(d, i)
 
 if __name__ == '__main__':
     unittest.main()

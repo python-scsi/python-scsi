@@ -28,23 +28,23 @@ enum_dict = {'A': 1,
 class EnumTest(unittest.TestCase):
     def test_main(self):
         i = Enum(enum_dict)
-        assert i.A == 1
-        assert i.B == 2
-        assert i.C == 3
-        assert i[1] == 'A'
-        assert i[2] == 'B'
-        assert i[3] == 'C'
-        assert i[4] == ''
+        self.assertEqual(i.A, 1)
+        self.assertEqual(i.B, 2)
+        self.assertEqual(i.C, 3)
+        self.assertEqual(i[1], 'A')
+        self.assertEqual(i[2], 'B')
+        self.assertEqual(i[3], 'C')
+        self.assertEqual(i[4], '')
         a = Enum(A=1, B=2, C=3)
-        assert a.A == 1
-        assert a.B == 2
-        assert a.C == 3
-        assert a[1] == 'A'
-        assert a[2] == 'B'
-        assert a[3] == 'C'
-        assert a[4] == ''
-        assert smc.WRITE_BUFFER.value == 0x3b
-        assert smc.WRITE_BUFFER.name == 'WRITE_BUFFER'
+        self.assertEqual(a.A, 1)
+        self.assertEqual(a.B, 2)
+        self.assertEqual(a.C, 3)
+        self.assertEqual(a[1], 'A')
+        self.assertEqual(a[2], 'B')
+        self.assertEqual(a[3], 'C')
+        self.assertEqual(a[4], '')
+        self.assertEqual(smc.WRITE_BUFFER.value, 0x3b)
+        self.assertEqual(smc.WRITE_BUFFER.name, 'WRITE_BUFFER')
 
 if __name__ == '__main__':
     unittest.main()

@@ -35,11 +35,11 @@ class UnmarshallReadcapacity10Test(unittest.TestCase):
     def test_main(self):
         with MockSCSI(MockReadCapacity10(sbc)) as s:
             i = s.readcapacity10().result
-            assert i['returned_lba'] == 65536
-            assert i['block_length'] == 4096
+            self.assertEqual(i['returned_lba'], 65536)
+            self.assertEqual(i['block_length'], 4096)
 
             d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
-            assert d == i
+            self.assertEqual(d, i)
 
 if __name__ == '__main__':
     unittest.main()

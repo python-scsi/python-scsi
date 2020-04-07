@@ -51,16 +51,16 @@ class UnmarshallGetlbastatusTest(unittest.TestCase):
     def test_main(self):
         with MockSCSI(MockGetLBAStatus(sbc)) as s:
             i = s.getlbastatus(0).result
-            assert len(i['lbas']) == 2
-            assert i['lbas'][0]['lba'] == 1023
-            assert i['lbas'][0]['num_blocks'] == 27
-            assert i['lbas'][0]['p_status'] == P_STATUS.MAPPED
-            assert i['lbas'][1]['lba'] == 200000
-            assert i['lbas'][1]['num_blocks'] == 9999
-            assert i['lbas'][1]['p_status'] == P_STATUS.DEALLOCATED
+            self.assertEqual(len(i['lbas']), 2)
+            self.assertEqual(i['lbas'][0]['lba'], 1023)
+            self.assertEqual(i['lbas'][0]['num_blocks'], 27)
+            self.assertEqual(i['lbas'][0]['p_status'], P_STATUS.MAPPED)
+            self.assertEqual(i['lbas'][1]['lba'], 200000)
+            self.assertEqual(i['lbas'][1]['num_blocks'], 9999)
+            self.assertEqual(i['lbas'][1]['p_status'], P_STATUS.DEALLOCATED)
 
             d = GetLBAStatus.unmarshall_datain(GetLBAStatus.marshall_datain(i))
-            assert d == i
+            self.assertEqual(d, i)
 
 if __name__ == '__main__':
     unittest.main()

@@ -27,12 +27,12 @@ class CdbInitelementstatusTest(unittest.TestCase):
         with MockSCSI(MockDevice(smc)) as s:
             r = s.initializeelementstatus()
             cdb = r.cdb
-            assert cdb[0] == s.device.opcodes.INITIALIZE_ELEMENT_STATUS.value
+            self.assertEqual(cdb[0], s.device.opcodes.INITIALIZE_ELEMENT_STATUS.value)
             cdb = r.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.INITIALIZE_ELEMENT_STATUS.value
+            self.assertEqual(cdb['opcode'], s.device.opcodes.INITIALIZE_ELEMENT_STATUS.value)
 
             d = InitializeElementStatus.unmarshall_cdb(InitializeElementStatus.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

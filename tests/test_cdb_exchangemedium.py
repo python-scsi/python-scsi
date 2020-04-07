@@ -28,24 +28,24 @@ class CdbExchangemediumTest(unittest.TestCase):
         with MockSCSI(MockDevice(smc)) as s:
             m = s.exchangemedium(15, 32, 64, 32, inv1=1)
             cdb = m.cdb
-            assert cdb[0] == s.device.opcodes.EXCHANGE_MEDIUM.value
-            assert cdb[1] == 0
-            assert scsi_ba_to_int(cdb[2:4]) == 15
-            assert scsi_ba_to_int(cdb[4:6]) == 32
-            assert scsi_ba_to_int(cdb[6:8]) == 64
-            assert scsi_ba_to_int(cdb[8:10]) == 32
-            assert cdb[10] == 0x02
+            self.assertEqual(cdb[0], s.device.opcodes.EXCHANGE_MEDIUM.value)
+            self.assertEqual(cdb[1], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[2:4]), 15)
+            self.assertEqual(scsi_ba_to_int(cdb[4:6]), 32)
+            self.assertEqual(scsi_ba_to_int(cdb[6:8]), 64)
+            self.assertEqual(scsi_ba_to_int(cdb[8:10]), 32)
+            self.assertEqual(cdb[10], 0x02)
             cdb = m.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.EXCHANGE_MEDIUM.value
-            assert cdb['medium_transport_address'] == 15
-            assert cdb['source_address'] == 32
-            assert cdb['first_destination_address'] == 64
-            assert cdb['second_destination_address'] == 32
-            assert cdb['inv1'] == 1
-            assert cdb['inv2'] == 0
+            self.assertEqual(cdb['opcode'], s.device.opcodes.EXCHANGE_MEDIUM.value)
+            self.assertEqual(cdb['medium_transport_address'], 15)
+            self.assertEqual(cdb['source_address'], 32)
+            self.assertEqual(cdb['first_destination_address'], 64)
+            self.assertEqual(cdb['second_destination_address'], 32)
+            self.assertEqual(cdb['inv1'], 1)
+            self.assertEqual(cdb['inv2'], 0)
 
             d = ExchangeMedium.unmarshall_cdb(ExchangeMedium.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

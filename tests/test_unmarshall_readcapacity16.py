@@ -39,18 +39,18 @@ class UnmarshallReadcapacity16Test(unittest.TestCase):
     def test_main(self):
         with MockSCSI(MockReadCapacity16(sbc)) as s:
             i = s.readcapacity16().result
-            assert i['returned_lba'] == 281474976710656
-            assert i['block_length'] == 4096
-            assert i['p_type'] == 4
-            assert i['prot_en'] == 1
-            assert i['p_i_exponent'] == 8
-            assert i['lbppbe'] == 8
-            assert i['lbpme'] == 1
-            assert i['lbprz'] == 1
-            assert i['lowest_aligned_lba'] == 8193
+            self.assertEqual(i['returned_lba'], 281474976710656)
+            self.assertEqual(i['block_length'], 4096)
+            self.assertEqual(i['p_type'], 4)
+            self.assertEqual(i['prot_en'], 1)
+            self.assertEqual(i['p_i_exponent'], 8)
+            self.assertEqual(i['lbppbe'], 8)
+            self.assertEqual(i['lbpme'], 1)
+            self.assertEqual(i['lbprz'], 1)
+            self.assertEqual(i['lowest_aligned_lba'], 8193)
 
             d = ReadCapacity16.unmarshall_datain(ReadCapacity16.marshall_datain(i))
-            assert d == i
+            self.assertEqual(d, i)
 
 if __name__ == '__main__':
     unittest.main()

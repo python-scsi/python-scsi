@@ -32,20 +32,20 @@ class CdbInitelementstatuswithrangeTest(unittest.TestCase):
         with MockSCSI(MockDevice(smc)) as s:
             r = s.initializeelementstatuswithrange(15, 3, rng=1, fast=1)
             cdb = r.cdb
-            assert cdb[0] == s.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE.value
-            assert cdb[1] == 0x03
-            assert scsi_ba_to_int(cdb[2:4]) == 15
-            assert scsi_ba_to_int(cdb[6:8]) == 3
+            self.assertEqual(cdb[0], s.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE.value)
+            self.assertEqual(cdb[1], 0x03)
+            self.assertEqual(scsi_ba_to_int(cdb[2:4]), 15)
+            self.assertEqual(scsi_ba_to_int(cdb[6:8]), 3)
 
             cdb = r.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE.value
-            assert cdb['starting_element_address'] == 15
-            assert cdb['number_of_elements'] == 3
-            assert cdb['fast'] == 1
-            assert cdb['range'] == 1
+            self.assertEqual(cdb['opcode'], s.device.opcodes.INITIALIZE_ELEMENT_STATUS_WITH_RANGE.value)
+            self.assertEqual(cdb['starting_element_address'], 15)
+            self.assertEqual(cdb['number_of_elements'], 3)
+            self.assertEqual(cdb['fast'], 1)
+            self.assertEqual(cdb['range'], 1)
 
             d = InitializeElementStatusWithRange.unmarshall_cdb(InitializeElementStatusWithRange.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

@@ -27,14 +27,14 @@ class CdbPreventallowMediumremovalTest(unittest.TestCase):
         with MockSCSI(MockDevice(smc)) as s:
             m = s.preventallowmediumremoval(prevent=3)
             cdb = m.cdb
-            assert cdb[0] == s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value
-            assert cdb[4] == 0x03
+            self.assertEqual(cdb[0], s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value)
+            self.assertEqual(cdb[4], 0x03)
             cdb = m.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value
-            assert cdb['prevent'] == 3
+            self.assertEqual(cdb['opcode'], s.device.opcodes.PREVENT_ALLOW_MEDIUM_REMOVAL.value)
+            self.assertEqual(cdb['prevent'], 3)
 
             d = PreventAllowMediumRemoval.unmarshall_cdb(PreventAllowMediumRemoval.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

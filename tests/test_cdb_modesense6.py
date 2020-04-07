@@ -29,41 +29,41 @@ class CdbModesense6Test(unittest.TestCase):
             # cdb for SMC: ElementAddressAssignment
             m = s.modesense6(page_code=MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT)
             cdb = m.cdb
-            assert cdb[0] == s.device.opcodes.MODE_SENSE_6.value
-            assert cdb[1] == 0
-            assert cdb[2] == MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
-            assert cdb[3] == 0
-            assert cdb[4] == 96
-            assert cdb[5] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.MODE_SENSE_6.value)
+            self.assertEqual(cdb[1], 0)
+            self.assertEqual(cdb[2], MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT)
+            self.assertEqual(cdb[3], 0)
+            self.assertEqual(cdb[4], 96)
+            self.assertEqual(cdb[5], 0)
             cdb = m.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.MODE_SENSE_6.value
-            assert cdb['dbd'] == 0
-            assert cdb['pc'] == 0
-            assert cdb['page_code'] == MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT
-            assert cdb['sub_page_code'] == 0
-            assert cdb['alloc_len'] == 96
+            self.assertEqual(cdb['opcode'], s.device.opcodes.MODE_SENSE_6.value)
+            self.assertEqual(cdb['dbd'], 0)
+            self.assertEqual(cdb['pc'], 0)
+            self.assertEqual(cdb['page_code'], MODESENSE6.PAGE_CODE.ELEMENT_ADDRESS_ASSIGNMENT)
+            self.assertEqual(cdb['sub_page_code'], 0)
+            self.assertEqual(cdb['alloc_len'], 96)
 
             d = ModeSense6.unmarshall_cdb(ModeSense6.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
             m = s.modesense6(page_code=0, sub_page_code=3, dbd=1, pc=MODESENSE6.PC.DEFAULT, alloclen=90)
             cdb = m.cdb
-            assert cdb[0] == s.device.opcodes.MODE_SENSE_6.value
-            assert cdb[1] == 0x08
-            assert cdb[2] == MODESENSE6.PC.DEFAULT << 6
-            assert cdb[3] == 3
-            assert cdb[4] == 90
-            assert cdb[5] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.MODE_SENSE_6.value)
+            self.assertEqual(cdb[1], 0x08)
+            self.assertEqual(cdb[2], MODESENSE6.PC.DEFAULT << 6)
+            self.assertEqual(cdb[3], 3)
+            self.assertEqual(cdb[4], 90)
+            self.assertEqual(cdb[5], 0)
             cdb = m.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.MODE_SENSE_6.value
-            assert cdb['dbd'] == 1
-            assert cdb['pc'] == MODESENSE6.PC.DEFAULT
-            assert cdb['page_code'] == 0
-            assert cdb['sub_page_code'] == 3
-            assert cdb['alloc_len'] == 90
+            self.assertEqual(cdb['opcode'], s.device.opcodes.MODE_SENSE_6.value)
+            self.assertEqual(cdb['dbd'], 1)
+            self.assertEqual(cdb['pc'], MODESENSE6.PC.DEFAULT)
+            self.assertEqual(cdb['page_code'], 0)
+            self.assertEqual(cdb['sub_page_code'], 3)
+            self.assertEqual(cdb['alloc_len'], 90)
 
             d = ModeSense6.unmarshall_cdb(ModeSense6.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()

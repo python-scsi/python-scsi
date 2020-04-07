@@ -30,45 +30,45 @@ class CdbRead10Test(unittest.TestCase):
             s.blocksize = 512
             r = s.read10(1024, 27)
             cdb = r.cdb
-            assert cdb[0] == s.device.opcodes.READ_10.value
-            assert cdb[1] == 0
-            assert scsi_ba_to_int(cdb[2:6]) == 1024
-            assert cdb[6] == 0
-            assert scsi_ba_to_int(cdb[7:9]) == 27
-            assert cdb[9] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.READ_10.value)
+            self.assertEqual(cdb[1], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[2:6]), 1024)
+            self.assertEqual(cdb[6], 0)
+            self.assertEqual(scsi_ba_to_int(cdb[7:9]), 27)
+            self.assertEqual(cdb[9], 0)
             cdb = r.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.READ_10.value
-            assert cdb['rdprotect'] == 0
-            assert cdb['dpo'] == 0
-            assert cdb['fua'] == 0
-            assert cdb['rarc'] == 0
-            assert cdb['lba'] == 1024
-            assert cdb['group'] == 0
-            assert cdb['tl'] == 27
+            self.assertEqual(cdb['opcode'], s.device.opcodes.READ_10.value)
+            self.assertEqual(cdb['rdprotect'], 0)
+            self.assertEqual(cdb['dpo'], 0)
+            self.assertEqual(cdb['fua'], 0)
+            self.assertEqual(cdb['rarc'], 0)
+            self.assertEqual(cdb['lba'], 1024)
+            self.assertEqual(cdb['group'], 0)
+            self.assertEqual(cdb['tl'], 27)
 
             d = Read10.unmarshall_cdb(Read10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
             r = s.read10(1024, 27, rdprotect=2, dpo=1, fua=1, rarc=1, group=19)
             cdb = r.cdb
-            assert cdb[0] == s.device.opcodes.READ_10.value
-            assert cdb[1] == 0x5c
-            assert scsi_ba_to_int(cdb[2:6]) == 1024
-            assert cdb[6] == 0x13
-            assert scsi_ba_to_int(cdb[7:9]) == 27
-            assert cdb[9] == 0
+            self.assertEqual(cdb[0], s.device.opcodes.READ_10.value)
+            self.assertEqual(cdb[1], 0x5c)
+            self.assertEqual(scsi_ba_to_int(cdb[2:6]), 1024)
+            self.assertEqual(cdb[6], 0x13)
+            self.assertEqual(scsi_ba_to_int(cdb[7:9]), 27)
+            self.assertEqual(cdb[9], 0)
             cdb = r.unmarshall_cdb(cdb)
-            assert cdb['opcode'] == s.device.opcodes.READ_10.value
-            assert cdb['rdprotect'] == 2
-            assert cdb['dpo'] == 1
-            assert cdb['fua'] == 1
-            assert cdb['rarc'] == 1
-            assert cdb['lba'] == 1024
-            assert cdb['group'] == 19
-            assert cdb['tl'] == 27
+            self.assertEqual(cdb['opcode'], s.device.opcodes.READ_10.value)
+            self.assertEqual(cdb['rdprotect'], 2)
+            self.assertEqual(cdb['dpo'], 1)
+            self.assertEqual(cdb['fua'], 1)
+            self.assertEqual(cdb['rarc'], 1)
+            self.assertEqual(cdb['lba'], 1024)
+            self.assertEqual(cdb['group'], 19)
+            self.assertEqual(cdb['tl'], 27)
 
             d = Read10.unmarshall_cdb(Read10.marshall_cdb(cdb))
-            assert d == cdb
+            self.assertEqual(d, cdb)
 
 if __name__ == '__main__':
     unittest.main()
