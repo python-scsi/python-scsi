@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from distutils.core import setup
+from setuptools import setup
 
 # lets prepare our initial setup
 setup_dict = {'name': 'PYSCSI',
