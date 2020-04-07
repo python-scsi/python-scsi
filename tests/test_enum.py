@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+
 from pyscsi.utils.enum import Enum
 from pyscsi.pyscsi.scsi_enum_command import smc
 
@@ -23,27 +25,26 @@ enum_dict = {'A': 1,
              'B': 2,
              'C': 3, }
 
+class EnumTest(unittest.TestCase):
+    def test_main(self):
+        i = Enum(enum_dict)
+        assert i.A == 1
+        assert i.B == 2
+        assert i.C == 3
+        assert i[1] == 'A'
+        assert i[2] == 'B'
+        assert i[3] == 'C'
+        assert i[4] == ''
+        a = Enum(A=1, B=2, C=3)
+        assert a.A == 1
+        assert a.B == 2
+        assert a.C == 3
+        assert a[1] == 'A'
+        assert a[2] == 'B'
+        assert a[3] == 'C'
+        assert a[4] == ''
+        assert smc.WRITE_BUFFER.value == 0x3b
+        assert smc.WRITE_BUFFER.name == 'WRITE_BUFFER'
 
-def main():
-    i = Enum(enum_dict)
-    assert i.A == 1
-    assert i.B == 2
-    assert i.C == 3
-    assert i[1] == 'A'
-    assert i[2] == 'B'
-    assert i[3] == 'C'
-    assert i[4] == ''
-    a = Enum(A=1, B=2, C=3)
-    assert a.A == 1
-    assert a.B == 2
-    assert a.C == 3
-    assert a[1] == 'A'
-    assert a[2] == 'B'
-    assert a[3] == 'C'
-    assert a[4] == ''
-    assert smc.WRITE_BUFFER.value == 0x3b
-    assert smc.WRITE_BUFFER.name == 'WRITE_BUFFER'
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    unittest.main()

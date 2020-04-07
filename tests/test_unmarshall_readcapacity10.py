@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+
 from mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
@@ -29,17 +31,15 @@ class MockReadCapacity10(MockDevice):
         # block size
         cmd.datain[4:8] = [0x00, 0x00, 0x10, 0x00]
 
+class UnmarshallReadcapacity10Test(unittest.TestCase):
+    def test_main(self):
+        with MockSCSI(MockReadCapacity10(sbc)) as s:
+            i = s.readcapacity10().result
+            assert i['returned_lba'] == 65536
+            assert i['block_length'] == 4096
 
-def main():
-    with MockSCSI(MockReadCapacity10(sbc)) as s:
-        i = s.readcapacity10().result
-        assert i['returned_lba'] == 65536
-        assert i['block_length'] == 4096
+            d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
+            assert d == i
 
-        d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
-        assert d == i
-
-
-if __name__ == "__main__":
-    main()
-
+if __name__ == '__main__':
+    unittest.main()
