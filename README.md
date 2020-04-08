@@ -44,37 +44,6 @@ You can avoid installing the optional dependencies by omitting the "extras":
 
     python-scsi $ pip install .
 
-Unit testing
-============
-The tests directory contain unit tests for python-scsi.
-
-To run the tests:
-
-    python-scsi $ pip install -e .[dev]
-    python-scsi $ pytest --mypy
-
-or use the make file:
-
-    $ cd tests
-    $ make
-
-Development and releasing
-=========================
-
-You can install all tools needed for developing the package by using
-the `dev` extra:
-
-    python-scsi $ pip install -e .[dev]
-
-This will include test and verification tools, as well as all the
-necessary packages to build a new release.
-
-[Setuptools](https://setuptools.readthedocs.io/) is used to create the
-released packages:
-
-    python-scsi $ git clean -fxd
-    python-scsi $ python3 setup.py sdist
-
 Tools (examples)
 ================
 The tools directory contains example programs written against the python-scsi
