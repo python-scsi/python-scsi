@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -27,6 +26,3 @@ class OpcodeMapperTest(unittest.TestCase):
         self.assertEqual(ssc.READ_ELEMENT_STATUS_ATTACHED.value, 0xb4)
         self.assertEqual(smc.MAINTENANCE_IN.value, 0xa3)
         self.assertEqual(smc.MAINTENANCE_IN.serviceaction.REPORT_DEVICE_IDENTIFICATION, 0x07)
-
-if __name__ == '__main__':
-    unittest.main()

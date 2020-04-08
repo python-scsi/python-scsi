@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -22,7 +21,7 @@ from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 class CdbReadelementstatusTest(unittest.TestCase):
     def test_main(self):
@@ -49,6 +48,3 @@ class CdbReadelementstatusTest(unittest.TestCase):
 
             d = ReadElementStatus.unmarshall_cdb(ReadElementStatus.marshall_cdb(cdb))
             self.assertEqual(d, cdb)
-
-if __name__ == '__main__':
-    unittest.main()

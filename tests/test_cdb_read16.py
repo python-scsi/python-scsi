@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -21,7 +20,7 @@ import unittest
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 from pyscsi.pyscsi.scsi_cdb_read16 import Read16
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 class CdbRead16Test(unittest.TestCase):
     def test_main(self):
@@ -70,6 +69,3 @@ class CdbRead16Test(unittest.TestCase):
 
             d = Read16.unmarshall_cdb(Read16.marshall_cdb(cdb))
             self.assertEqual(d, cdb)
-
-if __name__ == '__main__':
-    unittest.main()
