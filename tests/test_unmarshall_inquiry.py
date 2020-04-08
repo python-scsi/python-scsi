@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -18,7 +17,7 @@
 
 import unittest
 
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 from pyscsi.utils.converter import scsi_int_to_ba
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
@@ -285,6 +284,3 @@ class UnmarshallInquiryTest(unittest.TestCase):
 
             d = Inquiry.unmarshall_datain(Inquiry.marshall_datain(i), evpd=1)
             self.assertEqual(d, i)
-
-if __name__ == '__main__':
-    unittest.main()

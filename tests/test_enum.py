@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -45,6 +44,3 @@ class EnumTest(unittest.TestCase):
         self.assertEqual(a[4], '')
         self.assertEqual(smc.WRITE_BUFFER.value, 0x3b)
         self.assertEqual(smc.WRITE_BUFFER.name, 'WRITE_BUFFER')
-
-if __name__ == '__main__':
-    unittest.main()

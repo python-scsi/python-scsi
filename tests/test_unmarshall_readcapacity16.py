@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -18,7 +17,7 @@
 
 import unittest
 
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 
@@ -51,6 +50,3 @@ class UnmarshallReadcapacity16Test(unittest.TestCase):
 
             d = ReadCapacity16.unmarshall_datain(ReadCapacity16.marshall_datain(i))
             self.assertEqual(d, i)
-
-if __name__ == '__main__':
-    unittest.main()

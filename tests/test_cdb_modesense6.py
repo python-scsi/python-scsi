@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 # Copyright (C) 2014 by Ronnie Sahlberg <ronniesahlberg@gmail.com>
 # Copyright (C) 2015 by Markus Rosjat <markus.rosjat@gmail.com>
@@ -21,7 +20,7 @@ import unittest
 from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6
-from mock_device import MockDevice, MockSCSI
+from .mock_device import MockDevice, MockSCSI
 
 class CdbModesense6Test(unittest.TestCase):
     def test_main(self):
@@ -64,6 +63,3 @@ class CdbModesense6Test(unittest.TestCase):
 
             d = ModeSense6.unmarshall_cdb(ModeSense6.marshall_cdb(cdb))
             self.assertEqual(d, cdb)
-
-if __name__ == '__main__':
-    unittest.main()

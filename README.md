@@ -22,15 +22,15 @@ Please see the LICENSE file for the full license text.
 
 Getting the sources
 ===================
-The module is hosted at https://github.com/rosjat/python-scsi
+The module is hosted at https://github.com/python-scsi/python-scsi
 
 You can use git to checkout the latest version of the source code using:
 
-    $ git clone git@github.com:rosjat/python-scsi.git
+    $ git clone git@github.com:python-scsi/python-scsi.git
 
 It is also available as a downloadable zip archive from:
 
-    https://github.com/rosjat/python-scsi/archive/master.zip 
+    https://github.com/python-scsi/python-scsi/archive/master.zip
 
 
 Building and installing
@@ -43,20 +43,6 @@ To build and install from the repository:
 You can avoid installing the optional dependencies by omitting the "extras":
 
     python-scsi $ pip install .
-
-Unit testing
-============
-The tests directory contain unit tests for python-scsi.
-
-To run the tests:
-
-    python-scsi $ pip install -e .[dev]
-    python-scsi $ pytest
-
-or use the make file:
-
-    $ cd tests
-    $ make
 
 Tools (examples)
 ================
