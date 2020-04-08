@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     python_requires='~=3.7',
     extras_require={
-        'dev': ['pytest'],
+        'dev': ['mypy', 'pytest'],
         'iscsi': ['cython-iscsi'],
         'sgio': ['cython-sgio'],
     },
