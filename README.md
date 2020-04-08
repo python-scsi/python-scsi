@@ -51,7 +51,7 @@ The tests directory contain unit tests for python-scsi.
 To run the tests:
 
     python-scsi $ pip install -e .[dev]
-    python-scsi $ pytest
+    python-scsi $ pytest --mypy
 
 or use the make file:
 
