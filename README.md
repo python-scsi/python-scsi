@@ -53,6 +53,11 @@ To run the tests:
     python-scsi $ pip install -e .[dev]
     python-scsi $ pytest
 
+or use the make file:
+
+    $ cd tests
+    $ make
+
 Tools (examples)
 ================
 The tools directory contains example programs written against the python-scsi
