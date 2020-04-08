@@ -47,11 +47,11 @@ You can avoid installing the optional dependencies by omitting the "extras":
 Unit testing
 ============
 The tests directory contain unit tests for python-scsi.
+
 To run the tests:
 
-   $ cd tests
-   $ make
-
+    python-scsi $ pip install -e .[dev]
+    python-scsi $ pytest
 
 Tools (examples)
 ================
