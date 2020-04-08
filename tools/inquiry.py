@@ -3,10 +3,11 @@
 
 import sys
 
-from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
+from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
 from pyscsi.utils import init_device
+
 
 def usage():
     print('Usage: inquiry.py [-p <page-code>] [--help] <device>')
@@ -264,4 +265,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

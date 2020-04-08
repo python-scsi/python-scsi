@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 import sys
+
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.utils import init_device
 

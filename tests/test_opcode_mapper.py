@@ -17,7 +17,8 @@
 
 import unittest
 
-from pyscsi.pyscsi.scsi_enum_command import spc, sbc, ssc, smc
+from pyscsi.pyscsi.scsi_enum_command import sbc, smc, spc, ssc
+
 
 class OpcodeMapperTest(unittest.TestCase):
     def test_main(self):

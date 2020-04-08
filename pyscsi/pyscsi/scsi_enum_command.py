@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from pyscsi.utils.enum import Enum
 from pyscsi.pyscsi.scsi_opcode import OpCode
+from pyscsi.utils.enum import Enum
 
 # Dictionaries to define service actions and there values
 #

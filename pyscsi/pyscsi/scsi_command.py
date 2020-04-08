@@ -19,7 +19,7 @@
 
 
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
-from pyscsi.utils.converter import CheckDict, encode_dict, decode_bits
+from pyscsi.utils.converter import CheckDict, decode_bits, encode_dict
 
 
 class SCSICommand(metaclass=ExMETA):

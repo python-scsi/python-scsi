@@ -17,9 +17,11 @@
 
 import unittest
 
-from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
+from pyscsi.pyscsi.scsi_enum_command import sbc
+
 from .mock_device import MockDevice, MockSCSI
+
 
 class CdbTestunitreadyTest(unittest.TestCase):
     def test_main(self):

@@ -17,10 +17,12 @@
 
 import unittest
 
-from pyscsi.utils.converter import scsi_ba_to_int
-from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
+from pyscsi.pyscsi.scsi_enum_command import spc
+from pyscsi.utils.converter import scsi_ba_to_int
+
 from .mock_device import MockDevice, MockSCSI
+
 
 class CdbInquiryTest(unittest.TestCase):
     def test_main(self):

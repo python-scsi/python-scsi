@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
-
+from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
 try:
     import iscsi

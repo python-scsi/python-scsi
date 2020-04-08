@@ -20,12 +20,16 @@
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
-from pyscsi.pyscsi.scsi_cdb_initelementstatuswithrange import InitializeElementStatusWithRange
+from pyscsi.pyscsi.scsi_cdb_initelementstatuswithrange import (
+    InitializeElementStatusWithRange,
+)
 from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
-from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6, ModeSelect6
-from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSense10, ModeSelect10
+from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSelect6, ModeSense6
+from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSelect10, ModeSense10
 from pyscsi.pyscsi.scsi_cdb_movemedium import MoveMedium
-from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
+from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import (
+    OpenCloseImportExportElement,
+)
 from pyscsi.pyscsi.scsi_cdb_positiontoelement import PositionToElement
 from pyscsi.pyscsi.scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
 from pyscsi.pyscsi.scsi_cdb_read10 import Read10
@@ -42,7 +46,7 @@ from pyscsi.pyscsi.scsi_cdb_write12 import Write12
 from pyscsi.pyscsi.scsi_cdb_write16 import Write16
 from pyscsi.pyscsi.scsi_cdb_writesame10 import WriteSame10
 from pyscsi.pyscsi.scsi_cdb_writesame16 import WriteSame16
-from pyscsi.pyscsi.scsi_enum_command import spc, sbc, smc, ssc, mmc
+from pyscsi.pyscsi.scsi_enum_command import mmc, sbc, smc, spc, ssc
 from pyscsi.utils.converter import get_opcode
 
 
@@ -718,4 +722,3 @@ class SCSI(object):
         self.execute(cmd)
         cmd.unmarshall()
         return cmd
- 

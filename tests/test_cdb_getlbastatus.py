@@ -17,10 +17,12 @@
 
 import unittest
 
-from pyscsi.utils.converter import scsi_ba_to_int
-from pyscsi.pyscsi.scsi_enum_command import sbc
-from .mock_device import MockDevice, MockSCSI
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from pyscsi.utils.converter import scsi_ba_to_int
+
+from .mock_device import MockDevice, MockSCSI
+
 
 class CdbGetlbastatusTest(unittest.TestCase):
     def test_main(self):

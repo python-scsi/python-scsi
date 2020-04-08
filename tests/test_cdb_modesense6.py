@@ -17,10 +17,12 @@
 
 import unittest
 
-from pyscsi.pyscsi.scsi_enum_command import spc
 from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi.scsi_cdb_modesense6 import ModeSense6
+from pyscsi.pyscsi.scsi_enum_command import spc
+
 from .mock_device import MockDevice, MockSCSI
+
 
 class CdbModesense6Test(unittest.TestCase):
     def test_main(self):

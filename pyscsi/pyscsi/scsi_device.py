@@ -1,6 +1,4 @@
 # coding: utf-8
-
-# Copyright:
 #  Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
 #  Copyright (C) 2015 by Markus Rosjat<markus.rosjat@gmail.com>
 #
@@ -16,9 +14,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+import os
+
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
-import os
 
 try:
     import sgio

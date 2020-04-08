@@ -1,5 +1,5 @@
-from .enum import *
 from .converter import *
+from .enum import *
 
 
 def init_device(dev, read_write=False):

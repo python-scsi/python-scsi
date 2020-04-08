@@ -17,11 +17,12 @@
 
 import unittest
 
-from .mock_device import MockDevice, MockSCSI
-from pyscsi.utils.converter import scsi_int_to_ba
-from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from pyscsi.utils.converter import scsi_int_to_ba
+
+from .mock_device import MockDevice, MockSCSI
 
 
 class MockInquiryStandard(MockDevice):
