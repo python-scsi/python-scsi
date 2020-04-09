@@ -77,7 +77,7 @@ class MockDevId(MockDevice):
         cmd.datain[2] = 0x00
         cmd.datain[3] = 0x00
         pos = 4
-        
+
         # Designation Descriptor: T10_VENDOR_ID
         t10 = bytearray(8)
         t10[0] = ord('T')
