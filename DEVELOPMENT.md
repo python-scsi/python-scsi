@@ -8,6 +8,17 @@ the `dev` extra:
 This will include test and verification tools, as well as all the
 necessary packages to build a new release.
 
+## pre-commit
+
+This repository uses [pre-commit](https://pre-commit.com/) to maintain a
+consistent codebase. The tool is installed as part of the `dev` extra.
+
+To activate the pre-commit hooks, you should use:
+
+    python-scsi $ pre-commit install
+
+which will set up the hooks for the current repository.
+
 ## Unit Testing
 
 The tests directory contain unit tests for python-scsi.
@@ -47,6 +58,8 @@ The repository follows a (mostly) standard layout for Python repositories:
 
  * `.gitignore` is part of the repository configuration and is set to
    ignore generated files from Python testing and usage.
+ * `.pre-commit-config.yaml` contains the configuration for
+   [pre-commit](https://pre-commit.com/) and its hooks.
  * `.travis.yml` configures the continuous integration used to
    validate pull requests.
  * `mypy.ini` contains configuration for
