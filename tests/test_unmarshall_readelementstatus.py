@@ -17,11 +17,12 @@
 
 import unittest
 
-from .mock_device import MockDevice, MockSCSI
-from pyscsi.utils.converter import scsi_int_to_ba
-from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.pyscsi import scsi_enum_readelementstatus as READELEMENTSTATUS
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
+from pyscsi.pyscsi.scsi_enum_command import smc
+from pyscsi.utils.converter import scsi_int_to_ba
+
+from .mock_device import MockDevice, MockSCSI
 
 
 class MockReadElementStatus(MockDevice):

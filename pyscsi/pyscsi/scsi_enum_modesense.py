@@ -19,7 +19,6 @@
 
 from pyscsi.utils.enum import Enum
 
-
 # we using Enum to utilize the mode page dict so we can use them in a more
 # descriptive way. The ne enum has basically a dictionary as enum value. So we
 # can access the values of the mode page bits as followed:
@@ -215,4 +214,3 @@ PC = Enum(pc)
 PAGE_CODE = Enum(page_code)
 MODESENSE6 = Enum(modepage6bits)
 MODESENSE10 = Enum(modepage10bits)
-

@@ -17,10 +17,14 @@
 
 import unittest
 
+from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import (
+    OpenCloseImportExportElement,
+)
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_ba_to_int
+
 from .mock_device import MockDevice, MockSCSI
-from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import OpenCloseImportExportElement
+
 
 class CdbOpencloseExportimportElementTest(unittest.TestCase):
     def test_main(self):

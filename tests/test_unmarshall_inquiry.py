@@ -17,11 +17,12 @@
 
 import unittest
 
-from .mock_device import MockDevice, MockSCSI
-from pyscsi.utils.converter import scsi_int_to_ba
-from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi import scsi_enum_inquiry as INQUIRY
 from pyscsi.pyscsi.scsi_cdb_inquiry import Inquiry
+from pyscsi.pyscsi.scsi_enum_command import sbc
+from pyscsi.utils.converter import scsi_int_to_ba
+
+from .mock_device import MockDevice, MockSCSI
 
 
 class MockInquiryStandard(MockDevice):
@@ -76,7 +77,7 @@ class MockDevId(MockDevice):
         cmd.datain[2] = 0x00
         cmd.datain[3] = 0x00
         pos = 4
-        
+
         # Designation Descriptor: T10_VENDOR_ID
         t10 = bytearray(8)
         t10[0] = ord('T')

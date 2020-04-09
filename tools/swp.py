@@ -6,9 +6,9 @@
 #
 import sys
 
+from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
-from pyscsi.pyscsi import scsi_enum_modesense as MODESENSE6
 from pyscsi.utils import init_device
 
 
@@ -59,4 +59,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

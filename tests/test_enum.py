@@ -17,8 +17,8 @@
 
 import unittest
 
-from pyscsi.utils.enum import Enum
 from pyscsi.pyscsi.scsi_enum_command import smc
+from pyscsi.utils.enum import Enum
 
 enum_dict = {'A': 1,
              'B': 2,

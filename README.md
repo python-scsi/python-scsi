@@ -47,7 +47,7 @@ You can avoid installing the optional dependencies by omitting the "extras":
 Tools (examples)
 ================
 The tools directory contains example programs written against the python-scsi
-API. 
+API.
 
 inquiry.py
 ----------

@@ -16,7 +16,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
+from pyscsi.utils.converter import decode_bits, encode_dict
 
 #
 # SCSI ReadCapacity16 command and definitions

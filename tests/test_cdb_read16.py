@@ -17,10 +17,12 @@
 
 import unittest
 
+from pyscsi.pyscsi.scsi_cdb_read16 import Read16
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
-from pyscsi.pyscsi.scsi_cdb_read16 import Read16
+
 from .mock_device import MockDevice, MockSCSI
+
 
 class CdbRead16Test(unittest.TestCase):
     def test_main(self):

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import encode_dict, decode_bits
+from pyscsi.utils.converter import decode_bits, encode_dict
 
 #
 # SCSI WriteSame16 command and definitions

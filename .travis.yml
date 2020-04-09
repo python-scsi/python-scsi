@@ -6,7 +6,7 @@ matrix:
   include:
     - python: 3.7
     - python: 3.8
-      PYTEST_MYPY=--mypy
+      env: PRE_COMMIT=true PYTEST_MYPY=--mypy
     - python: 3.9-dev
 
 install:
@@ -14,3 +14,4 @@ install:
 
 script:
   - py.test -vvv $PYTEST_MYPY
+  - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi

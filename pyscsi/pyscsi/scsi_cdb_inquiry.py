@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 import pyscsi.pyscsi.scsi_enum_inquiry as inquiry_enums
-from pyscsi.pyscsi.scsi_command import SCSICommand
 import pyscsi.utils.converter as convert
+from pyscsi.pyscsi.scsi_command import SCSICommand
 
 #
 # SCSI Inquiry command and definitions

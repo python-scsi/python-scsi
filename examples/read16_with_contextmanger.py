@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 import sys
+
 from pyscsi.pyscsi.scsi_cdb_read16 import Read16
-from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_device import SCSIDevice
+from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils import init_device
 
 

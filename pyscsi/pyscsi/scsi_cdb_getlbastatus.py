@@ -16,7 +16,12 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
-from pyscsi.utils.converter import scsi_int_to_ba, scsi_ba_to_int, encode_dict, decode_bits
+from pyscsi.utils.converter import (
+    decode_bits,
+    encode_dict,
+    scsi_ba_to_int,
+    scsi_int_to_ba,
+)
 
 #
 # SCSI GetLBAStatus command and definitions

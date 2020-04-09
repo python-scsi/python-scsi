@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
-
+from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
 
 try:
     import iscsi
@@ -84,7 +83,7 @@ class ISCSIDevice(metaclass=ExMETA):
         """
 
         """
-        self._iscsi = libisci.Context(device)
+        self._iscsi = isci.Context(device)
         self._iscsi_url = iscsi.URL(self._iscsi, self._file_name)
         self._iscsi.set_targetname(self._iscsi_url.target)
         self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
