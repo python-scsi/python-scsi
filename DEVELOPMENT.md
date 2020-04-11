@@ -46,8 +46,17 @@ on the master branch as well as on each Pull Request.
 [Setuptools](https://setuptools.readthedocs.io/) is used to create the
 released packages:
 
+    python-scsi $ pip install -e .[dev]
     python-scsi $ git clean -fxd
-    python-scsi $ python3 setup.py sdist
+    python-scsi $ git tag -a python-scsi-X.Y.Z
+    python-scsi $ python3 setup.py sdist bdist_wheel
+
+The `git tag` command is used to tag the version that will be used by
+[setuptools-scm](https://github.com/pypa/setuptools_scm/) to apply the
+correct version information in the source and wheel packages.
+
+The version to tag should be following [Semantic
+Versioning](https://semver.org/) (SemVer).
 
 For more details, see [Generating distribution
 archives](https://packaging.python.org/tutorials/packaging-projects/#generating-distribution-archives).
