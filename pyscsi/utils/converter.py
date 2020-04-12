@@ -179,7 +179,7 @@ def print_data(data_dict):
             print(k)
             print_data(v)
         else:
-            if isinstance(v, basestring):
+            if isinstance(v, str):
                 print('%s -> %s' % (k, v))
             elif isinstance(v, float):
                 print('%s -> %.02d' % (k, v))
