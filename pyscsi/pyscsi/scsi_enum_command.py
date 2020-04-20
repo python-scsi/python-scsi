@@ -52,96 +52,36 @@ Service Actions Dictionaries for the A3 opcode
 ------------------------------------------------------------------------------
 """
 
-spc_opcode_a3 = {'REPORT_DEVICE_IDENTIFIER': 0x05,
-                 'REPORT_ALIASES': 0x0b,
-                 'REPORT_PRIORITY': 0x0e,
-                 'REPORT_SUPPORTED_OPERATION_CODES': 0x0c,
-                 'REPORT_SUPPORTED_TASK_MANAGEMENT_FUNCTIONS': 0x0d,
-                 'REPORT_TARGET_PORT_GROUPS': 0x0a,
-                 'REPORT_TIMESTAMP': 0x0f, }
-
-sbc_opcode_a3 = {'REPORT_PRIORITY': 0x0e,
-                 'REPORT_IDENTIFYING_INFORMATION': 0x05,
-                 'REPORT_SUPPORTED_TASK_MANAGEMENT_FUNCTIONS': 0x0d,
-                 'REPORT_TARGET_PORT_GROUPS': 0x0a,
-                 'REPORT_SUPPORTED_OPERATION_CODES': 0x0c,
-                 'REPORT_ALIASES': 0x0b, }
-
-ssc_opcode_a3 = {'REPORT_DEVICE_IDENTIFIER': 0x05,
-                 'REPORT_SUPPORTED_OPERATION_CODES': 0x0c,
-                 'REPORT_TARGET_PORT_GROUPS': 0x0a, }
-
-smc_opcode_a3 = {'REPORT_ALIASES': 0x0b,
-                 'REPORT_DEVICE_IDENTIFIER': 0x05,
-                 'REPORT_PRIORITY': 0x0e,
-                 'REPORT_SUPPORTED_OPERATION_CODES': 0x0c,
-                 'REPORT_SUPPORTED_TASK_MANAGEMENT_FUNCTIONS': 0x0d,
-                 'REPORT_TARGET_PORT_GROUPS': 0x0a,
-                 'REPORT_TIMESTAMP': 0x0f,
-                 'REQUEST_DATA_TRANSFER_ELEMENT_INQUIRY': 0x06, }
-
-"""
-------------------------------------------------------------------------------
-Service Actions Dictionaries for the A4 opcode
-------------------------------------------------------------------------------
-"""
-
-spc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
-                 'SET_DEVICE_IDENTIFIER': 0x06,
-                 'SET_PRIORITY': 0x0e,
-                 'SET_TARGET_PORT_GROUPS': 0x0a,
-                 'SET_TIMESTAMP': 0x0f, }
-
-sbc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
-                 'SET_IDENTIFYING_INFORMATION': 0x06,
-                 'SET_PRIORITY': 0x0e,
-                 'SET_TARGET_PORT_GROUPS': 0x0a, }
-
-ssc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
-                 'SET_DEVICE_IDENTIFIER': 0x06,
-                 'SET_TARGET_PORT_GROUPS': 0x0a, }
-
-smc_opcode_a4 = {'CHANGE_ALIASES': 0x0b,
-                 'SET_DEVICE_IDENTIFIER': 0x06,
-                 'SET_TARGET_PORT_GROUPS': 0x0a,
-                 'SET_PRIORITY': 0x0e,
-                 'SET_TIMESTAMP': 0x0f, }
-
-"""
-------------------------------------------------------------------------------
-Service Actions Dictionaries for the 7F opcode
-------------------------------------------------------------------------------
-"""
-
-sbc_opcode_7f = {'ORWRITE_32': 0x000e,
-                 'READ_32': 0x0009,
-                 'VERIFY_32': 0x000a,
-                 'WRITE_32': 0x000b,
-                 'WRITE_AND_VERIFY_32': 0x000c,
-                 'WRITE_SAME_32': 0x000d,
-                 'XDREAD_32': 0x0003,
-                 'XDWRITE_32': 0x0004,
-                 'XDWRITEREAD_32': 0x0007,
-                 'XPWRITE_32': 0x0006, }
-
-"""
-------------------------------------------------------------------------------
-Service Actions Dictionaries for the 9E opcode
-------------------------------------------------------------------------------
-"""
-
-sbc_opcode_9e = {'GET_LBA_STATUS': 0x12,
-                 'READ_CAPACITY_16': 0x10,
-                 'REPORT_REFERRALS': 0x13, }
-
-"""
-------------------------------------------------------------------------------
-Service Actions Dictionaries for the 1B opcode
-------------------------------------------------------------------------------
-"""
-
-smc_opcode_1b = {'OPEN_IMPORTEXPORT_ELEMENT': 0x00,
-                 'CLOSE_IMPORTEXPORT_ELEMENT': 0x01, }
+service_actions = {'REPORT_DEVICE_IDENTIFIER': 0x05,
+                   'REPORT_ALIASES': 0x0b,
+                   'REPORT_PRIORITY': 0x0e,
+                   'REPORT_SUPPORTED_OPERATION_CODES': 0x0c,
+                   'REPORT_SUPPORTED_TASK_MANAGEMENT_FUNCTIONS': 0x0d,
+                   'REPORT_TARGET_PORT_GROUPS': 0x0a,
+                   'REPORT_TIMESTAMP': 0x0f,
+                   'REPORT_IDENTIFYING_INFORMATION': 0x05,
+                   'REQUEST_DATA_TRANSFER_ELEMENT_INQUIRY': 0x06,
+                   'CHANGE_ALIASES': 0x0b,
+                   'SET_DEVICE_IDENTIFIER': 0x06,
+                   'SET_PRIORITY': 0x0e,
+                   'SET_TARGET_PORT_GROUPS': 0x0a,
+                   'SET_TIMESTAMP': 0x0f,
+                   'SET_IDENTIFYING_INFORMATION': 0x06,
+                   'ORWRITE_32': 0x000e,
+                   'READ_32': 0x0009,
+                   'VERIFY_32': 0x000a,
+                   'WRITE_32': 0x000b,
+                   'WRITE_AND_VERIFY_32': 0x000c,
+                   'WRITE_SAME_32': 0x000d,
+                   'XDREAD_32': 0x0003,
+                   'XDWRITE_32': 0x0004,
+                   'XDWRITEREAD_32': 0x0007,
+                   'XPWRITE_32': 0x0006,
+                   'GET_LBA_STATUS': 0x12,
+                   'READ_CAPACITY_16': 0x10,
+                   'REPORT_REFERRALS': 0x13,
+                   'OPEN_IMPORTEXPORT_ELEMENT': 0x00,
+                   'CLOSE_IMPORTEXPORT_ELEMENT': 0x01, }
 
 """
 ------------------------------------------------------------------------------
@@ -149,8 +89,8 @@ opcode Dictionaries
 ------------------------------------------------------------------------------
 """
 
-spc_opcodes = {'SPC_OPCODE_A4': OpCode('SPC_OPCODE_A4', 0xa4, spc_opcode_a4),
-               'SPC_OPCODE_A3': OpCode('SPC_OPCODE_A3', 0xa3, spc_opcode_a3),
+spc_opcodes = {'SPC_OPCODE_A4': OpCode('SPC_OPCODE_A4', 0xa4, service_actions),
+               'SPC_OPCODE_A3': OpCode('SPC_OPCODE_A3', 0xa3, service_actions),
                'ACCESS_CONTROL_IN': OpCode('ACCESS_CONTROL_IN', 0x86, {}),
                'ACCESS_CONTROL_OUT': OpCode('ACCESS_CONTROL_OUT', 0x87, {}),
                'EXTENDED_COPY': OpCode('EXTENDED_COPY', 0x83, {}),
@@ -178,10 +118,10 @@ spc_opcodes = {'SPC_OPCODE_A4': OpCode('SPC_OPCODE_A4', 0xa4, spc_opcode_a4),
                'WRITE_ATTRIBUTE': OpCode('WRITE_ATTRIBUTE', 0x8d, {}),
                'WRITE_BUFFER': OpCode('WRITE_BUFFER', 0x3b, {}), }
 
-sbc_opcodes = {'SBC_OPCODE_7F': OpCode('SBC_OPCODE_7F', 0x7f, sbc_opcode_7f),
-               'SBC_OPCODE_A4': OpCode('SBC_OPCODE_A4', 0xa4, sbc_opcode_a4),
-               'SBC_OPCODE_A3': OpCode('SBC_OPCODE_A3', 0xa3, sbc_opcode_a3),
-               'SBC_OPCODE_9E': OpCode('SBC_OPCODE_9E', 0x9e, sbc_opcode_9e),
+sbc_opcodes = {'SBC_OPCODE_7F': OpCode('SBC_OPCODE_7F', 0x7f, service_actions),
+               'SBC_OPCODE_A4': OpCode('SBC_OPCODE_A4', 0xa4, service_actions),
+               'SBC_OPCODE_A3': OpCode('SBC_OPCODE_A3', 0xa3, service_actions),
+               'SBC_OPCODE_9E': OpCode('SBC_OPCODE_9E', 0x9e, service_actions),
                'ACCESS_CONTROL_IN': OpCode('ACCESS_CONTROL_IN', 0x86, {}),
                'ACCESS_CONTROL_OUT': OpCode('ACCESS_CONTROL_OUT', 0x87, {}),
                'COMPARE_AND_WRITE': OpCode('COMPARE_AND_WRITE', 0x89, {}),
@@ -254,8 +194,8 @@ sbc_opcodes = {'SBC_OPCODE_7F': OpCode('SBC_OPCODE_7F', 0x7f, sbc_opcode_7f),
                'XDWRITEREAD_10': OpCode('XDWRITEREAD_10', 0x53, {}),
                'XPWRITE_10': OpCode('XPWRITE_10', 0x51, {}), }
 
-ssc_opcodes = {'SSC_OPCODE_A4': OpCode('SSC_OPCODE_A4', 0xa4, ssc_opcode_a4),
-               'SSC_OPCODE_A3': OpCode('SSC_OPCODE_A3', 0xa3, ssc_opcode_a3),
+ssc_opcodes = {'SSC_OPCODE_A4': OpCode('SSC_OPCODE_A4', 0xa4, service_actions),
+               'SSC_OPCODE_A3': OpCode('SSC_OPCODE_A3', 0xa3, service_actions),
                'ACCESS_CONTROL_IN': OpCode('ACCESS_CONTROL_IN', 0x86, {}),
                'ACCESS_CONTROL_OUT': OpCode('ACCESS_CONTROL_OUT', 0x87, {}),
                'ERASE_16': OpCode('ERASE_16', 0x93, {}),
@@ -306,8 +246,8 @@ ssc_opcodes = {'SSC_OPCODE_A4': OpCode('SSC_OPCODE_A4', 0xa4, ssc_opcode_a4),
                'WRITE_FILEMARKS_6': OpCode('WRITE_FILEMARKS_6', 0x10, {}),
                'WRITE_FILEMARKS_16': OpCode('WRITE_FILEMARKS_16', 0x80, {}), }
 
-smc_opcodes = {'SMC_OPCODE_A4': OpCode('SMC_OPCODE_A4', 0xa4, smc_opcode_a4),
-               'SMC_OPCODE_A3': OpCode('SMC_OPCODE_A3', 0xa3, smc_opcode_a3),
+smc_opcodes = {'SMC_OPCODE_A4': OpCode('SMC_OPCODE_A4', 0xa4, service_actions),
+               'SMC_OPCODE_A3': OpCode('SMC_OPCODE_A3', 0xa3, service_actions),
                'ACCESS_CONTROL_IN': OpCode('ACCESS_CONTROL_IN', 0x86, {}),
                'ACCESS_CONTROL_OUT': OpCode('ACCESS_CONTROL_OUT', 0x87, {}),
                'EXCHANGE_MEDIUM': OpCode('EXCHANGE_MEDIUM', 0xa6, {}),
@@ -323,7 +263,7 @@ smc_opcodes = {'SMC_OPCODE_A4': OpCode('SMC_OPCODE_A4', 0xa4, smc_opcode_a4),
                'MODE_SENSE_6': OpCode('MODE_SENSE_6', 0x1a, {}),
                'MODE_SENSE_10': OpCode('MODE_SENSE_10', 0x5a, {}),
                'MOVE_MEDIUM': OpCode('MOVE_MEDIUM', 0xa5, {}),
-               'OPEN_CLOSE_IMPORT_EXPORT_ELEMENT': OpCode('SMC_OPCODE_1B', 0x1b, smc_opcode_1b),
+               'OPEN_CLOSE_IMPORT_EXPORT_ELEMENT': OpCode('SMC_OPCODE_1B', 0x1b, service_actions),
                'PERSISTENT_RESERVE_IN': OpCode('PERSISTENT_RESERVE_IN', 0x5e, {}),
                'PERSISTENT_RESERVE_OUT': OpCode('PERSISTENT_RESERVE_OUT', 0x5f, {}),
                'PREVENT_ALLOW_MEDIUM_REMOVAL': OpCode('PREVENT_ALLOW_MEDIUM_REMOVAL', 0x1e, {}),
