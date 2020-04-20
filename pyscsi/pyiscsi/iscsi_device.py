@@ -77,8 +77,8 @@ class ISCSIDevice(metaclass=ExMETA):
         self._iscsi.set_targetname(self._iscsi_url.target)
         self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
         self._iscsi.set_header_digest(iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
-        self._iscsi.full_connect_sync(self._iscsi_url.portal,
-                                      self._iscsi_url.lun)
+        self._iscsi.connect(self._iscsi_url.portal,
+                            self._iscsi_url.lun)
 
     def close(self):
         self._iscsi.disconnect()
