@@ -23,6 +23,6 @@ setup(
             'wheel',
         ],
         'iscsi': ['cython-iscsi'],
-        'sgio': ['cython-sgio'],
+        'sgio': ['cython-sgio>=1.1.2'],
     },
 )
