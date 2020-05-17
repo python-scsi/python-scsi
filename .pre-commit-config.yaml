@@ -15,3 +15,7 @@ repos:
       - id: isort
         additional_dependencies:
           - toml
+-   repo: https://github.com/fsfe/reuse-tool
+    rev: latest
+    hooks:
+    - id: reuse
