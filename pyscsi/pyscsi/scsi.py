@@ -26,6 +26,7 @@ from pyscsi.pyscsi.scsi_cdb_read12 import Read12
 from pyscsi.pyscsi.scsi_cdb_read16 import Read16
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
+from pyscsi.pyscsi.scsi_cdb_readcd import ReadCd
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
@@ -475,6 +476,31 @@ class SCSI(object):
                              **kwargs)
         self.execute(cmd)
         cmd.unmarshall()
+        return cmd
+
+    def readcd(self,
+               lba,
+               tl,
+               **kwargs):
+        """
+        Returns a ReadCd Instance
+
+        :param lba: Logical Block Address
+        :param tl: Transfer Length
+        :param kwargs: a dict with key/value pairs
+                       est=0: Expected Sector Type
+                       dap=0: Digital Audio Play
+                       mcsb=0: Main Channel Selection Bits
+                       c2e1=0: C2 Error Information
+                       scsb=0: Sub-Channel Selection Bits
+        :return: a ReadCd instance
+        """
+        opcode = self.device.opcodes.READ_CD
+        cmd = ReadCd(opcode,
+                     lba,
+                     tl,
+                     **kwargs)
+        self.execute(cmd)
         return cmd
 
     def readelementstatus(self,
