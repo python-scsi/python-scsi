@@ -4,18 +4,18 @@
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.0.1
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/timothycrosley/isort
-    rev: 4.3.21
+    rev: 5.10.1
     hooks:
       - id: isort
         additional_dependencies:
           - toml
 -   repo: https://github.com/fsfe/reuse-tool
-    rev: latest
+    rev: v0.13.0
     hooks:
     - id: reuse
