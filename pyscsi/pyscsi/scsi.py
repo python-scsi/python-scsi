@@ -27,6 +27,7 @@ from pyscsi.pyscsi.scsi_cdb_read16 import Read16
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_cdb_readcapacity16 import ReadCapacity16
 from pyscsi.pyscsi.scsi_cdb_readcd import ReadCd
+from pyscsi.pyscsi.scsi_cdb_readdiscinformation import ReadDiscInformation
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
@@ -501,6 +502,25 @@ class SCSI(object):
                      tl,
                      **kwargs)
         self.execute(cmd)
+        return cmd
+
+    def readdiscinformation(self,
+                            data_type,
+                            alloc_len=4096):
+        """
+        Returns a ReadDiscInformation Instance
+
+        :param data_type: Data Type
+        :param alloc_len: Allocation Length
+
+        :return: a ReadDiscInformation instance
+        """
+        opcode = self.device.opcodes.READ_DISC_INFORMATION
+        cmd = ReadDiscInformation(opcode,
+                                  data_type,
+                                  alloc_len=alloc_len)
+        self.execute(cmd)
+        cmd.unmarshall()
         return cmd
 
     def readelementstatus(self,
