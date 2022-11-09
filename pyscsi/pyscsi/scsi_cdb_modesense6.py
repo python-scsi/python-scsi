@@ -218,7 +218,7 @@ class ModeSelect6(SCSICommand):
 
         :param data: a byte array with data
         """
-        return ModeSense6.unmarshall_dataout(data)
+        return None
 
     @staticmethod
     def marshall_dataout(data):
