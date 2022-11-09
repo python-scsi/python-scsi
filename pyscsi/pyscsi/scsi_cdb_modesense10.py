@@ -234,7 +234,7 @@ class ModeSelect10(SCSICommand):
         :param data: a byte array
         :return result: a dict
         """
-        return ModeSense10.unmarshall_dataout(data)
+        return None
 
     @staticmethod
     def marshall_dataout(data):
