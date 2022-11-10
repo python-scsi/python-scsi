@@ -502,6 +502,7 @@ class SCSI(object):
                      tl,
                      **kwargs)
         self.execute(cmd)
+        cmd.unmarshall(lba=lba, tl=tl, **kwargs)
         return cmd
 
     def readdiscinformation(self,
