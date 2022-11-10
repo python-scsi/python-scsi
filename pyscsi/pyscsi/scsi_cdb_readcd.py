@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
+from pyscsi.pyscsi.scsi_enum_readcd import EXPECTED_SECTOR_TYPE
 from pyscsi.utils.converter import decode_bits, encode_dict
 
 #
@@ -29,8 +30,8 @@ class ReadCd(SCSICommand):
 
     def __init__(self,
                  opcode,
-                 lba,
-                 tl,
+                 lba=0,
+                 tl=0,
                  est=0,
                  dap=0,
                  mcsb=0,
@@ -64,3 +65,171 @@ class ReadCd(SCSICommand):
                                   mcsb=mcsb,
                                   c2ei=c2ei,
                                   scsb=scsb)
+
+    @classmethod
+    def unmarshall_datain(cls, d, lba=0, tl=0, **kwargs):
+        """
+        Unmarshall the ReadCD datain.
+
+        :param data: a byte array
+        :return result: a dict
+        """
+        result = {}
+
+        est = kwargs['est']
+        mcsb = kwargs['mcsb'] << 3
+        # Need to remap according to MMC:
+        # Table 354 — Main Channel Selection and Mapped Values
+        if mcsb in [0x28, 0x48, 0x68, 0x88, 0x90, 0x98, 0xa8, 0xc0, 0xc8, 0xd0, 0xd8, 0xe8] and est != EXPECTED_SECTOR_TYPE.CDDA:
+            raise ValueError('Invalid MCSB/EST combination')
+        if mcsb in [0x30, 0xb0, 0xb8] and est > EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+            raise ValueError('Invalid MCSB/EST combination')
+        if est == EXPECTED_SECTOR_TYPE.CDDA:
+            mcsb = 0x10
+        if mcsb == 0x08 and est == EXPECTED_SECTOR_TYPE.MODE_2_FORM_1:
+            mcsb = 0x10
+        if mcsb == 0x38 and est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+            mcsb = 0x30
+        if mcsb == 0x58 and est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+            mcsb = 0x10
+        if mcsb == 0xb8 and est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+            mcsb = 0xb0
+        if mcsb == 0xf8 and est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+            mcsb = 0xb0
+        if mcsb == 0x40 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0x00
+        if mcsb == 0x50 and est < EXPECTED_SECTOR_TYPE.MODE_2_FORM_1:
+            mcsb = 0x10
+        if mcsb == 0x58 and est == EXPECTED_SECTOR_TYPE.MODE_1:
+            mcsb = 0x18
+        if mcsb == 0x60 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0x20
+        if mcsb == 0x70 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0x30
+        if mcsb == 0x78 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0x38
+        if mcsb == 0xe0 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0xa0
+        if mcsb == 0xf0 and est in [EXPECTED_SECTOR_TYPE.MODE_1, EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS]:
+            mcsb = 0xb0
+        if mcsb == 0xf8 and est == EXPECTED_SECTOR_TYPE.MODE_1:
+            mcsb = 0xb8
+        mcsb = mcsb >> 3
+
+        for l in range(lba, lba + tl):
+            r = {}
+            # SYNC
+            if mcsb & 0x10:
+                r['sync'] = d[:12]
+                d = d[12:]
+            # Header Codes: Sector Header
+            if mcsb & 0x04:
+                r['sector-header'] = {}
+                r['sector-header']['minute'] = d[0]
+                r['sector-header']['second'] = d[1]
+                r['sector-header']['frame'] = d[2]
+                r['sector-header']['mode'] = d[3]
+                r['sector-header']['data'] = d[:4]
+                d = d[4:]
+            # Header Codes: Sector Subheader
+            if mcsb & 0x08:
+                r['sector-subheader'] = []
+                # sub header first copy
+                _b = {}
+                _b['file-number'] = d[0]
+                _b['channel-number'] = d[1]
+                _b['sub-mode'] = d[2]
+                _b['data'] = d[:4]
+                r['sector-subheader'].append(_b)
+                d = d[4:]
+                # sub header second copy
+                _b = {}
+                _b['file-number'] = d[0]
+                _b['channel-number'] = d[1]
+                _b['sub-mode'] = d[2]
+                _b['data'] = d[:4]
+                r['sector-subheader'].append(_b)
+                d = d[4:]
+            # User Data
+            if mcsb & 0x02:
+                # CD-DA
+                if est == EXPECTED_SECTOR_TYPE.CDDA:
+                    r['data'] = d[:2352]
+                    d = d[2352:]
+                # Mode 1
+                if est == EXPECTED_SECTOR_TYPE.MODE_1:
+                    r['data'] = d[:2048]
+                    d = d[2048:]
+                # Mode 2 Formless
+                if est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+                    r['data'] = d[:2336]
+                    d = d[2336:]
+                # Mode 2 Form 1
+                if est == EXPECTED_SECTOR_TYPE.MODE_2_FORM_1:
+                    r['data'] = d[:2048]
+                    d = d[2048:]
+                # Mode 2 Form 2
+                if est == EXPECTED_SECTOR_TYPE.MODE_2_FORM_2:
+                    r['data'] = d[:2324]
+                    d = d[2324:]
+            if mcsb & 0x01:
+                if est == EXPECTED_SECTOR_TYPE.CDDA:
+                    # Everything is DATA for CDDA
+                    True
+                elif est == EXPECTED_SECTOR_TYPE.MODE_1:
+                    r['edc'] = d[:4]
+                    d = d[4:]
+                    # zero fill
+                    d = d[8:]
+                    r['p-parity'] = d[:172]
+                    d = d[172:]
+                    r['q-parity'] = d[:104]
+                    d = d[104:]
+                elif est == EXPECTED_SECTOR_TYPE.MODE_2_FORMLESS:
+                    raise ValueError('No EDC/ECC for Mode2Formless')
+                elif est == EXPECTED_SECTOR_TYPE.MODE_2_FORM_1:
+                    r['edc'] = d[:4]
+                    d = d[4:]
+                    r['p-parity'] = d[:172]
+                    d = d[172:]
+                    r['q-parity'] = d[:104]
+                    d = d[104:]
+                elif est == EXPECTED_SECTOR_TYPE.MODE_2_FORM_2:
+                    r['edc'] = d[:4]
+                    d = d[4:]
+                else:
+                    raise NotImplementedError('EDC/ECC not yet implemented for this MCSB/EST combination')
+
+            if kwargs['c2ei'] == 1:
+                r['c2ei-data'] = d[:294]
+                d = d[294:]
+            if kwargs['c2ei'] == 2:
+                r['c2ei'] = {}
+                r['c2ei']['data'] = d[:296]
+                d = d[296:]
+
+            if kwargs['scsb'] == 2:
+                r['subchannel'] = {}
+                r['subchannel']['c'] = d[0] >> 4
+                r['subchannel']['adr'] = d[0] & 0x0f
+                r['subchannel']['track-number'] = d[1]
+                r['subchannel']['index-number'] = d[2]
+                r['subchannel']['min'] = d[3]
+                r['subchannel']['sec'] = d[4]
+                r['subchannel']['frame'] = d[5]
+                r['subchannel']['zero'] = d[6]
+                r['subchannel']['amin'] = d[7]
+                r['subchannel']['asec'] = d[8]
+                r['subchannel']['aframe'] = d[9]
+                r['subchannel']['crc'] = (d[10] << 8) | d[11]
+                r['subchannel']['p'] = d[15] >> 7
+                r['subchannel']['data'] = d[:16]
+                d = d[16:]
+            if kwargs['scsb'] == 4:
+                r['subchannel']= {}
+                r['subchannel']['data'] = d[:96]
+                d = d[96:]
+
+            result[l] = r
+
+        return result
