@@ -5,6 +5,7 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+import pyscsi.utils.converter as convert
 from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.pyscsi.scsi_enum_readcd import EXPECTED_SECTOR_TYPE
 from pyscsi.utils.converter import decode_bits, encode_dict
@@ -22,10 +23,31 @@ class ReadCd(SCSICommand):
                  'est': [0x1c, 1],
                  'dap': [0x02, 1],
                  'lba': [0xffffffff, 2],
-                 'tl': [0xffff, 6],
+                 'tl': [0xffffff, 6],
                  'mcsb': [0xf8, 9],
                  'c2ei': [0x06, 9],
                  'scsb': [0x07, 10],
+                 }
+    # SubChannel type 2 bits
+    _sc2_bits =  {'c': [0xf0, 0],
+                  'adr': [0x0f, 0],
+                  'track-number': [0xff, 1],
+                  'index-number': [0xff, 2],
+                  'min': [0xff, 3],
+                  'sec': [0xff, 4],
+                  'frame': [0xff, 5],
+                  'zero': [0xff, 6],
+                  'amin': [0xff, 7],
+                  'asec': [0xff, 8],
+                  'aframe': [0xff, 9],
+                  'crc': [0xffff, 10],
+                  'p': [0x80, 15],
+                  }
+    # SectorHeader
+    _sh_bits =  {'minute': [0xff, 0],
+                 'second': [0xff, 1],
+                 'frame': [0xff, 2],
+                 'mode': [0xff, 3],
                  }
 
     def __init__(self,
@@ -125,11 +147,7 @@ class ReadCd(SCSICommand):
             # Header Codes: Sector Header
             if mcsb & 0x04:
                 r['sector-header'] = {}
-                r['sector-header']['minute'] = d[0]
-                r['sector-header']['second'] = d[1]
-                r['sector-header']['frame'] = d[2]
-                r['sector-header']['mode'] = d[3]
-                r['sector-header']['data'] = d[:4]
+                convert.decode_bits(d, cls._sh_bits, r['sector-header'])
                 d = d[4:]
             # Header Codes: Sector Subheader
             if mcsb & 0x08:
@@ -210,19 +228,7 @@ class ReadCd(SCSICommand):
 
             if kwargs['scsb'] == 2:
                 r['subchannel'] = {}
-                r['subchannel']['c'] = d[0] >> 4
-                r['subchannel']['adr'] = d[0] & 0x0f
-                r['subchannel']['track-number'] = d[1]
-                r['subchannel']['index-number'] = d[2]
-                r['subchannel']['min'] = d[3]
-                r['subchannel']['sec'] = d[4]
-                r['subchannel']['frame'] = d[5]
-                r['subchannel']['zero'] = d[6]
-                r['subchannel']['amin'] = d[7]
-                r['subchannel']['asec'] = d[8]
-                r['subchannel']['aframe'] = d[9]
-                r['subchannel']['crc'] = (d[10] << 8) | d[11]
-                r['subchannel']['p'] = d[15] >> 7
+                convert.decode_bits(d, cls._sc2_bits, r['subchannel'])
                 r['subchannel']['data'] = d[:16]
                 d = d[16:]
             if kwargs['scsb'] == 4:
