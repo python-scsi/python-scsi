@@ -6,6 +6,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+from pyscsi.pyscsi.scsi_cdb_atapassthrough12 import ATAPassThrough12
+from pyscsi.pyscsi.scsi_cdb_atapassthrough16 import ATAPassThrough16
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
@@ -757,4 +759,103 @@ class SCSI(object):
                              **kwargs)
         self.execute(cmd)
         cmd.unmarshall()
+        return cmd
+
+    def atapassthrough12(self,
+                         protocal,
+                         t_length,
+                         byte_block,
+                         t_dir,
+                         t_type,
+                         off_line,
+                         fetures,
+                         count,
+                         lba,
+                         command,
+                         **kwargs):
+        """
+        Return a ATAPassThrough12 Instance, check ATA Status Return Descriptor by yourself
+
+        :param protocal: ATAPassthrough12 PROTOCOL field
+        :param t_length: ATAPassthrough12 t_length field
+        :param byte_block: ATAPassthrough12 byte_block field
+        :param t_dir: ATAPassthrough12 t_dir field
+        :param t_type: ATAPassthrough12 t_type field
+        :param off_line: ATAPassThrough12 off_line field
+        :param fetures: ATAPassThrough12 fetures field
+        :param count: ATAPassThrough12 count field
+        :param lba: ATAPassThrough12 lba field
+        :param command: ATAPassThrough12 command field
+        :param kwargs: a dict with key/value pairs
+                       blocksize=None: a blocksize
+                       ck_cond=0: ATAPassThrough12 ck_cond field
+                       device=0: ATAPassThrough12 device field
+                       control=0: ATAPassThrough12 control field
+                       data=None: a byte array with data, if command need data-in data-out
+        :return: a ATAPassThrough12 instance
+        """
+        opcode = self.device.opcodes.ATA_PASS_THROUGH_12
+        cmd = ATAPassThrough12(opcode,
+                               protocal,
+                               t_length,
+                               byte_block,
+                               t_dir,
+                               t_type,
+                               off_line,
+                               fetures,
+                               count,
+                               lba,
+                               command,
+                               **kwargs)
+        self.execute(cmd)
+        return cmd
+
+    def atapassthrough16(self,
+                         protocal,
+                         t_length,
+                         byte_block,
+                         t_dir,
+                         t_type,
+                         off_line,
+                         fetures,
+                         count,
+                         lba,
+                         command,
+                         **kwargs):
+        """
+        Return a ATAPassThrough16 Instance, check ATA Status Return Descriptor by yourself
+
+        :param protocal: ATAPassThrough16 PROTOCOL field
+        :param t_length: ATAPassThrough16 t_length field
+        :param byte_block: ATAPassThrough16 byte_block field
+        :param t_dir: ATAPassThrough16 t_dir field
+        :param t_type: ATAPassThrough16 t_type field
+        :param off_line: ATAPassThrough16 off_line field
+        :param fetures: ATAPassThrough16 fetures field
+        :param count: ATAPassThrough16 count field
+        :param lba: ATAPassThrough16 lba field
+        :param command: ATAPassThrough16 command field
+        :param kwargs: a dict with key/value pairs
+                       blocksize=None: a blocksize
+                       ck_cond=0: ATAPassThrough16 ck_cond field
+                       device=0: ATAPassThrough16 device field
+                       control=0: ATAPassThrough16 control field
+                       data=None: a byte array with data, if command need data-in data-out
+                       extend=1: ATAPassthrough16 extend field
+        :return: a ATAPassThrough16 instance
+        """
+        opcode = self.device.opcodes.ATA_PASS_THROUGH_16
+        cmd = ATAPassThrough16(opcode,
+                               protocal,
+                               t_length,
+                               byte_block,
+                               t_dir,
+                               t_type,
+                               off_line,
+                               fetures,
+                               count,
+                               lba,
+                               command,
+                               **kwargs)
+        self.execute(cmd)
         return cmd

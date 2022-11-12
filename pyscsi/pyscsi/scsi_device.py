@@ -129,7 +129,8 @@ class SCSIDevice(metaclass=ExMETA):
                 self._file,
                 cmd.cdb,
                 cmd.dataout,
-                cmd.datain)
+                cmd.datain,
+                cmd_sense=cmd.sense)
         except sgio.CheckConditionError as error:
             self.CheckCondition(error.sense)
 
