@@ -1,6 +1,6 @@
 # coding: utf-8
 
-# Copyright (C) 2014 by Ronnie Sahlberg<ronniesahlberg@gmail.com>
+# Copyright (C) 2014 by Erick <Eric-1128@outlook.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-from pydiskcmd.pyscsi.scsi_command import SCSICommand
+from pyscsi.pyscsi.scsi_command import SCSICommand
 
 #
 # SCSI ata-pass-through command and definitions
 #
 
-def lba_convert(lba):
+def scsi_to_ata_lba_convert(lba):
     """
     This function converts the lba to the ATAPassThrough16->lba field.
 
@@ -45,7 +45,6 @@ class ATAPassThrough16(SCSICommand):
     _cdb_bits = {'opcode': [0xff, 0],
                  'extend':[0x01,1],
                  'protocol':[0x1E,1],
-                 'obsolete1':[0xE0,1],
                  't_length':[0x03,2],
                  'byte_block':[0x04,2],
                  't_dir':[0x08,2],
@@ -72,12 +71,12 @@ class ATAPassThrough16(SCSICommand):
                  lba,
                  command,
                  blocksize=0,
+                 extra_tl=None,
                  ck_cond=0,
                  device=0x00,
                  control=0,
                  data=None,
-                 extend=1,
-                 sense_data_len=32):
+                 extend=1):
         """
         initialize a new instance
 
@@ -93,12 +92,12 @@ class ATAPassThrough16(SCSICommand):
         :param lba: ATAPassthrough16 lba field
         :param command: ATAPassthrough16 command field
         :param blocksize=None: a blocksize
+        :param extra_tl=None: if t_length=3, can fix the transfer length in this option
         :param ck_cond=0: ATAPassthrough16 ck_cond field
         :param device=0: ATAPassthrough16 device field
         :param control=0: ATAPassthrough16 control field
-        :param data=None: a byte array with data, if command need data-in data-out
+        :param data=None: a byte array with data, if command need data-in OR data-out
         :param extend=1: ATAPassthrough16 extend field
-        :param sense_data_len=32: a byte array with data, if need command sense
         """
         tl = 0
         if t_length == 1:
@@ -113,8 +112,10 @@ class ATAPassThrough16(SCSICommand):
             tl = count
         elif t_length == 3:
             # The transfer length is an unsigned integer specified in the TPSIU
-            # TODO
-            pass
+            # It's not the tool's job to check transfer length in different commands, can be set it by
+            # extra_tl
+            if extra_tl is not None:
+                tl = extra_tl
 
         if byte_block and (not t_type) and t_length:
             # fix the blocksize to 512
@@ -142,12 +143,12 @@ class ATAPassThrough16(SCSICommand):
                              opcode,
                              dataout_alloclen,
                              datain_alloclen)
-        ## need get the sense data to decode ATA Return Descriptor
-        if sense_data_len > 0:
-            self.sense = bytearray(sense_data_len)
-        # set data if need
+        # re-set data
         if data:
-            self.dataout = data
+            if t_dir == 0:
+                self.dataout = data
+            else:
+                self.datain = data
         self.cdb = self.build_cdb(opcode=self.opcode.value,
                                   extend=extend,
                                   protocol=protocal,
@@ -158,7 +159,7 @@ class ATAPassThrough16(SCSICommand):
                                   off_line=off_line,
                                   fetures=fetures,
                                   count=count,
-                                  lba=lba_convert(lba),
+                                  lba=scsi_to_ata_lba_convert(lba),
                                   command=command,
                                   control=control,
                                   ck_cond=ck_cond,

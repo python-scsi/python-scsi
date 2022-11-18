@@ -788,6 +788,7 @@ class SCSI(object):
         :param command: ATAPassThrough12 command field
         :param kwargs: a dict with key/value pairs
                        blocksize=None: a blocksize
+                       extra_tl=None, if t_length=3, can fix the transfer length in this option
                        ck_cond=0: ATAPassThrough12 ck_cond field
                        device=0: ATAPassThrough12 device field
                        control=0: ATAPassThrough12 control field
@@ -837,6 +838,7 @@ class SCSI(object):
         :param command: ATAPassThrough16 command field
         :param kwargs: a dict with key/value pairs
                        blocksize=None: a blocksize
+                       extra_tl=None, if t_length=3, can fix the transfer length in this option
                        ck_cond=0: ATAPassThrough16 ck_cond field
                        device=0: ATAPassThrough16 device field
                        control=0: ATAPassThrough16 control field
