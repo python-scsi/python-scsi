@@ -947,6 +947,10 @@ class SCSICheckCondition(Exception):
             self.data = self.unmarshall_fixed_format_sense_data(sense)
             self.asc = self.data['additional_sense_code']
             self.ascq = self.data['additional_sense_code_qualifier']
+        elif self.response_code == SENSE_FORMAT_CURRENT_DESCRIPTOR:
+            self.data = self.unmarshall_desc_format_sense_data(sense)
+            self.asc = self.data['additional_sense_code']
+            self.ascq = self.data['additional_sense_code_qualifier']
 
     def _ascq(self):
         return (self.asc << 8) + self.ascq
@@ -975,5 +979,13 @@ class SCSICheckCondition(Exception):
         result = {}
         decode_bits(data,
                     SCSICheckCondition._fixed_format_sdata_bits,
+                    result)
+        return result
+
+    @staticmethod
+    def unmarshall_desc_format_sense_data(data):
+        result = {}
+        decode_bits(data,
+                    SCSICheckCondition._desc_format_sdata_bits,
                     result)
         return result

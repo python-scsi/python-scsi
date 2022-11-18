@@ -17,6 +17,7 @@ class SCSICommand(metaclass=ExMETA):
     _cdb_bits: CheckDict = {}
     _cdb = None
     _sense = None
+    _raw_sense_data = None
     _datain = None
     _dataout = None
     _result = None
@@ -164,6 +165,25 @@ class SCSICommand(metaclass=ExMETA):
         :param value: a byte array
         """
         self._sense = value
+
+    @property
+    def raw_sense_data(self):
+        """
+        getter method of the raw_sense_data property
+
+        :return: a byte
+        """
+        return self._raw_sense_data
+
+    @raw_sense_data.setter
+    def raw_sense_data(self,
+                       value):
+        """
+        setter method of the raw_sense_data property
+
+        :param value: a byte
+        """
+        self._raw_sense_data = value
 
     @property
     def pagecode(self):
