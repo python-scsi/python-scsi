@@ -72,12 +72,12 @@ class ATAPassThrough12(SCSICommand):
         """
         tl = 0
         if t_length == 1:
-            # The transfer length is an unsigned integer specified in the FEATURES (7:0) field and, 
+            # The transfer length is an unsigned integer specified in the FEATURES (7:0) field and,
             # for the ATA PASS-THROUGH (16) command and the ATA PASS-THROUGH (32) command, the
             # FEATURES (15:8) field.
             tl = fetures
         elif t_length == 2:
-            # The transfer length is an unsigned integer specified in the COUNT (7:0) field and, for 
+            # The transfer length is an unsigned integer specified in the COUNT (7:0) field and, for
             # the ATA PASS-THROUGH(16) command and the ATA PASS-THROUGH (32) command, the COUNT(15:8)
             # field.
             tl = count
