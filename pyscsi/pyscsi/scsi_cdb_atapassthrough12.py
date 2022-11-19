@@ -94,7 +94,7 @@ class ATAPassThrough12(SCSICommand):
         elif byte_block and t_type and t_length:
             # The number of ATA logical sector size blocks to be transferred, set it in param blocksize
             if blocksize == 0:
-                raise SCSICommand.MissingBlocksizeException
+                raise SCSICommand.MissingBlocksizeException # pylint: disable=maybe-no-member
         elif (not byte_block) and t_length:
             blocksize = 1
         elif not t_length:
@@ -135,7 +135,7 @@ class ATAPassThrough12(SCSICommand):
                                   ck_cond=ck_cond,
                                   device=device)
 
-    @staticmethod                             
+    @staticmethod
     def scsi_to_ata_lba_convert(lba):
         """
         This function converts the lba to the ATAPassThrough12->lba field.
