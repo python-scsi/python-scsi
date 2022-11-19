@@ -21,22 +21,6 @@ from pyscsi.pyscsi.scsi_command import SCSICommand
 # SCSI ata-pass-through command and definitions
 #
 
-def scsi_to_ata_lba_convert(lba):
-    """
-    This function converts the lba to the ATAPassThrough16->lba field.
-
-    :param lba: lba(int) to convert
-    :return: ATAPassThrough16->lba
-    """
-    result = 0
-    result += ((lba & 0xFF) << 32)
-    result += (((lba >> 8) & 0xFF) << 16)
-    result += ((lba >> 16) & 0xFF)
-    result += (((lba >> 24) & 0xFF) << 40)
-    result += (((lba >> 32) & 0xFF) << 24)
-    result += (((lba >> 40) & 0xFF) << 8)
-    return result
-
 
 class ATAPassThrough16(SCSICommand):
     """
@@ -159,8 +143,25 @@ class ATAPassThrough16(SCSICommand):
                                   off_line=off_line,
                                   fetures=fetures,
                                   count=count,
-                                  lba=scsi_to_ata_lba_convert(lba),
+                                  lba=ATAPassThrough16.scsi_to_ata_lba_convert(lba),
                                   command=command,
                                   control=control,
                                   ck_cond=ck_cond,
                                   device=device)
+
+    @staticmethod
+    def scsi_to_ata_lba_convert(lba):
+        """
+        This function converts the lba to the ATAPassThrough16->lba field.
+
+        :param lba: lba(int) to convert
+        :return: ATAPassThrough16->lba
+        """
+        result = 0
+        result += ((lba & 0xFF) << 32)
+        result += (((lba >> 8) & 0xFF) << 16)
+        result += ((lba >> 16) & 0xFF)
+        result += (((lba >> 24) & 0xFF) << 40)
+        result += (((lba >> 32) & 0xFF) << 24)
+        result += (((lba >> 40) & 0xFF) << 8)
+        return result

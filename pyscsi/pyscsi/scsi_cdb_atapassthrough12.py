@@ -21,19 +21,6 @@ from pyscsi.pyscsi.scsi_command import SCSICommand
 # SCSI ata-pass-through command and definitions
 #
 
-def scsi_to_ata_lba_convert(lba):
-    """
-    This function converts the lba to the ATAPassThrough12->lba field.
-
-    :param lba: lba(int) to convert
-    :return: ATAPassThrough12->lba
-    """
-    result = 0
-    result += ((lba & 0xFF) << 16)
-    result += (((lba >> 8) & 0xFF) << 8)
-    result += ((lba >> 16) & 0xFF)
-    return result
-
 
 class ATAPassThrough12(SCSICommand):
     """
@@ -152,8 +139,22 @@ class ATAPassThrough12(SCSICommand):
                                   off_line=off_line,
                                   fetures=fetures,
                                   count=count,
-                                  lba=scsi_to_ata_lba_convert(lba),
+                                  lba=ATAPassThrough12.scsi_to_ata_lba_convert(lba),
                                   command=command,
                                   control=control,
                                   ck_cond=ck_cond,
                                   device=device)
+
+    @staticmethod                             
+    def scsi_to_ata_lba_convert(lba):
+        """
+        This function converts the lba to the ATAPassThrough12->lba field.
+
+        :param lba: lba(int) to convert
+        :return: ATAPassThrough12->lba
+        """
+        result = 0
+        result += ((lba & 0xFF) << 16)
+        result += (((lba >> 8) & 0xFF) << 8)
+        result += ((lba >> 16) & 0xFF)
+        return result
