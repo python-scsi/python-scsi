@@ -8,7 +8,6 @@
 import pyscsi.utils.converter as convert
 from pyscsi.pyscsi.scsi_command import SCSICommand
 from pyscsi.pyscsi.scsi_enum_readcd import EXPECTED_SECTOR_TYPE
-from pyscsi.utils.converter import decode_bits, encode_dict
 
 #
 # SCSI ReadCd command and definitions
