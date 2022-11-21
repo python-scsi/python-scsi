@@ -112,7 +112,7 @@ class SCSIDevice(metaclass=ExMETA):
     def close(self):
         self._file.close()
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense=False):
         """
         execute a scsi command
 
@@ -129,7 +129,8 @@ class SCSIDevice(metaclass=ExMETA):
                 self._file,
                 cmd.cdb,
                 cmd.dataout,
-                cmd.datain)
+                cmd.datain,
+                return_sense_buffer=en_raw_sense)
         except sgio.CheckConditionError as error:
             self.CheckCondition(error.sense)
 
