@@ -125,14 +125,21 @@ class SCSIDevice(metaclass=ExMETA):
                 self.open()
 
         try:
+            # TODO: If exist the corner case that sense cannot be raised by error.sense?
+            # will not set return_sense_data=True until i test most of the ata command set.
             sgio.execute(
                 self._file,
                 cmd.cdb,
                 cmd.dataout,
-                cmd.datain,
-                return_sense_buffer=en_raw_sense)
+                cmd.datain)
         except sgio.CheckConditionError as error:
             self.CheckCondition(error.sense)
+            # For ata-passthrough, mostly the scsi command return no real error, here
+            # save the raw sense data to command.raw_sense_data for upper level use.
+            # If you execute the other scsi commands with en_raw_sense=True, this will
+            # be a coppy of error.sense
+            if en_raw_sense:
+                cmd.raw_sense_data = error.sense
 
     @property
     def opcodes(self):
