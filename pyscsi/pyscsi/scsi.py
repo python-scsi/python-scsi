@@ -772,7 +772,6 @@ class SCSI(object):
                          count,
                          lba,
                          command,
-                         en_raw_sense=False,
                          **kwargs):
         """
         Return a ATAPassThrough12 Instance, check ATA Status Return Descriptor by yourself
@@ -787,7 +786,6 @@ class SCSI(object):
         :param count: ATAPassThrough12 count field
         :param lba: ATAPassThrough12 lba field
         :param command: ATAPassThrough12 command field
-        :param en_raw_sense=False: Flags to enable raw_sense_data
         :param kwargs: a dict with key/value pairs
                        blocksize=None: a blocksize
                        extra_tl=None, if t_length=3, can fix the transfer length in this option
@@ -810,7 +808,7 @@ class SCSI(object):
                                lba,
                                command,
                                **kwargs)
-        self.execute(cmd, en_raw_sense=en_raw_sense)
+        self.execute(cmd, en_raw_sense=True)
         return cmd
 
     def atapassthrough16(self,
@@ -824,7 +822,6 @@ class SCSI(object):
                          count,
                          lba,
                          command,
-                         en_raw_sense=False,
                          **kwargs):
         """
         Return a ATAPassThrough16 Instance, check ATA Status Return Descriptor by yourself
@@ -839,7 +836,6 @@ class SCSI(object):
         :param count: ATAPassThrough16 count field
         :param lba: ATAPassThrough16 lba field
         :param command: ATAPassThrough16 command field
-        :param en_raw_sense=False: Flags to enable raw_sense_data
         :param kwargs: a dict with key/value pairs
                        blocksize=None: a blocksize
                        extra_tl=None, if t_length=3, can fix the transfer length in this option
