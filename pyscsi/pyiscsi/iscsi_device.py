@@ -83,7 +83,7 @@ class ISCSIDevice(metaclass=ExMETA):
     def close(self):
         self._iscsi.disconnect()
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense=False):
         """
         execute a scsi command
         :param cmd: a scsi command
@@ -103,6 +103,9 @@ class ISCSIDevice(metaclass=ExMETA):
             cmd.dataout,
             cmd.datain)
         if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            # Match recent addition to SCSIDevice
+            if en_raw_sense:
+                cmd.raw_sense_data = cmd.sense
             # No sense information propagated.
             raise self.CheckCondition(cmd.sense)
         if task.status == scsi_enum_command.SCSI_STATUS.GOOD:
