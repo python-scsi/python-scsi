@@ -36,16 +36,19 @@ class ISCSIDevice(metaclass=ExMETA):
     """
 
     def __init__(self,
-                 device):
+                 device,
+                 initiator_name=None):
         """
         initialize a  new instance of a ISCSIDevice
 
         :param device: a url string
+        :param initiator_name: an initiator_name string
         """
         self._opcodes = scsi_enum_command.spc
         self._file_name = device
         self._iscsi = None
         self._iscsi_url = None
+        self._initiator_name = initiator_name
         if _has_iscsi and device[:8] == 'iscsi://':
             self.open(device)
         else:
@@ -72,7 +75,10 @@ class ISCSIDevice(metaclass=ExMETA):
         """
 
         """
-        self._iscsi = iscsi.Context(device)
+        if self._initiator_name:
+            self._iscsi = iscsi.Context(self._initiator_name)
+        else:
+            self._iscsi = iscsi.Context(device)
         self._iscsi_url = iscsi.URL(self._iscsi, self._file_name)
         self._iscsi.set_targetname(self._iscsi_url.target)
         self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
