@@ -6,13 +6,13 @@ from .converter import *
 from .enum import *
 
 
-def init_device(dev, read_write=False):
+def init_device(dev, read_write=False, initiator_name=None):
     if dev[:5] == '/dev/':
         from pyscsi.pyscsi.scsi_device import SCSIDevice
         device = SCSIDevice(dev, read_write)
     elif dev[:8] == 'iscsi://':
         from pyscsi.pyiscsi.iscsi_device import ISCSIDevice
-        device = ISCSIDevice(dev)
+        device = ISCSIDevice(dev, initiator_name)
     else:
         raise NotImplementedError('No backend implemented for %s' % dev)
     return device
