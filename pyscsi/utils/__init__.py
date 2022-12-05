@@ -4,10 +4,9 @@
 
 from .converter import *
 from .enum import *
-import socket
 
 
-def init_device(dev, read_write=False, initiator_name=f"iqn.2018-01.org.pyscsi:{socket.gethostname()}"):
+def init_device(dev, read_write=False, initiator_name=""):
     if dev[:5] == '/dev/':
         from pyscsi.pyscsi.scsi_device import SCSIDevice
         device = SCSIDevice(dev, read_write)
