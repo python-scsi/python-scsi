@@ -37,7 +37,7 @@ class ISCSIDevice(metaclass=ExMETA):
 
     def __init__(self,
                  device,
-                 initiator_name=None):
+                 initiator_name=""):
         """
         initialize a  new instance of a ISCSIDevice
 
@@ -75,7 +75,7 @@ class ISCSIDevice(metaclass=ExMETA):
         """
 
         """
-        if self._initiator_name:
+        if len(self._initiator_name):
             self._iscsi = iscsi.Context(self._initiator_name)
         else:
             self._iscsi = iscsi.Context(device)
