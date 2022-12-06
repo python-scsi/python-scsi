@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+import socket
+
 from .converter import *
 from .enum import *
 
 
-def init_device(dev, read_write=False, initiator_name=""):
+def init_device(dev, read_write=False, initiator_name=f"iqn.2018-01.org.pyscsi:{socket.gethostname()}"):
     if dev[:5] == '/dev/':
         from pyscsi.pyscsi.scsi_device import SCSIDevice
         device = SCSIDevice(dev, read_write)
