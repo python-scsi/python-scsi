@@ -10,8 +10,7 @@ import unittest
 
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_enum_command import sbc
-
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class CdbReadcapacity10Test(unittest.TestCase):

@@ -10,8 +10,7 @@ import unittest
 
 from pyscsi.pyscsi.scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
 from pyscsi.pyscsi.scsi_enum_command import smc
-
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class CdbPreventallowMediumremovalTest(unittest.TestCase):
