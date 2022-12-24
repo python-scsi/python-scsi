@@ -10,8 +10,7 @@ import unittest
 
 from pyscsi.pyscsi.scsi_cdb_readcd import ReadCd
 from pyscsi.pyscsi.scsi_enum_command import mmc
-
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 _SYNC = bytes([0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
                0xff, 0xff, 0xff, 0xff, 0xff, 0x00])
@@ -20,7 +19,7 @@ _SYNC = bytes([0x00, 0xff, 0xff, 0xff, 0xff, 0xff,
 # Mock for a read of two sectors for SYNC and SubChannel type 2
 #
 class MockReadCD_SyncSubC(MockDevice):
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         # sync
         cmd.datain[0:12] = _SYNC
         # subchannel
@@ -37,7 +36,7 @@ class MockReadCD_SyncSubC(MockDevice):
 # Mock for a read of two sectors for SYNC and SectorHeader
 #
 class MockReadCD_SyncSH(MockDevice):
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         # sync
         cmd.datain[0:12] = _SYNC
         # subchannel
