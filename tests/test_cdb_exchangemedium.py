@@ -12,7 +12,7 @@ from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_ba_to_int
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class CdbExchangemediumTest(unittest.TestCase):

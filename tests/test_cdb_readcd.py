@@ -12,7 +12,7 @@ from pyscsi.pyscsi.scsi_cdb_readcd import ReadCd
 from pyscsi.pyscsi.scsi_enum_command import mmc
 from pyscsi.utils.converter import scsi_ba_to_int
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class CdbRead10Test(unittest.TestCase):

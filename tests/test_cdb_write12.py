@@ -12,7 +12,7 @@ from pyscsi.pyscsi.scsi_cdb_write12 import Write12
 from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.utils.converter import scsi_ba_to_int
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class CdbWrite12Test(unittest.TestCase):

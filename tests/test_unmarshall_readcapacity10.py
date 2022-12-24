@@ -11,12 +11,12 @@ import unittest
 from pyscsi.pyscsi.scsi_cdb_readcapacity10 import ReadCapacity10
 from pyscsi.pyscsi.scsi_enum_command import sbc
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class MockReadCapacity10(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         # lba
         cmd.datain[0:4] = [0x00, 0x01, 0x00, 0x00]
         # block size

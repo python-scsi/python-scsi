@@ -13,12 +13,12 @@ from pyscsi.pyscsi.scsi_enum_command import sbc
 from pyscsi.pyscsi.scsi_enum_getlbastatus import P_STATUS
 from pyscsi.utils.converter import scsi_int_to_ba
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class MockGetLBAStatus(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         cmd.datain[0:8] = bytearray(8)
         pos = 8
 

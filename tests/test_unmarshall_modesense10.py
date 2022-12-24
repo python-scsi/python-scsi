@@ -13,12 +13,12 @@ from pyscsi.pyscsi.scsi_cdb_modesense10 import ModeSense10
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_int_to_ba
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class MockModeSenseEAA(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         cmd.datain[0] = 21    # mode data length
         cmd.datain[2] = 97    # medium type
         cmd.datain[3] = 98    # device specific parameter
@@ -40,7 +40,7 @@ class MockModeSenseEAA(MockDevice):
 
 class MockModeSenseControl(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         cmd.datain[0] = 15    # mode data length
         cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
         cmd.datain[3] = 0x90  # device specific parameter
@@ -59,7 +59,7 @@ class MockModeSenseControl(MockDevice):
 
 class MockModeSenseControlExt1(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         cmd.datain[0] = 15    # mode data length
         cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
         cmd.datain[3] = 0x90  # device specific parameter
@@ -76,7 +76,7 @@ class MockModeSenseControlExt1(MockDevice):
 
 class MockModeSenseDisconnect(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         cmd.datain[0] = 15    # mode data length
         cmd.datain[2] = 0     # medium type: BLOCK_DEVICE
         cmd.datain[3] = 0x90  # device specific parameter

@@ -13,12 +13,12 @@ from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.converter import scsi_int_to_ba
 
-from .mock_device import MockDevice, MockSCSI
+from tests.mock_device import MockDevice, MockSCSI
 
 
 class MockReadElementStatus(MockDevice):
 
-    def execute(self, cmd):
+    def execute(self, cmd, en_raw_sense: bool=False):
         # element status header data
         data = bytearray(8)
         data[0:2] = scsi_int_to_ba(12, 2)  # first element address reported
