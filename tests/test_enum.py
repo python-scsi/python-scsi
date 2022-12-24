@@ -10,12 +10,36 @@ import unittest
 
 from pyscsi.pyscsi.scsi_enum_command import smc
 from pyscsi.utils.enum import Enum
+from pyscsi.utils.exception import NotSupportedArgumentError
 
 enum_dict = {'A': 1,
              'B': 2,
              'C': 3, }
 
 class EnumTest(unittest.TestCase):
+
+    def test_fails_on_passing_multiple_args(self):
+        """
+        method to test exeption on creation of an Enum instance
+        """
+        with self.assertRaises(NotSupportedArgumentError):
+            Enum(1,2,3)
+
+    def test_fails_on_passing_list(self):
+        """
+        method to test exeption on creation of an Enum instanc
+        """
+        with self.assertRaises(NotSupportedArgumentError):
+            Enum((1,2,3))
+
+    def test_key_exists(self):
+        """
+        method to test exeption on adding an existing value
+        """
+        i = Enum(enum_dict)
+        with self.assertRaises(KeyError):
+            i.add('A',6)
+
     def test_main(self):
         i = Enum(enum_dict)
         self.assertEqual(i.A, 1)
