@@ -6,13 +6,13 @@
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
 from pyscsi.pyscsi.scsi_command import SCSICommand
+from pyscsi.pyscsi.scsi_enum_report_target_port_groups import DATA_FORMAT_TYPE
 from pyscsi.utils.converter import (
     decode_bits,
     encode_dict,
     scsi_ba_to_int,
     scsi_int_to_ba,
 )
-from pyscsi.pyscsi.scsi_enum_report_target_port_groups import DATA_FORMAT_TYPE
 
 #
 # SCSI ReportTargetPortGroups command and definitions
