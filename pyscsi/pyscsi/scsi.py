@@ -33,6 +33,7 @@ from pyscsi.pyscsi.scsi_cdb_readdiscinformation import ReadDiscInformation
 from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
+from pyscsi.pyscsi.scsi_cdb_report_target_port_groups import ReportTargetPortGroups
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -757,6 +758,24 @@ class SCSI(object):
         opcode = next(get_opcode(self.device.opcodes, 'A3'))
         cmd = ReportPriority(opcode=opcode,
                              **kwargs)
+        self.execute(cmd)
+        cmd.unmarshall()
+        return cmd
+
+    def reporttargetportgroups(self,
+                   **kwargs):
+        """
+        Return a ReportTargetPortGroups Instance
+
+        :param kwargs: a dict with key/value pairs
+                       data_format=0x00, specifies the requested format for the parameter
+                       data returned
+                       alloclen=16384, size of requested datain
+        :return: a ReportTargetPortGroups instance
+        """
+        opcode = next(get_opcode(self.device.opcodes, 'A3'))
+        cmd = ReportTargetPortGroups(opcode=opcode,
+                         **kwargs)
         self.execute(cmd)
         cmd.unmarshall()
         return cmd
