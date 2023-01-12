@@ -10,8 +10,8 @@
 import unittest
 
 from pyscsi.pyscsi.scsi_cdb_report_target_port_groups import ReportTargetPortGroups
-from pyscsi.pyscsi.scsi_enum_report_target_port_groups import DATA_FORMAT_TYPE
 from pyscsi.pyscsi.scsi_enum_command import spc
+from pyscsi.pyscsi.scsi_enum_report_target_port_groups import DATA_FORMAT_TYPE
 from pyscsi.utils.converter import scsi_ba_to_int
 from tests.mock_device import MockDevice, MockSCSI
 
