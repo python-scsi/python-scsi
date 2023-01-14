@@ -16,25 +16,21 @@ class Read12(SCSICommand):
     """
     A class to send a Read(12) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'rdprotect': [0xe0, 1],
-                 'dpo': [0x10, 1],
-                 'fua': [0x08, 1],
-                 'rarc': [0x04, 1],
-                 'lba': [0xffffffff, 2],
-                 'tl': [0xffffffff, 6],
-                 'group': [0x1f, 10], }
 
-    def __init__(self,
-                 opcode,
-                 blocksize,
-                 lba,
-                 tl,
-                 rdprotect=0,
-                 dpo=0,
-                 fua=0,
-                 rarc=0,
-                 group=0):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "rdprotect": [0xE0, 1],
+        "dpo": [0x10, 1],
+        "fua": [0x08, 1],
+        "rarc": [0x04, 1],
+        "lba": [0xFFFFFFFF, 2],
+        "tl": [0xFFFFFFFF, 6],
+        "group": [0x1F, 10],
+    }
+
+    def __init__(
+        self, opcode, blocksize, lba, tl, rdprotect=0, dpo=0, fua=0, rarc=0, group=0
+    ):
         """
         initialize a new instance
 
@@ -51,16 +47,15 @@ class Read12(SCSICommand):
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self,
-                             opcode,
-                             0,
-                             blocksize * tl)
+        SCSICommand.__init__(self, opcode, 0, blocksize * tl)
 
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  lba=lba,
-                                  tl=tl,
-                                  rdprotect=rdprotect,
-                                  dpo=dpo,
-                                  fua=fua,
-                                  rarc=rarc,
-                                  group=group)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            lba=lba,
+            tl=tl,
+            rdprotect=rdprotect,
+            dpo=dpo,
+            fua=fua,
+            rarc=rarc,
+            group=group,
+        )

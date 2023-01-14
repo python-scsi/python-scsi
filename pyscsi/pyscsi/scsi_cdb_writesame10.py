@@ -16,24 +16,20 @@ class WriteSame10(SCSICommand):
     """
     A class to send a WriteSame(10) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'wrprotect': [0xe0, 1],
-                 'anchor': [0x10, 1],
-                 'unmap': [0x08, 1],
-                 'lba': [0xffffffff, 2],
-                 'group': [0x1f, 6],
-                 'nb': [0xffff, 7], }
 
-    def __init__(self,
-                 opcode,
-                 blocksize,
-                 lba,
-                 nb,
-                 data,
-                 wrprotect=0,
-                 anchor=0,
-                 unmap=0,
-                 group=0):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "wrprotect": [0xE0, 1],
+        "anchor": [0x10, 1],
+        "unmap": [0x08, 1],
+        "lba": [0xFFFFFFFF, 2],
+        "group": [0x1F, 6],
+        "nb": [0xFFFF, 7],
+    }
+
+    def __init__(
+        self, opcode, blocksize, lba, nb, data, wrprotect=0, anchor=0, unmap=0, group=0
+    ):
         """
         initialize a new instance
 
@@ -50,15 +46,14 @@ class WriteSame10(SCSICommand):
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self,
-                             opcode,
-                             blocksize,
-                             0)
+        SCSICommand.__init__(self, opcode, blocksize, 0)
         self.dataout = data
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  lba=lba,
-                                  nb=nb,
-                                  wrprotect=wrprotect,
-                                  anchor=anchor,
-                                  unmap=unmap,
-                                  group=group)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            lba=lba,
+            nb=nb,
+            wrprotect=wrprotect,
+            anchor=anchor,
+            unmap=unmap,
+            group=group,
+        )

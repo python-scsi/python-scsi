@@ -10,7 +10,9 @@ from pyscsi.utils.enum import Enum
 #
 # PARAMETER DATA FORMAT TYPE
 #
-_data_format_type = {'LENGTH_ONLY_HEADER_PARAMETER_DATA_FORMAT': 0,
-                     'EXTENDED_HEADER_PARAMETER_DATA_FORMAT': 1, }
+_data_format_type = {
+    "LENGTH_ONLY_HEADER_PARAMETER_DATA_FORMAT": 0,
+    "EXTENDED_HEADER_PARAMETER_DATA_FORMAT": 1,
+}
 
 DATA_FORMAT_TYPE = Enum(_data_format_type)

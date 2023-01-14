@@ -10,6 +10,7 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 
 try:
     import iscsi
+
     _has_iscsi = True
 except ImportError as e:
     _has_iscsi = False
@@ -35,9 +36,7 @@ class ISCSIDevice(metaclass=ExMETA):
     Note: The workflow above is already implemented in the SCSI class
     """
 
-    def __init__(self,
-                 device,
-                 initiator_name=""):
+    def __init__(self, device, initiator_name=""):
         """
         initialize a  new instance of a ISCSIDevice
 
@@ -49,18 +48,15 @@ class ISCSIDevice(metaclass=ExMETA):
         self._iscsi = None
         self._iscsi_url = None
         self._initiator_name = initiator_name
-        if _has_iscsi and device[:8] == 'iscsi://':
+        if _has_iscsi and device[:8] == "iscsi://":
             self.open(device)
         else:
-            raise NotImplementedError('No backend implemented for %s' % device)
+            raise NotImplementedError("No backend implemented for %s" % device)
 
     def __enter__(self):
         return self
 
-    def __exit__(self,
-                 exc_type,
-                 exc_val,
-                 exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         """
 
         :param exc_type:
@@ -72,9 +68,6 @@ class ISCSIDevice(metaclass=ExMETA):
         self.close()
 
     def open(self, device):
-        """
-
-        """
         if len(self._initiator_name):
             self._iscsi = iscsi.Context(self._initiator_name)
         else:
@@ -83,8 +76,7 @@ class ISCSIDevice(metaclass=ExMETA):
         self._iscsi.set_targetname(self._iscsi_url.target)
         self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
         self._iscsi.set_header_digest(iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
-        self._iscsi.connect(self._iscsi_url.portal,
-                            self._iscsi_url.lun)
+        self._iscsi.connect(self._iscsi_url.portal, self._iscsi_url.lun)
 
     def close(self):
         self._iscsi.disconnect()
@@ -103,11 +95,7 @@ class ISCSIDevice(metaclass=ExMETA):
             dir = iscsi.SCSI_XFER_WRITE
             xferlen = len(cmd.dataout)
         task = iscsi.Task(cmd.cdb, dir, xferlen)
-        self._iscsi.command(
-            self._iscsi_url.lun,
-            task,
-            cmd.dataout,
-            cmd.datain)
+        self._iscsi.command(self._iscsi_url.lun, task, cmd.dataout, cmd.datain)
         if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
             # Match recent addition to SCSIDevice
             if en_raw_sense:
@@ -123,8 +111,7 @@ class ISCSIDevice(metaclass=ExMETA):
         return self._opcodes
 
     @opcodes.setter
-    def opcodes(self,
-                value):
+    def opcodes(self, value):
         self._opcodes = value
 
     @property
@@ -132,6 +119,5 @@ class ISCSIDevice(metaclass=ExMETA):
         return self._devicetype
 
     @devicetype.setter
-    def devicetype(self,
-                   value):
+    def devicetype(self, value):
         self._devicetype = value

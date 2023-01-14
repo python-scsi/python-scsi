@@ -18,7 +18,7 @@ from pyscsi.utils import init_device
 
 
 def usage():
-    print('Usage: swp.py [--help] [--on|--off] <device>')
+    print("Usage: swp.py [--help] [--on|--off] <device>")
 
 
 def main():
@@ -26,13 +26,13 @@ def main():
     swp_off = 0
     i = 1
     while i < len(sys.argv):
-        if sys.argv[i] == '--help':
+        if sys.argv[i] == "--help":
             return usage()
-        if sys.argv[i] == '--on':
+        if sys.argv[i] == "--on":
             del sys.argv[i]
             swp_on = 1
             continue
-        if sys.argv[i] == '--off':
+        if sys.argv[i] == "--off":
             del sys.argv[i]
             swp_off = 1
             continue
@@ -48,18 +48,18 @@ def main():
     i = s.modesense6(page_code=MODESENSE6.PAGE_CODE.CONTROL).result
 
     if swp_on:
-        i['mode_pages'][0]['swp'] = 1
+        i["mode_pages"][0]["swp"] = 1
         s.modeselect6(i)
-        print('Set SWP ON')
+        print("Set SWP ON")
         return
 
     if swp_off:
-        i['mode_pages'][0]['swp'] = 0
+        i["mode_pages"][0]["swp"] = 0
         s.modeselect6(i)
-        print('Set SWP OFF')
+        print("Set SWP OFF")
         return
 
-    print('SWP is %s' % ("ON" if i['mode_pages'][0]['swp'] else "OFF"))
+    print("SWP is %s" % ("ON" if i["mode_pages"][0]["swp"] else "OFF"))
 
 
 if __name__ == "__main__":

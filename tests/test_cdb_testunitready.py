@@ -26,7 +26,7 @@ class CdbTestunitreadyTest(unittest.TestCase):
             self.assertEqual(cdb[4], 0)
             self.assertEqual(cdb[5], 0)
             cdb = w.unmarshall_cdb(cdb)
-            self.assertEqual(cdb['opcode'], s.device.opcodes.TEST_UNIT_READY.value)
+            self.assertEqual(cdb["opcode"], s.device.opcodes.TEST_UNIT_READY.value)
 
             d = TestUnitReady.unmarshall_cdb(TestUnitReady.marshall_cdb(cdb))
             self.assertEqual(d, cdb)

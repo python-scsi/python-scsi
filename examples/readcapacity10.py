@@ -14,11 +14,11 @@ from pyscsi.utils import init_device
 
 def main(device):
     with SCSI(device) as s:
-        print('ReadCapacity10')
-        print('==========================================\n')
+        print("ReadCapacity10")
+        print("==========================================\n")
         r = s.readcapacity10().result
         for k, v in r.items():
-            print('%s - %s' % (k, v))
+            print("%s - %s" % (k, v))
 
 
 if __name__ == "__main__":
