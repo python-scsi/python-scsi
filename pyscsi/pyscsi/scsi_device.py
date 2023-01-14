@@ -13,6 +13,7 @@ from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMET
 
 try:
     import sgio
+
     _has_sgio = True
 except ImportError as e:
     _has_sgio = False
@@ -43,10 +44,7 @@ class SCSIDevice(metaclass=ExMETA):
     Note: The workflow above is already implemented in the SCSI class
     """
 
-    def __init__(self,
-                 device,
-                 readwrite=False,
-                 detect_replugged=True):
+    def __init__(self, device, readwrite=False, detect_replugged=True):
         """
         initialize a  new instance of a SCSIDevice
         :param device: the file descriptor
@@ -61,10 +59,10 @@ class SCSIDevice(metaclass=ExMETA):
         self._ino = None
         self._detect_replugged = detect_replugged
 
-        if _has_sgio and device[:5] == '/dev/':
+        if _has_sgio and device[:5] == "/dev/":
             self.open()
         else:
-            raise NotImplementedError('No backend implemented for %s' % device)
+            raise NotImplementedError("No backend implemented for %s" % device)
 
     def __enter__(self):
         """
@@ -73,10 +71,7 @@ class SCSIDevice(metaclass=ExMETA):
         """
         return self
 
-    def __exit__(self,
-                 exc_type,
-                 exc_val,
-                 exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         """
 
         :param exc_type:
@@ -105,8 +100,7 @@ class SCSIDevice(metaclass=ExMETA):
         :param read_write:
         :return:
         """
-        self._file = open(self._file_name,
-                          'w+b' if self._read_write else 'rb')
+        self._file = open(self._file_name, "w+b" if self._read_write else "rb")
         self._ino = get_inode(self._file_name)
 
     def close(self):
@@ -127,11 +121,7 @@ class SCSIDevice(metaclass=ExMETA):
         try:
             # TODO: If exist the corner case that sense cannot be raised by error.sense?
             # will not set return_sense_data=True until i test most of the ata command set.
-            sgio.execute(
-                self._file,
-                cmd.cdb,
-                cmd.dataout,
-                cmd.datain)
+            sgio.execute(self._file, cmd.cdb, cmd.dataout, cmd.datain)
         except sgio.CheckConditionError as error:
             self.CheckCondition(error.sense)
             # For ata-passthrough, mostly the scsi command return no real error, here
@@ -146,8 +136,7 @@ class SCSIDevice(metaclass=ExMETA):
         return self._opcodes
 
     @opcodes.setter
-    def opcodes(self,
-                value):
+    def opcodes(self, value):
         self._opcodes = value
 
     @property
@@ -155,6 +144,5 @@ class SCSIDevice(metaclass=ExMETA):
         return self._devicetype
 
     @devicetype.setter
-    def devicetype(self,
-                   value):
+    def devicetype(self, value):
         self._devicetype = value

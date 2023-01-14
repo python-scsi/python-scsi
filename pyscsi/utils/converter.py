@@ -8,15 +8,10 @@
 
 from typing import Mapping, Sequence, Tuple, Union
 
-CheckDict = Mapping[
-    str, Union[
-        Sequence[int],
-        Tuple[int, int],
-        Tuple[str, int, int]
-    ]]
+CheckDict = Mapping[str, Union[Sequence[int], Tuple[int, int], Tuple[str, int, int]]]
 
-def scsi_int_to_ba(to_convert=0,
-                   array_size=4):
+
+def scsi_int_to_ba(to_convert=0, array_size=4):
     """
     This function converts a  integer of (8 *array_size)-bit to a bytearray(array_size) in
     BigEndian byte order. Here we use the 32-bit as default.
@@ -32,7 +27,7 @@ def scsi_int_to_ba(to_convert=0,
     :param array_size: a integer defining the size of the byte array
     :return: a byte array
     """
-    return bytearray((to_convert >> i * 8) & 0xff for i in reversed(range(array_size)))
+    return bytearray((to_convert >> i * 8) & 0xFF for i in reversed(range(array_size)))
 
 
 def scsi_ba_to_int(ba):
@@ -46,9 +41,7 @@ def scsi_ba_to_int(ba):
     return sum(ba[i] << ((len(ba) - 1 - i) * 8) for i in range(len(ba)))
 
 
-def decode_bits(data,
-                check_dict,
-                result_dict):
+def decode_bits(data, check_dict, result_dict):
     """
     helper method to perform some simple bit operations
 
@@ -83,29 +76,27 @@ def decode_bits(data,
             bitmask, byte_pos = val
             _num = 1
             _bm = bitmask
-            while _bm > 0xff:
+            while _bm > 0xFF:
                 _bm >>= 8
                 _num += 1
-            value = scsi_ba_to_int(data[byte_pos:byte_pos + _num])
+            value = scsi_ba_to_int(data[byte_pos : byte_pos + _num])
             while not bitmask & 0x01:
                 bitmask >>= 1
                 value >>= 1
             value &= bitmask
-        elif val[0] == 'b':
+        elif val[0] == "b":
             offset, length = val[1:]
-            value = data[offset:offset + length]
-        elif val[0] == 'w':
+            value = data[offset : offset + length]
+        elif val[0] == "w":
             offset, length = val[1:]
-            value = data[offset:offset + length * 2]
-        elif val[0] == 'dw':
+            value = data[offset : offset + length * 2]
+        elif val[0] == "dw":
             offset, length = val[1:]
-            value = data[offset:offset + length * 4]
+            value = data[offset : offset + length * 4]
         result_dict.update({key: value})
 
 
-def encode_dict(data_dict,
-                check_dict,
-                result):
+def encode_dict(data_dict, check_dict, result):
     """
     helper method to perform some simple bit operations
 
@@ -130,7 +121,7 @@ def encode_dict(data_dict,
 
             _num = 1
             _bm = bitmask
-            while _bm > 0xff:
+            while _bm > 0xFF:
                 _bm >>= 8
                 _num += 1
 
@@ -142,15 +133,15 @@ def encode_dict(data_dict,
             v = scsi_int_to_ba(value, _num)
             for i in range(len(v)):
                 result[bytepos + i] ^= v[i]
-        elif val[0] == 'b':
+        elif val[0] == "b":
             offset, length = val[1:]
-            result[offset:offset + length] = value
-        elif val[0] == 'w':
+            result[offset : offset + length] = value
+        elif val[0] == "w":
             offset, length = val[1:]
-            result[offset:offset + length * 2] = value
-        elif val[0] == 'dw':
+            result[offset : offset + length * 2] = value
+        elif val[0] == "dw":
             offset, length = val[1:]
-            result[offset:offset + length * 4] = value
+            result[offset : offset + length * 4] = value
 
 
 def print_data(data_dict):
@@ -169,11 +160,11 @@ def print_data(data_dict):
             print_data(v)
         else:
             if isinstance(v, str):
-                print('%s -> %s' % (k, v))
+                print("%s -> %s" % (k, v))
             elif isinstance(v, float):
-                print('%s -> %.02d' % (k, v))
+                print("%s -> %.02d" % (k, v))
             else:
-                print('%s -> 0x%02X' % (k, v))
+                print("%s -> 0x%02X" % (k, v))
 
 
 def get_opcode(enum, part):
@@ -186,5 +177,5 @@ def get_opcode(enum, part):
     :return: an OpCode object
     """
     for val in enum.keys:
-        if val[len(val)-2:] == part:
-                yield getattr(enum, val)
+        if val[len(val) - 2 :] == part:
+            yield getattr(enum, val)

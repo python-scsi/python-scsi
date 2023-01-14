@@ -21,14 +21,19 @@ class CdbReadcapacity16Test(unittest.TestCase):
             r = s.readcapacity16(alloclen=37)
             cdb = r.cdb
             self.assertEqual(cdb[0], s.device.opcodes.SBC_OPCODE_9E.value)
-            self.assertEqual(cdb[1], s.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16)
+            self.assertEqual(
+                cdb[1], s.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16
+            )
             self.assertEqual(cdb[2:10], bytearray(8))
             self.assertEqual(scsi_ba_to_int(cdb[10:14]), 37)
             self.assertEqual(cdb[14:16], bytearray(2))
             cdb = r.unmarshall_cdb(cdb)
-            self.assertEqual(cdb['opcode'], s.device.opcodes.SBC_OPCODE_9E.value)
-            self.assertEqual(cdb['service_action'], s.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16)
-            self.assertEqual(cdb['alloc_len'], 37)
+            self.assertEqual(cdb["opcode"], s.device.opcodes.SBC_OPCODE_9E.value)
+            self.assertEqual(
+                cdb["service_action"],
+                s.device.opcodes.SBC_OPCODE_9E.serviceaction.READ_CAPACITY_16,
+            )
+            self.assertEqual(cdb["alloc_len"], 37)
 
             d = ReadCapacity16.unmarshall_cdb(ReadCapacity16.marshall_cdb(cdb))
             self.assertEqual(d, cdb)

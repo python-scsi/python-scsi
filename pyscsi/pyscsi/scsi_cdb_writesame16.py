@@ -17,26 +17,31 @@ class WriteSame16(SCSICommand):
     """
     A class to send a WriteSame(16) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'wrprotect': [0xe0, 1],
-                 'anchor': [0x10, 1],
-                 'unmap': [0x08, 1],
-                 'ndob': [0x01, 1],
-                 'lba': [0xffffffffffffffff, 2],
-                 'group': [0x1f, 14],
-                 'nb': [0xffffffff, 10], }
 
-    def __init__(self,
-                 opcode,
-                 blocksize,
-                 lba,
-                 nb,
-                 data,
-                 wrprotect=0,
-                 anchor=0,
-                 unmap=0,
-                 ndob=0,
-                 group=0):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "wrprotect": [0xE0, 1],
+        "anchor": [0x10, 1],
+        "unmap": [0x08, 1],
+        "ndob": [0x01, 1],
+        "lba": [0xFFFFFFFFFFFFFFFF, 2],
+        "group": [0x1F, 14],
+        "nb": [0xFFFFFFFF, 10],
+    }
+
+    def __init__(
+        self,
+        opcode,
+        blocksize,
+        lba,
+        nb,
+        data,
+        wrprotect=0,
+        anchor=0,
+        unmap=0,
+        ndob=0,
+        group=0,
+    ):
         """
         initialize a new instance
 
@@ -55,16 +60,15 @@ class WriteSame16(SCSICommand):
         if not ndob and blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self,
-                             opcode,
-                             0 if ndob else blocksize,
-                             0)
+        SCSICommand.__init__(self, opcode, 0 if ndob else blocksize, 0)
         self.dataout = None if ndob else data
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  lba=lba,
-                                  nb=nb,
-                                  wrprotect=wrprotect,
-                                  anchor=anchor,
-                                  unmap=unmap,
-                                  ndob=ndob,
-                                  group=group)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            lba=lba,
+            nb=nb,
+            wrprotect=wrprotect,
+            anchor=anchor,
+            unmap=unmap,
+            ndob=ndob,
+            group=group,
+        )

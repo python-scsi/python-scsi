@@ -18,11 +18,11 @@ from pyscsi.utils import init_device
 def main(device):
     with SCSI(device) as s:
         s.testunitready()
-        print ('ReportPriority')
-        print ('==========================================\n')
+        print("ReportPriority")
+        print("==========================================\n")
         r = s.reportpriority().result
         for k, v in r.items():
-            print('%s - %s' % (k, v))
+            print("%s - %s" % (k, v))
 
 
 if __name__ == "__main__":

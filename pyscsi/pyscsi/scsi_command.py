@@ -14,6 +14,7 @@ class SCSICommand(metaclass=ExMETA):
     """
     The base class for a derived scsi command class
     """
+
     _cdb_bits: CheckDict = {}
     _cdb = None
     _sense = None
@@ -24,10 +25,7 @@ class SCSICommand(metaclass=ExMETA):
     _page_code = None
     _opcode = None
 
-    def __init__(self,
-                 opcode,
-                 dataout_alloclen,
-                 datain_alloclen):
+    def __init__(self, opcode, dataout_alloclen, datain_alloclen):
         """
         initialize a new instance
 
@@ -57,15 +55,15 @@ class SCSICommand(metaclass=ExMETA):
         :param opcode: a OpCode object
         :return: a byte array
         """
-        if 0x00 <= opcode.value <= 0x1f:
+        if 0x00 <= opcode.value <= 0x1F:
             cdb = bytearray(6)
-        elif 0x20 <= opcode.value <= 0x5f:
+        elif 0x20 <= opcode.value <= 0x5F:
             cdb = bytearray(10)
-        elif 0x00 <= opcode.value <= 0x1f:
+        elif 0x00 <= opcode.value <= 0x1F:
             raise SCSICommand.OpcodeException
-        elif 0x80 <= opcode.value <= 0x9f:
+        elif 0x80 <= opcode.value <= 0x9F:
             cdb = bytearray(16)
-        elif 0xa0 <= opcode.value <= 0xbf:
+        elif 0xA0 <= opcode.value <= 0xBF:
             cdb = bytearray(12)
         else:
             raise SCSICommand.OpcodeException
@@ -81,8 +79,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._result
 
     @result.setter
-    def result(self,
-               value):
+    def result(self, value):
         """
         setter method of the result property
 
@@ -100,8 +97,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._cdb
 
     @cdb.setter
-    def cdb(self,
-            value):
+    def cdb(self, value):
         """
         setter method of the cdb property
 
@@ -119,8 +115,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._datain
 
     @datain.setter
-    def datain(self,
-               value):
+    def datain(self, value):
         """
         setter method of the datain property
 
@@ -138,8 +133,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._dataout
 
     @dataout.setter
-    def dataout(self,
-                value):
+    def dataout(self, value):
         """
         setter method of the dataout property
 
@@ -157,8 +151,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._sense
 
     @sense.setter
-    def sense(self,
-              value):
+    def sense(self, value):
         """
         setter method of the sense property
 
@@ -176,8 +169,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._raw_sense_data
 
     @raw_sense_data.setter
-    def raw_sense_data(self,
-                       value):
+    def raw_sense_data(self, value):
         """
         setter method of the raw_sense_data property
 
@@ -193,8 +185,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._page_code
 
     @pagecode.setter
-    def pagecode(self,
-                 value):
+    def pagecode(self, value):
         """
         setter method of the pagecode property
 
@@ -210,8 +201,7 @@ class SCSICommand(metaclass=ExMETA):
         return self._opcode
 
     @opcode.setter
-    def opcode(self,
-               value):
+    def opcode(self, value):
         """
         setter method of the opcode property
 
@@ -225,7 +215,7 @@ class SCSICommand(metaclass=ExMETA):
         """
 
         for b in self._cdb:
-            print('0x%02X ' % b)
+            print("0x%02X " % b)
 
     @staticmethod
     def marshall_cdb(cdb):
@@ -236,9 +226,7 @@ class SCSICommand(metaclass=ExMETA):
         :return result: a byte array representing a code descriptor block
         """
         result = bytearray(len(SCSICommand._cdb))
-        encode_dict(cdb,
-                    SCSICommand._cdb_bits,
-                    result)
+        encode_dict(cdb, SCSICommand._cdb_bits, result)
         return result
 
     @staticmethod
@@ -250,13 +238,10 @@ class SCSICommand(metaclass=ExMETA):
         :return result: a dict
         """
         result = {}
-        decode_bits(cdb,
-                    SCSICommand._cdb_bits,
-                    result)
+        decode_bits(cdb, SCSICommand._cdb_bits, result)
         return result
 
-    def build_cdb(self,
-                  **kwargs):
+    def build_cdb(self, **kwargs):
         """
         Build a SCSICommand CDB
 
@@ -273,8 +258,9 @@ class SCSICommand(metaclass=ExMETA):
         :param kwargs: keyword argument dict, content depends on SCSICommand subclass
         """
         try:
-            if getattr(self,
-                       'unmarshall_datain'):
+            if getattr(self, "unmarshall_datain"):
                 self.result = self.unmarshall_datain(self.datain, **kwargs)
         except AttributeError:
-            raise NotImplementedError('%s has no method to unmarshall datain data' % self)
+            raise NotImplementedError(
+                "%s has no method to unmarshall datain data" % self
+            )

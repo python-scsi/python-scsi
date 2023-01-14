@@ -16,41 +16,46 @@ class ATAPassThrough16(SCSICommand):
     """
     A class to send a ATAPassThrough16 command to a ata device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'extend':[0x01,1],
-                 'protocol':[0x1E,1],
-                 't_length':[0x03,2],
-                 'byte_block':[0x04,2],
-                 't_dir':[0x08,2],
-                 't_type':[0x10,2],
-                 'ck_cond':[0x20,2],
-                 'off_line':[0xC0,2],
-                 'fetures':[0xffff,3],
-                 'count':[0xffff,5],
-                 'lba':[0xffffffffffff,7],
-                 'device':[0xff,13],
-                 'command':[0xff,14],
-                 'control':[0xff,15], }
 
-    def __init__(self,
-                 opcode,
-                 protocal,
-                 t_length,
-                 byte_block,
-                 t_dir,
-                 t_type,
-                 off_line,
-                 fetures,
-                 count,
-                 lba,
-                 command,
-                 blocksize=0,
-                 extra_tl=None,
-                 ck_cond=0,
-                 device=0x00,
-                 control=0,
-                 data=None,
-                 extend=1):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "extend": [0x01, 1],
+        "protocol": [0x1E, 1],
+        "t_length": [0x03, 2],
+        "byte_block": [0x04, 2],
+        "t_dir": [0x08, 2],
+        "t_type": [0x10, 2],
+        "ck_cond": [0x20, 2],
+        "off_line": [0xC0, 2],
+        "fetures": [0xFFFF, 3],
+        "count": [0xFFFF, 5],
+        "lba": [0xFFFFFFFFFFFF, 7],
+        "device": [0xFF, 13],
+        "command": [0xFF, 14],
+        "control": [0xFF, 15],
+    }
+
+    def __init__(
+        self,
+        opcode,
+        protocal,
+        t_length,
+        byte_block,
+        t_dir,
+        t_type,
+        off_line,
+        fetures,
+        count,
+        lba,
+        command,
+        blocksize=0,
+        extra_tl=None,
+        ck_cond=0,
+        device=0x00,
+        control=0,
+        data=None,
+        extend=1,
+    ):
         """
         initialize a new instance
 
@@ -97,7 +102,7 @@ class ATAPassThrough16(SCSICommand):
         elif byte_block and t_type and t_length:
             # The number of ATA logical sector size blocks to be transferred, set it in param blocksize
             if blocksize == 0:
-                raise SCSICommand.MissingBlocksizeException # pylint: disable=maybe-no-member
+                raise SCSICommand.MissingBlocksizeException  # pylint: disable=maybe-no-member
         elif (not byte_block) and t_length:
             blocksize = 1
         elif not t_length:
@@ -113,31 +118,30 @@ class ATAPassThrough16(SCSICommand):
             dataout_alloclen = 0
             datain_alloclen = tl * blocksize
 
-        SCSICommand.__init__(self,
-                             opcode,
-                             dataout_alloclen,
-                             datain_alloclen)
+        SCSICommand.__init__(self, opcode, dataout_alloclen, datain_alloclen)
         # re-set data
         if data:
             if t_dir == 0:
                 self.dataout = data
             else:
                 self.datain = data
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  extend=extend,
-                                  protocol=protocal,
-                                  t_length=t_length,
-                                  byte_block=byte_block,
-                                  t_dir=t_dir,
-                                  t_type=t_type,
-                                  off_line=off_line,
-                                  fetures=fetures,
-                                  count=count,
-                                  lba=ATAPassThrough16.scsi_to_ata_lba_convert(lba),
-                                  command=command,
-                                  control=control,
-                                  ck_cond=ck_cond,
-                                  device=device)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            extend=extend,
+            protocol=protocal,
+            t_length=t_length,
+            byte_block=byte_block,
+            t_dir=t_dir,
+            t_type=t_type,
+            off_line=off_line,
+            fetures=fetures,
+            count=count,
+            lba=ATAPassThrough16.scsi_to_ata_lba_convert(lba),
+            command=command,
+            control=control,
+            ck_cond=ck_cond,
+            device=device,
+        )
 
     @staticmethod
     def scsi_to_ata_lba_convert(lba):
@@ -148,10 +152,10 @@ class ATAPassThrough16(SCSICommand):
         :return: ATAPassThrough16->lba
         """
         result = 0
-        result += ((lba & 0xFF) << 32)
-        result += (((lba >> 8) & 0xFF) << 16)
-        result += ((lba >> 16) & 0xFF)
-        result += (((lba >> 24) & 0xFF) << 40)
-        result += (((lba >> 32) & 0xFF) << 24)
-        result += (((lba >> 40) & 0xFF) << 8)
+        result += (lba & 0xFF) << 32
+        result += ((lba >> 8) & 0xFF) << 16
+        result += (lba >> 16) & 0xFF
+        result += ((lba >> 24) & 0xFF) << 40
+        result += ((lba >> 32) & 0xFF) << 24
+        result += ((lba >> 40) & 0xFF) << 8
         return result

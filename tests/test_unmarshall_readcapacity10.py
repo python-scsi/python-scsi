@@ -14,19 +14,19 @@ from tests.mock_device import MockDevice, MockSCSI
 
 
 class MockReadCapacity10(MockDevice):
-
-    def execute(self, cmd, en_raw_sense: bool=False):
+    def execute(self, cmd, en_raw_sense: bool = False):
         # lba
         cmd.datain[0:4] = [0x00, 0x01, 0x00, 0x00]
         # block size
         cmd.datain[4:8] = [0x00, 0x00, 0x10, 0x00]
 
+
 class UnmarshallReadcapacity10Test(unittest.TestCase):
     def test_main(self):
         with MockSCSI(MockReadCapacity10(sbc)) as s:
             i = s.readcapacity10().result
-            self.assertEqual(i['returned_lba'], 65536)
-            self.assertEqual(i['block_length'], 4096)
+            self.assertEqual(i["returned_lba"], 65536)
+            self.assertEqual(i["block_length"], 4096)
 
             d = ReadCapacity10.unmarshall_datain(ReadCapacity10.marshall_datain(i))
             self.assertEqual(d, i)

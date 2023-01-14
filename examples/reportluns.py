@@ -17,11 +17,11 @@ from pyscsi.utils import init_device
 
 def main(device):
     with SCSI(device) as s:
-        print('ReportLuns')
-        print('==========================================\n')
+        print("ReportLuns")
+        print("==========================================\n")
         r = s.reportluns().result
         for k, v in r.items():
-            print('%s - %s' % (k, v))
+            print("%s - %s" % (k, v))
 
 
 if __name__ == "__main__":

@@ -10,10 +10,12 @@ from pyscsi.utils.enum import Enum
 #
 # EXPECTED_SECTOR_TYPE
 #
-_expected_sector_type = {'CDDA': 1,
-                         'MODE_1': 2,
-                         'MODE_2_FORMLESS': 3,
-                         'MODE_2_FORM_1': 4,
-                         'MODE_2_FORM_2': 5, }
+_expected_sector_type = {
+    "CDDA": 1,
+    "MODE_1": 2,
+    "MODE_2_FORMLESS": 3,
+    "MODE_2_FORM_1": 4,
+    "MODE_2_FORM_2": 5,
+}
 
 EXPECTED_SECTOR_TYPE = Enum(_expected_sector_type)

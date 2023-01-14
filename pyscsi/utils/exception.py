@@ -7,4 +7,8 @@
 
 
 class NotSupportedArgumentError(Exception):
+    """
+    Exception for a not supported argument.
+    """
+
     ...

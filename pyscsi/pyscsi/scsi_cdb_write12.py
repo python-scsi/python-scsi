@@ -16,24 +16,20 @@ class Write12(SCSICommand):
     """
     A class to send a Write(12) command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'wrprotect': [0xe0, 1],
-                 'dpo': [0x10, 1],
-                 'fua': [0x08, 1],
-                 'lba': [0xffffffff, 2],
-                 'group': [0x1f, 10],
-                 'tl': [0xffffffff, 6], }
 
-    def __init__(self,
-                 opcode,
-                 blocksize,
-                 lba,
-                 tl,
-                 data,
-                 wrprotect=0,
-                 dpo=0,
-                 fua=0,
-                 group=0):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "wrprotect": [0xE0, 1],
+        "dpo": [0x10, 1],
+        "fua": [0x08, 1],
+        "lba": [0xFFFFFFFF, 2],
+        "group": [0x1F, 10],
+        "tl": [0xFFFFFFFF, 6],
+    }
+
+    def __init__(
+        self, opcode, blocksize, lba, tl, data, wrprotect=0, dpo=0, fua=0, group=0
+    ):
         """
         initialize a new instance
 
@@ -50,15 +46,14 @@ class Write12(SCSICommand):
         if blocksize == 0:
             raise SCSICommand.MissingBlocksizeException
 
-        SCSICommand.__init__(self,
-                             opcode,
-                             blocksize * tl,
-                             0)
+        SCSICommand.__init__(self, opcode, blocksize * tl, 0)
         self.dataout = data
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  lba=lba,
-                                  tl=tl,
-                                  wrprotect=wrprotect,
-                                  dpo=dpo,
-                                  fua=fua,
-                                  group=group)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            lba=lba,
+            tl=tl,
+            wrprotect=wrprotect,
+            dpo=dpo,
+            fua=fua,
+            group=group,
+        )

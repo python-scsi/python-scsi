@@ -22,18 +22,20 @@ class GetLBAStatus(SCSICommand):
     """
     A class to hold information from a GetLBAStatus command to a scsi device
     """
-    _cdb_bits =    {'opcode': [0xff, 0],
-                    'service_action': [0x1f, 1],
-                    'lba': [0xffffffffffffffff, 2],
-                    'alloc_len': [0xffffffff, 10], }
-    _datain_bits = {'lba': [0xffffffffffffffff, 0],
-                    'num_blocks': [0xffffffff, 8],
-                    'p_status': [0x0f, 12], }
 
-    def __init__(self,
-                 opcode,
-                 lba,
-                 alloclen=16384):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "service_action": [0x1F, 1],
+        "lba": [0xFFFFFFFFFFFFFFFF, 2],
+        "alloc_len": [0xFFFFFFFF, 10],
+    }
+    _datain_bits = {
+        "lba": [0xFFFFFFFFFFFFFFFF, 0],
+        "num_blocks": [0xFFFFFFFF, 8],
+        "p_status": [0x0F, 12],
+    }
+
+    def __init__(self, opcode, lba, alloclen=16384):
         """
         initialize a new instance
 
@@ -41,18 +43,16 @@ class GetLBAStatus(SCSICommand):
         :param lba: a local block address
         :param alloclen: the max number of bytes allocated for the data_in buffer
         """
-        SCSICommand.__init__(self,
-                             opcode,
-                             0,
-                             alloclen)
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  service_action=self.opcode.serviceaction.GET_LBA_STATUS,
-                                  lba=lba,
-                                  alloc_len=alloclen, )
+        SCSICommand.__init__(self, opcode, 0, alloclen)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            service_action=self.opcode.serviceaction.GET_LBA_STATUS,
+            lba=lba,
+            alloc_len=alloclen,
+        )
 
     @classmethod
-    def unmarshall_datain(cls,
-                          data):
+    def unmarshall_datain(cls, data):
         """
         Unmarshall the GetLBAStatus datain.
 
@@ -60,18 +60,16 @@ class GetLBAStatus(SCSICommand):
         :return result: a dict
         """
         result = {}
-        _data = data[8:scsi_ba_to_int(data[:4]) + 4]
+        _data = data[8 : scsi_ba_to_int(data[:4]) + 4]
         _lbas = []
         while len(_data):
             _r = {}
-            decode_bits(_data[:16],
-                        cls._datain_bits,
-                        _r)
+            decode_bits(_data[:16], cls._datain_bits, _r)
 
             _lbas.append(_r)
             _data = _data[16:]
 
-        result.update({'lbas': _lbas})
+        result.update({"lbas": _lbas})
         return result
 
     @classmethod
@@ -83,15 +81,13 @@ class GetLBAStatus(SCSICommand):
         :return result: a byte array
         """
         result = bytearray(8)
-        if 'lbas' not in data:
+        if "lbas" not in data:
             result[:4] = scsi_int_to_ba(len(result) - 4, 4)
             return result
 
-        for l in data['lbas']:
+        for l in data["lbas"]:
             _r = bytearray(16)
-            encode_dict(l,
-                        cls._datain_bits,
-                        _r)
+            encode_dict(l, cls._datain_bits, _r)
 
             result += _r
 

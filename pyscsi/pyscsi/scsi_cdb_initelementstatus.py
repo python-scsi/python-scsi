@@ -16,19 +16,20 @@ class InitializeElementStatus(SCSICommand):
     """
     A class to hold information from a InitializeElementStatus command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0], }
 
-    def __init__(self,
-                 opcode):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+    }
+
+    def __init__(self, opcode):
         """
         initialize a new instance
 
         :param opcode: a OpCode instance
         :param scsi:
         """
-        SCSICommand.__init__(self,
-                             opcode,
-                             0,
-                             0)
+        SCSICommand.__init__(self, opcode, 0, 0)
 
-        self.cdb = self.build_cdb(opcode=self.opcode.value, )
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+        )

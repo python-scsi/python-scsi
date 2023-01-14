@@ -22,7 +22,7 @@ class CdbReadcapacity10Test(unittest.TestCase):
             self.assertEqual(cdb[0], s.device.opcodes.READ_CAPACITY_10.value)
             self.assertEqual(cdb[1:10], bytearray(9))
             cdb = r.unmarshall_cdb(cdb)
-            self.assertEqual(cdb['opcode'], s.device.opcodes.READ_CAPACITY_10.value)
+            self.assertEqual(cdb["opcode"], s.device.opcodes.READ_CAPACITY_10.value)
 
             d = ReadCapacity10.unmarshall_cdb(ReadCapacity10.marshall_cdb(cdb))
             self.assertEqual(d, cdb)

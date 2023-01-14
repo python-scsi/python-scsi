@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-__all__ = ['iscsi_device']
+__all__ = ["iscsi_device"]

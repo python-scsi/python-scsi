@@ -17,15 +17,14 @@ class OpenCloseImportExportElement(SCSICommand):
     A class to hold information from a OpenCloseImportExportElement
     command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'element_address': [0xffff, 2],
-                 'action_code': [0x1f, 4], }
 
-    def __init__(self,
-                 opcode,
-                 xfer,
-                 acode,
-                 **kwargs):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "element_address": [0xFFFF, 2],
+        "action_code": [0x1F, 4],
+    }
+
+    def __init__(self, opcode, xfer, acode, **kwargs):
         """
         initialize a new instance
 
@@ -33,11 +32,10 @@ class OpenCloseImportExportElement(SCSICommand):
         :param xfer: element address
         :param acode: action code
         """
-        SCSICommand.__init__(self,
-                             opcode,
-                             0,
-                             0)
+        SCSICommand.__init__(self, opcode, 0, 0)
 
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  element_address=xfer,
-                                  action_code=acode, )
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            element_address=xfer,
+            action_code=acode,
+        )

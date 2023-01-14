@@ -9,7 +9,6 @@ from pyscsi.pyscsi.scsi import SCSI
 
 
 class MockSCSI(SCSI):
-
     def __init__(self, dev):
         self.device = dev
 
@@ -28,7 +27,7 @@ class MockDevice:
     def opcodes(self, value):
         self._opcodes = value
 
-    def execute(self, cmd, en_raw_sense: bool=False):
+    def execute(self, cmd, en_raw_sense: bool = False):
         pass
 
     def open(self):

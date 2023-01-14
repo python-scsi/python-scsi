@@ -16,18 +16,16 @@ class MoveMedium(SCSICommand):
     """
     A class to hold information from a MoveMedium command to a scsi device
     """
-    _cdb_bits = {'opcode': [0xff, 0],
-                 'medium_transport_address': [0xffff, 2],
-                 'source_address': [0xffff, 4],
-                 'destination_address': [0xffff, 6],
-                 'invert': [0x01, 10], }
 
-    def __init__(self,
-                 opcode,
-                 xfer,
-                 source,
-                 dest,
-                 invert=0):
+    _cdb_bits = {
+        "opcode": [0xFF, 0],
+        "medium_transport_address": [0xFFFF, 2],
+        "source_address": [0xFFFF, 4],
+        "destination_address": [0xFFFF, 6],
+        "invert": [0x01, 10],
+    }
+
+    def __init__(self, opcode, xfer, source, dest, invert=0):
         """
         initialize a new instance
 
@@ -37,12 +35,11 @@ class MoveMedium(SCSICommand):
         :param dest: destination address
         :param invert: invert can be 0 or 1
         """
-        SCSICommand.__init__(self,
-                             opcode,
-                             0,
-                             0)
-        self.cdb = self.build_cdb(opcode=self.opcode.value,
-                                  medium_transport_address=xfer,
-                                  source_address=source,
-                                  destination_address=dest,
-                                  invert=invert)
+        SCSICommand.__init__(self, opcode, 0, 0)
+        self.cdb = self.build_cdb(
+            opcode=self.opcode.value,
+            medium_transport_address=xfer,
+            source_address=source,
+            destination_address=dest,
+            invert=invert,
+        )

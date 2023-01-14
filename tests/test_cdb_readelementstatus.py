@@ -20,7 +20,14 @@ class CdbReadelementstatusTest(unittest.TestCase):
 
         with MockSCSI(MockDevice(smc)) as s:
             # cdb for SMC: ReadElementStatus
-            r = s.readelementstatus(300, 700, element_type=READELEMENTSTATUS.ELEMENT_TYPE.STORAGE, voltag=1, curdata=1, dvcid=1)
+            r = s.readelementstatus(
+                300,
+                700,
+                element_type=READELEMENTSTATUS.ELEMENT_TYPE.STORAGE,
+                voltag=1,
+                curdata=1,
+                dvcid=1,
+            )
             cdb = r.cdb
             self.assertEqual(cdb[0], s.device.opcodes.READ_ELEMENT_STATUS.value)
             self.assertEqual(cdb[1], 0x10 | READELEMENTSTATUS.ELEMENT_TYPE.STORAGE)
@@ -29,14 +36,16 @@ class CdbReadelementstatusTest(unittest.TestCase):
             self.assertEqual(cdb[6], 0x03)
             self.assertEqual(scsi_ba_to_int(cdb[7:10]), 16384)
             cdb = r.unmarshall_cdb(cdb)
-            self.assertEqual(cdb['opcode'], s.device.opcodes.READ_ELEMENT_STATUS.value)
-            self.assertEqual(cdb['voltag'], 1)
-            self.assertEqual(cdb['element_type'], READELEMENTSTATUS.ELEMENT_TYPE.STORAGE)
-            self.assertEqual(cdb['starting_element_address'], 300)
-            self.assertEqual(cdb['num_elements'], 700)
-            self.assertEqual(cdb['curdata'], 1)
-            self.assertEqual(cdb['dvcid'], 1)
-            self.assertEqual(cdb['alloc_len'], 16384)
+            self.assertEqual(cdb["opcode"], s.device.opcodes.READ_ELEMENT_STATUS.value)
+            self.assertEqual(cdb["voltag"], 1)
+            self.assertEqual(
+                cdb["element_type"], READELEMENTSTATUS.ELEMENT_TYPE.STORAGE
+            )
+            self.assertEqual(cdb["starting_element_address"], 300)
+            self.assertEqual(cdb["num_elements"], 700)
+            self.assertEqual(cdb["curdata"], 1)
+            self.assertEqual(cdb["dvcid"], 1)
+            self.assertEqual(cdb["alloc_len"], 16384)
 
             d = ReadElementStatus.unmarshall_cdb(ReadElementStatus.marshall_cdb(cdb))
             self.assertEqual(d, cdb)
