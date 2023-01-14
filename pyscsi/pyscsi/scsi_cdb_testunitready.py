@@ -16,6 +16,7 @@ class TestUnitReady(SCSICommand):
     """
     A class to hold information from a testunitready command to a scsi device
     """
+    __test__ = False
     _cdb_bits = {'opcode': [0xff, 0], }
 
     def __init__(self,
