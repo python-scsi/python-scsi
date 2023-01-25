@@ -91,6 +91,35 @@ service_actions = {
 
 """
 ------------------------------------------------------------------------------
+Persistent Reserve In Service Actions
+------------------------------------------------------------------------------
+"""
+sa_persistent_reserve_in = {
+    "READ_KEYS": 0x00,
+    "READ_RESERVATION": 0x01,
+    "REPORT_CAPABILITIES": 0x02,
+    "READ_FULL_STATUS": 0x03,
+}
+
+"""
+------------------------------------------------------------------------------
+Persistent Reserve Out Service Actions
+------------------------------------------------------------------------------
+"""
+sa_persistent_reserve_out = {
+    "REGISTER": 0x00,
+    "RESERVE": 0x01,
+    "RELEASE": 0x02,
+    "CLEAR": 0x03,
+    "PREEMPT": 0x04,
+    "PREEMPT_AND_ABORT": 0x05,
+    "REGISTER_AND_IGNORE_EXISTING_KEY": 0x06,
+    "REGISTER_AND_MOVE": 0x07,
+    "REPLACE_LOST_REGISTRATION": 0x08,
+}
+
+"""
+------------------------------------------------------------------------------
 opcode Dictionaries
 ------------------------------------------------------------------------------
 """
@@ -108,8 +137,12 @@ spc_opcodes = {
     "MODE_SELECT_10": OpCode("MODE_SELECT_10", 0x55, {}),
     "MODE_SENSE_6": OpCode("MODE_SENSE_6", 0x1A, {}),
     "MODE_SENSE_10": OpCode("MODE_SENSE_10", 0x5A, {}),
-    "PERSISTENT_RESERVE_IN": OpCode("PERSISTENT_RESERVE_IN", 0x5E, {}),
-    "PERSISTENT_RESERVE_OUT": OpCode("PERSISTENT_RESERVE_OUT", 0x5F, {}),
+    "PERSISTENT_RESERVE_IN": OpCode(
+        "PERSISTENT_RESERVE_IN", 0x5E, sa_persistent_reserve_in
+    ),
+    "PERSISTENT_RESERVE_OUT": OpCode(
+        "PERSISTENT_RESERVE_OUT", 0x5F, sa_persistent_reserve_out
+    ),
     "PREVENT_ALLOW_MEDIUM_REMOVAL": OpCode("PREVENT_ALLOW_MEDIUM_REMOVAL", 0x1E, {}),
     "READ_ATTRIBUTE": OpCode("READ_ATTRIBUTE", 0x8C, {}),
     "READ_BUFFER_10": OpCode("READ_BUFFER_10", 0x3C, {}),
@@ -153,8 +186,12 @@ sbc_opcodes = {
     "MODE_SENSE_6": OpCode("MODE_SENSE_6", 0x1A, {}),
     "MODE_SENSE_10": OpCode("MODE_SENSE_10", 0x5A, {}),
     "ORWRITE_16": OpCode("ORWRITE_16", 0x8B, {}),
-    "PERSISTENT_RESERVE_IN": OpCode("PERSISTENT_RESERVE_IN", 0x5E, {}),
-    "PERSISTENT_RESERVE_OUT": OpCode("PERSISTENT_RESERVE_OUT", 0x5F, {}),
+    "PERSISTENT_RESERVE_IN": OpCode(
+        "PERSISTENT_RESERVE_IN", 0x5E, sa_persistent_reserve_in
+    ),
+    "PERSISTENT_RESERVE_OUT": OpCode(
+        "PERSISTENT_RESERVE_OUT", 0x5F, sa_persistent_reserve_out
+    ),
     "PRE_FETCH_10": OpCode("PRE_FETCH_10", 0x34, {}),
     "PRE_FETCH_16": OpCode("PRE_FETCH_16", 0x90, {}),
     "PREVENT_ALLOW_MEDIUM_REMOVAL": OpCode("PREVENT_ALLOW_MEDIUM_REMOVAL", 0x1E, {}),
