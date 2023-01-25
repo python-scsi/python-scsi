@@ -21,6 +21,8 @@ from pyscsi.pyscsi.scsi_cdb_movemedium import MoveMedium
 from pyscsi.pyscsi.scsi_cdb_openclose_exportimport_element import (
     OpenCloseImportExportElement,
 )
+from pyscsi.pyscsi.scsi_cdb_persistentreservein import *
+from pyscsi.pyscsi.scsi_cdb_persistentreserveout import PersistentReserveOut
 from pyscsi.pyscsi.scsi_cdb_positiontoelement import PositionToElement
 from pyscsi.pyscsi.scsi_cdb_preventallow_mediumremoval import PreventAllowMediumRemoval
 from pyscsi.pyscsi.scsi_cdb_read10 import Read10
@@ -729,4 +731,90 @@ class SCSI(object):
             **kwargs
         )
         self.execute(cmd, en_raw_sense=True)
+        return cmd
+
+    def persistentreservein(self, service_action, **kwargs):
+        """
+        Return a PersistentReserveIn Instance
+
+        :param service_action: an int, the SERVICE ACTION code
+        :param kwargs: a dict with key/value pairs
+                       alloclen=1024, size of requested datain
+        :return: a PersistentReserveIn instance
+        """
+        opcode = self.device.opcodes.PERSISTENT_RESERVE_IN
+        if service_action == opcode.serviceaction.READ_KEYS:
+            cmd = PersistentReserveInReadKeys(opcode=opcode, **kwargs)
+        elif service_action == opcode.serviceaction.READ_RESERVATION:
+            cmd = PersistentReserveInReadReservation(opcode=opcode, **kwargs)
+        elif service_action == opcode.serviceaction.REPORT_CAPABILITIES:
+            cmd = PersistentReserveInReportCapabilities(opcode=opcode, **kwargs)
+        elif service_action == opcode.serviceaction.READ_FULL_STATUS:
+            cmd = PersistentReserveInReadFullStatus(opcode=opcode, **kwargs)
+        else:
+            raise ValueError("Invalid Service Action")
+
+        self.execute(cmd)
+        cmd.unmarshall()
+        return cmd
+
+    def persistentreserveout(self, service_action, scope=0, pr_type=0, **kwargs):
+        """
+        Returns a PersistentReserveOut Instance
+
+        :param service_action: an int, the SERVICE ACTION code
+        :param scope: persistent reservation SCOPE field
+        :param pr_type: persistent reservation TYPE field
+        :param kwargs: a dict with key/value pairs to specify the parameter
+                       list, either a Basic parameter list or a Register and
+                       Move parameter list
+
+
+        Basic parameter list may have the following keys:
+            reservation_key: eight-byte value to identify the I_T nexus that
+                             is the source of the PERSISTENT RESERVE OUT command
+            service_action_reservation_key: eight-byte value containing the
+                             reservation key to be registered to the specified
+                             I_T nexus
+            spec_i_pt: bit, Specify Initiator Ports (SPEC_I_PT)
+            all_tg_pt: bit, All Target Ports
+            aptpl: bit, Activate Persist Through Power Loss
+            transport_ids: a list of TransportID dicts used with REGISTER when
+                           spec_i_pt is set.
+
+        Each TransportID dict may have keys:
+            protocol_id, an int, specifies the SCSI transport protocol
+            tpid_format, an int, specifies the the format of the TransportID
+            n_port_name, 8-byte value, applicable to FIBRE_CHANNEL protocol_id
+            eui64_name, 8-byte value, applicable to IEEE_1394 protocol_id
+            initiator_port_identifier, 16-byte value, applicable to RDMA
+                                        protocol_id
+            iscsi_name, string representing IQN of initiator, applicable to
+                        iSCSI protocol_id
+            iscsi_initiator_session_id, string containing the iSCSI initiator
+                                        session identifier (see RFC 7143) in
+                                        the form of ASCII characters that are
+                                        the hexadecimal digits converted from
+                                        the binary iSCSI initiator session
+                                        identifier value.  Applicable to ISCSI
+                                        protocol_id when tpid_format=1
+            sas_address, 8-byte value, applicable to SAS protocol_id
+            routing_id, 8-byte value, applicable to SOP (SCSI over PCI Express)
+                                      protocol_id
+
+        Register and Move parameter list may have the following keys:
+            reservation_key: as described in Basic parameter list
+            service_action_reservation_key: as described in Basic parameter list
+            unreg: bit, Unregister
+            aptpl: bit, Activate Persist Through Power Loss
+            relative_target_port_id: 2-byte int, the relative port identifier of
+                                     the target port in the I_T nexus to which
+                                     the persistent reservation is to be moved.
+            transport_id: a TransportID dict
+
+        :return: a PersistentReserveOut instance
+        """
+        opcode = self.device.opcodes.PERSISTENT_RESERVE_OUT
+        cmd = PersistentReserveOut(opcode, service_action, scope, pr_type, **kwargs)
+        self.execute(cmd)
         return cmd

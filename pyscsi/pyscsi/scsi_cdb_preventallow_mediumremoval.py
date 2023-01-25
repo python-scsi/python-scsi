@@ -14,7 +14,7 @@ from pyscsi.pyscsi.scsi_command import SCSICommand
 
 class PreventAllowMediumRemoval(SCSICommand):
     """
-    A class to hold information from a PositionToElement command to a scsi device
+    A class to hold information from a PreventAllowMediumRemoval command to a scsi device
     """
 
     _cdb_bits = {
