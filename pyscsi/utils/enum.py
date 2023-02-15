@@ -10,7 +10,7 @@
 # pylint: disable=not-an-iterable
 # pylint: disable=unsupported-membership-test
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from pyscsi.utils.exception import NotSupportedArgumentError
 
@@ -79,11 +79,11 @@ class Enum(type):
             raise KeyError(f"Key {ex} not found") from ex
 
     @property
-    def keys(cls) -> list[str]:
+    def keys(cls) -> List[str]:
         """
         Property to return a list of Keys in the Enum.
         """
-        result: list[str] = [
+        result: List[str] = [
             key
             for key, val in vars(cls).items()
             if not callable(val)
