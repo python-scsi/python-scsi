@@ -40,7 +40,31 @@ class SCSIDeviceExceptionMeta(type):
         class CheckCondition(SCSICheckCondition):
             pass
 
+        class ConditionsMet(Exception):
+            pass
+
+        class BusyStatus(Exception):
+            pass
+
+        class ReservationConflict(Exception):
+            pass
+
+        class TaskSetFull(Exception):
+            pass
+
+        class ACAActive(Exception):
+            pass
+
+        class TaskAborted(Exception):
+            pass
+
         attributes.update({"CheckCondition": CheckCondition})
+        attributes.update({"ConditionsMet": ConditionsMet})
+        attributes.update({"BusyStatus": BusyStatus})
+        attributes.update({"ReservationConflict": ReservationConflict})
+        attributes.update({"TaskSetFull": TaskSetFull})
+        attributes.update({"ACAActive": ACAActive})
+        attributes.update({"TaskAborted": TaskAborted})
 
         return type.__new__(mcs, cls, bases, attributes)
 

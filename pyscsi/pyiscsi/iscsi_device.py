@@ -104,6 +104,18 @@ class ISCSIDevice(metaclass=ExMETA):
             raise self.CheckCondition(cmd.sense)
         if task.status == scsi_enum_command.SCSI_STATUS.GOOD:
             return
+        if task.status == scsi_enum_command.SCSI_STATUS.RESERVATION_CONFLICT:
+            raise self.ReservationConflict()
+        if task.status == scsi_enum_command.SCSI_STATUS.TASK_ABORTED:
+            raise self.TaskAborted()
+        if task.status == scsi_enum_command.SCSI_STATUS.BUSY:
+            raise self.BusyStatus()
+        if task.status == scsi_enum_command.SCSI_STATUS.TASK_SET_FULL:
+            raise self.TaskSetFull()
+        if task.status == scsi_enum_command.SCSI_STATUS.ACA_ACTIVE:
+            raise self.ACAActive()
+        if task.status == scsi_enum_command.SCSI_STATUS.CONDITIONS_MET:
+            raise self.ConditionsMet()
         raise RuntimeError
 
     @property
