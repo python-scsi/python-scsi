@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-from pyscsi.utils.converter import decode_bits
+from pyscsi.utils.converter import decode_bits, encode_dict
 
 #
 # SPC4 4.5 Sense Data
@@ -1043,4 +1043,20 @@ class SCSICheckCondition(Exception):
     def unmarshall_desc_format_sense_data(data):
         result = {}
         decode_bits(data, SCSICheckCondition._desc_format_sdata_bits, result)
+        return result
+
+    @staticmethod
+    def marshall_sense_data(data):
+        if data["response_code"] == SENSE_FORMAT_CURRENT_FIXED:
+            result = bytearray(18)
+            encode_dict(data, SCSICheckCondition._fixed_format_sdata_bits, result)
+        elif data["response_code"] == SENSE_FORMAT_CURRENT_DESCRIPTOR:
+            result = bytearray(8)
+            encode_dict(data, SCSICheckCondition._desc_format_sdata_bits, result)
+        else:
+            raise ValueError(
+                "Invalid response code: %d (0x%x)",
+                data["response_code"],
+                data["response_code"],
+            )
         return result

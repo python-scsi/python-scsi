@@ -7,6 +7,7 @@
 
 import pyscsi.pyscsi.scsi_enum_command as scsi_enum_command
 from pyscsi.pyscsi.scsi_exception import SCSIDeviceCommandExceptionMeta as ExMETA
+from pyscsi.pyscsi.scsi_sense import SCSICheckCondition
 
 try:
     import iscsi
@@ -97,6 +98,19 @@ class ISCSIDevice(metaclass=ExMETA):
         task = iscsi.Task(cmd.cdb, dir, xferlen)
         self._iscsi.command(self._iscsi_url.lun, task, cmd.dataout, cmd.datain)
         if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            if not cmd.sense:
+                try:
+                    libiscsi_sense = task.sense
+                    sense_d = {
+                        "response_code": libiscsi_sense["error_type"] & 0x7F,
+                        "sense_key": libiscsi_sense["key"],
+                        "additional_sense_code": libiscsi_sense["ascq"] >> 8,
+                        "additional_sense_code_qualifier": libiscsi_sense["ascq"]
+                        & 0xFF,
+                    }
+                    cmd.sense = SCSICheckCondition.marshall_sense_data(sense_d)
+                except AttributeError:
+                    pass
             # Match recent addition to SCSIDevice
             if en_raw_sense:
                 cmd.raw_sense_data = cmd.sense
