@@ -15,7 +15,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbTestunitreadyTest(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(sbc)) as s:
             w = s.testunitready()
             cdb = w.cdb

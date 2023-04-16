@@ -86,7 +86,6 @@ class PersistentReserveInReadKeys(PersistentReserveIn):
     }
 
     def __init__(self, opcode, alloclen=1024, **kwargs):
-
         PersistentReserveIn.__init__(
             self, opcode, opcode.serviceaction.READ_KEYS, alloclen
         )
@@ -125,7 +124,6 @@ class PersistentReserveInReadReservation(PersistentReserveIn):
     }
 
     def __init__(self, opcode, alloclen=1024, **kwargs):
-
         PersistentReserveIn.__init__(
             self, opcode, opcode.serviceaction.READ_RESERVATION, alloclen
         )
@@ -178,7 +176,6 @@ class PersistentReserveInReportCapabilities(PersistentReserveIn):
     }
 
     def __init__(self, opcode, alloclen=1024, **kwargs):
-
         PersistentReserveIn.__init__(
             self, opcode, opcode.serviceaction.REPORT_CAPABILITIES, alloclen
         )
@@ -226,7 +223,6 @@ class PersistentReserveInReadFullStatus(PersistentReserveIn):
     }
 
     def __init__(self, opcode, alloclen=1024, **kwargs):
-
         PersistentReserveIn.__init__(
             self, opcode, opcode.serviceaction.READ_FULL_STATUS, alloclen
         )

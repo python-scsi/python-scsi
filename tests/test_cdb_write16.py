@@ -16,7 +16,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbWrite16Test(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(sbc)) as s:
             s.blocksize = 512
 

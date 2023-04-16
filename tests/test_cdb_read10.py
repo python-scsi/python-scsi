@@ -16,7 +16,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbRead10Test(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(sbc)) as s:
             s.blocksize = 512
             r = s.read10(1024, 27)

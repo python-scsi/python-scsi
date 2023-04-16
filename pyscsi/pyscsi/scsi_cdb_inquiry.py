@@ -413,7 +413,6 @@ class Inquiry(SCSICommand):
         convert.decode_bits(data, cls._datain_bits, result)
 
         if evpd == 0:
-
             convert.decode_bits(data, cls._standard_bits, result)
             return result
 

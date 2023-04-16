@@ -32,7 +32,6 @@ class CdbPersistentreserveinTest(unittest.TestCase):
                 self.assertEqual(result["pr_type_mask"][k], 0)
 
     def test_main(self):
-
         key1_data = bytearray(b"\x00\x00\x00\x00\xDE\xAD\xBE\xEF")
         key2_data = bytearray(b"\xAB\xCD\xEF\xAA\xBB\xCC\xDD\xEE")
         key1_value = 0xDEADBEEF

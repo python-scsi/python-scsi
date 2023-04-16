@@ -49,7 +49,6 @@ def main():
     device = init_device(sys.argv[1])
 
     with SCSI(device) as s:
-
         try:
             s.testunitready()
 

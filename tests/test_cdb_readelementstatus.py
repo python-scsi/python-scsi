@@ -17,7 +17,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbReadelementstatusTest(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(smc)) as s:
             # cdb for SMC: ReadElementStatus
             r = s.readelementstatus(

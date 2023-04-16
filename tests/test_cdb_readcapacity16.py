@@ -16,7 +16,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbReadcapacity16Test(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(sbc)) as s:
             r = s.readcapacity16(alloclen=37)
             cdb = r.cdb

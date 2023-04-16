@@ -18,7 +18,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbReporttargetportgroupsTest(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(spc)) as s:
             r = s.reporttargetportgroups(data_format=0x00, alloclen=1112527)
             cdb = r.cdb

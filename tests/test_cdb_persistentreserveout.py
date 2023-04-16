@@ -19,7 +19,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbPersistentreserveoutTest(unittest.TestCase):
     def test_main(self):
-
         key1_data = bytearray(b"\x00\x00\x00\x00\xDE\xAD\xBE\xEF")
         key2_data = bytearray(b"\xAB\xCD\xEF\xAA\xBB\xCC\xDD\xEE")
         key1_value = 0xDEADBEEF

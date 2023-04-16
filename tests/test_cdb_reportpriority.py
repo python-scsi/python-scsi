@@ -16,7 +16,6 @@ from tests.mock_device import MockDevice, MockSCSI
 
 class CdbReportpriorityTest(unittest.TestCase):
     def test_main(self):
-
         with MockSCSI(MockDevice(spc)) as s:
             r = s.reportpriority(priority=0x00, alloclen=1112527)
             cdb = r.cdb
