@@ -97,6 +97,11 @@ class ISCSIDevice(metaclass=ExMETA):
         task = iscsi.Task(cmd.cdb, dir, xferlen)
         self._iscsi.command(self._iscsi_url.lun, task, cmd.dataout, cmd.datain)
         if task.status == scsi_enum_command.SCSI_STATUS.CHECK_CONDITION:
+            if not cmd.sense:
+                try:
+                    cmd.sense = task.raw_sense
+                except AttributeError:
+                    pass
             # Match recent addition to SCSIDevice
             if en_raw_sense:
                 cmd.raw_sense_data = cmd.sense
