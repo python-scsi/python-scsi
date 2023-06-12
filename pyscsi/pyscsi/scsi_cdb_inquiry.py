@@ -269,7 +269,7 @@ class Inquiry(SCSICommand):
 
         if _type == cls.DESIGNATOR.NAA:
             _r = bytearray(16)
-            convert.decode_bits(data, cls._naa_type_bits, _r)
+            convert.encode_dict(data, cls._naa_type_bits, _r)
             if data["naa"] == cls.NAA.IEEE_EXTENDED:
                 convert.encode_dict(data, cls._naa_ieee_extended_bits, _r)
                 return _r[:8]

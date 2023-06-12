@@ -9,6 +9,8 @@
 from pyscsi.pyscsi.scsi_cdb_atapassthrough12 import ATAPassThrough12
 from pyscsi.pyscsi.scsi_cdb_atapassthrough16 import ATAPassThrough16
 from pyscsi.pyscsi.scsi_cdb_exchangemedium import ExchangeMedium
+from pyscsi.pyscsi.scsi_cdb_extended_copy_spc4 import ExtendedCopy as ExtendedCopy4
+from pyscsi.pyscsi.scsi_cdb_extended_copy_spc5 import ExtendedCopy as ExtendedCopy5
 from pyscsi.pyscsi.scsi_cdb_getlbastatus import GetLBAStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatus import InitializeElementStatus
 from pyscsi.pyscsi.scsi_cdb_initelementstatuswithrange import (
@@ -816,5 +818,57 @@ class SCSI(object):
         """
         opcode = self.device.opcodes.PERSISTENT_RESERVE_OUT
         cmd = PersistentReserveOut(opcode, service_action, scope, pr_type, **kwargs)
+        self.execute(cmd)
+        return cmd
+
+    def extendedcopy4(
+        self,
+        list_identifier=0,
+        sequential_striped=0,
+        nrcr=0,
+        priority=0,
+        target_descriptor_list=[],
+        segment_descriptor_list=[],
+        inline_data=bytearray(0),
+    ):
+        opcode = self.device.opcodes.EXTENDED_COPY
+        cmd = ExtendedCopy4(
+            opcode,
+            list_identifier,
+            sequential_striped,
+            nrcr,
+            priority,
+            target_descriptor_list,
+            segment_descriptor_list,
+            inline_data,
+        )
+        self.execute(cmd)
+        return cmd
+
+    def extendedcopy5(
+        self,
+        sequential_striped=0,
+        list_id_usage=0,
+        priority=0,
+        g_sense=0,
+        immed=0,
+        list_identifier=0,
+        cscd_descriptor_list=[],
+        segment_descriptor_list=[],
+        inline_data=bytearray(0),
+    ):
+        opcode = self.device.opcodes.EXTENDED_COPY
+        cmd = ExtendedCopy5(
+            opcode,
+            sequential_striped,
+            list_id_usage,
+            priority,
+            g_sense,
+            immed,
+            list_identifier,
+            cscd_descriptor_list,
+            segment_descriptor_list,
+            inline_data,
+        )
         self.execute(cmd)
         return cmd
