@@ -235,7 +235,7 @@ sbc_opcodes = {
     "VERIFY_16": OpCode("VERIFY_16", 0x8F, {}),
     "VOLUME_SET_IN": OpCode("VOLUME_SET_IN", 0xBE, {}),
     "VOLUME_SET_OUT": OpCode("VOLUME_SET_IN", 0xBF, {}),
-    "WRITE_6": OpCode("WRITE_6", 0xA0, {}),
+    "WRITE_6": OpCode("WRITE_6", 0x0A, {}),
     "WRITE_10": OpCode("WRITE_10", 0x2A, {}),
     "WRITE_12": OpCode("WRITE_12", 0xAA, {}),
     "WRITE_16": OpCode("WRITE_16", 0x8A, {}),
