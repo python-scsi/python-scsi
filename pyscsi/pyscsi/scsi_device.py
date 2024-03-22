@@ -44,13 +44,14 @@ class SCSIDevice(metaclass=ExMETA):
     Note: The workflow above is already implemented in the SCSI class
     """
 
-    def __init__(self, device, readwrite=False, detect_replugged=True):
+    def __init__(self, device, readwrite=False, detect_replugged=True, buffering=-1):
         """
         initialize a  new instance of a SCSIDevice
         :param device: the file descriptor
         :param readwrite: access type
         :param detect_replugged: detects device unplugged and plugged events and ensure executions will not fail
         silently due to replugged events
+        :param buffering: Set the amount of buffering. For details, refer to the documentation of the open() built-in
         """
         self._opcodes = scsi_enum_command.spc
         self._file_name = device
@@ -58,6 +59,7 @@ class SCSIDevice(metaclass=ExMETA):
         self._file = None
         self._ino = None
         self._detect_replugged = detect_replugged
+        self._buffering = buffering
 
         if _has_sgio and device[:5] == "/dev/":
             self.open()
@@ -100,7 +102,8 @@ class SCSIDevice(metaclass=ExMETA):
         :param read_write:
         :return:
         """
-        self._file = open(self._file_name, "w+b" if self._read_write else "rb")
+        self._file = open(self._file_name, "w+b" if self._read_write else "rb",
+                          buffering=self._buffering)
         self._ino = get_inode(self._file_name)
 
     def close(self):
