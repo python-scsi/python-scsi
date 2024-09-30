@@ -102,8 +102,11 @@ class SCSIDevice(metaclass=ExMETA):
         :param read_write:
         :return:
         """
-        self._file = open(self._file_name, "w+b" if self._read_write else "rb",
-                          buffering=self._buffering)
+        self._file = open(
+            self._file_name,
+            "w+b" if self._read_write else "rb",
+            buffering=self._buffering,
+        )
         self._ino = get_inode(self._file_name)
 
     def close(self):
