@@ -25,6 +25,8 @@ __all__ = [
     "scsi_cdb_readdiscinformation",
     "scsi_cdb_report_luns",
     "scsi_cdb_report_priority",
+    "scsi_cdb_synchronize_cache10",
+    "scsi_cdb_synchronize_cache16",
     "scsi_cdb_testunitready",
     "scsi_cdb_write10",
     "scsi_cdb_write12",
