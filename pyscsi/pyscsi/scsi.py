@@ -38,6 +38,8 @@ from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
 from pyscsi.pyscsi.scsi_cdb_report_target_port_groups import ReportTargetPortGroups
+from pyscsi.pyscsi.scsi_cdb_synchronize_cache10 import SynchronizeCache10
+from pyscsi.pyscsi.scsi_cdb_synchronize_cache16 import SynchronizeCache16
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -471,6 +473,46 @@ class SCSI(object):
         """
         opcode = self.device.opcodes.MOVE_MEDIUM
         cmd = MoveMedium(opcode, xfer, source, dest, **kwargs)
+        self.execute(cmd)
+        return cmd
+
+    def synchronizecache10(self, lba, numblks, **kwargs):
+        """
+        Returns a SynchronizeCache10 Instance
+
+        :param lba: Logical Block Address to write to
+        :param numblks: number of logical blocks that shall be
+                        synchronized, starting with the logical
+                        block referenced by the lba
+        :param kwargs: a dict with key/value pairs
+                       immed = 0, do not return status until the
+                                  synchronize cache operation has
+                                  been completed.
+                       group = 0, Group Number
+        :return: a SynchronizeCache10 instance
+        """
+        opcode = self.device.opcodes.SYNCHRONIZE_CACHE_10
+        cmd = SynchronizeCache10(opcode, lba, numblks, **kwargs)
+        self.execute(cmd)
+        return cmd
+
+    def synchronizecache16(self, lba, numblks, **kwargs):
+        """
+        Returns a SynchronizeCache16 Instance
+
+        :param lba: Logical Block Address to write to
+        :param numblks: number of logical blocks that shall be
+                        synchronized, starting with the logical
+                        block referenced by the lba
+        :param kwargs: a dict with key/value pairs
+                       immed = 0, do not return status until the
+                                  synchronize cache operation has
+                                  been completed.
+                       group = 0, Group Number
+        :return: a SynchronizeCache16 instance
+        """
+        opcode = self.device.opcodes.SYNCHRONIZE_CACHE_16
+        cmd = SynchronizeCache16(opcode, lba, numblks, **kwargs)
         self.execute(cmd)
         return cmd
 
