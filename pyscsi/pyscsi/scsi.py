@@ -38,6 +38,7 @@ from pyscsi.pyscsi.scsi_cdb_readelementstatus import ReadElementStatus
 from pyscsi.pyscsi.scsi_cdb_report_luns import ReportLuns
 from pyscsi.pyscsi.scsi_cdb_report_priority import ReportPriority
 from pyscsi.pyscsi.scsi_cdb_report_target_port_groups import ReportTargetPortGroups
+from pyscsi.pyscsi.scsi_cdb_synchronizecache import SynchronizeCache
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
@@ -471,6 +472,16 @@ class SCSI(object):
         """
         opcode = self.device.opcodes.MOVE_MEDIUM
         cmd = MoveMedium(opcode, xfer, source, dest, **kwargs)
+        self.execute(cmd)
+        return cmd
+
+    def synchronizecache(self):
+        """
+        Returns a SynchronizeCache Instance
+
+        """
+        opcode = self.device.opcodes.SYNCHRONIZE_CACHE_10
+        cmd = TestUnitReady(opcode)
         self.execute(cmd)
         return cmd
 
