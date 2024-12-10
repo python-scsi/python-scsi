@@ -39,6 +39,7 @@ vendor_specific_sense_asc = vendor_specific_sense_ascq = range(0x80, 0xFF + 1)
 
 # dict with additional sense data
 sense_ascq_dict = {
+    0x0000: "NO ADDITIONAL SENSE INFORMATION",
     0x0001: "FILEMARK DETECTED",
     0x0002: "END-OF-PARTITION/MEDIUM DETECTED",
     0x0003: "SETMARK DETECTED",
