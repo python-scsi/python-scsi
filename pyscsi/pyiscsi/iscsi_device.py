@@ -74,8 +74,10 @@ class ISCSIDevice(metaclass=ExMETA):
             self._iscsi = iscsi.Context(device)
         self._iscsi_url = iscsi.URL(self._iscsi, self._file_name)
         self._iscsi.set_targetname(self._iscsi_url.target)
-        self._iscsi.set_session_type(iscsi.ISCSI_SESSION_NORMAL)
-        self._iscsi.set_header_digest(iscsi.ISCSI_HEADER_DIGEST_NONE_CRC32C)
+        self._iscsi.set_session_type(iscsi.iscsi_session_type.ISCSI_SESSION_NORMAL)
+        self._iscsi.set_header_digest(
+            iscsi.iscsi_header_digest.ISCSI_HEADER_DIGEST_NONE_CRC32C
+        )
         self._iscsi.connect(self._iscsi_url.portal, self._iscsi_url.lun)
 
     def close(self):
@@ -86,13 +88,13 @@ class ISCSIDevice(metaclass=ExMETA):
         execute a scsi command
         :param cmd: a scsi command
         """
-        dir = iscsi.SCSI_XFER_NONE
+        dir = iscsi.scsi_xfer_dir.SCSI_XFER_NONE
         xferlen = 0
         if len(cmd.datain):
-            dir = iscsi.SCSI_XFER_READ
+            dir = iscsi.scsi_xfer_dir.SCSI_XFER_READ
             xferlen = len(cmd.datain)
         if len(cmd.dataout):
-            dir = iscsi.SCSI_XFER_WRITE
+            dir = iscsi.scsi_xfer_dir.SCSI_XFER_WRITE
             xferlen = len(cmd.dataout)
         task = iscsi.Task(cmd.cdb, dir, xferlen)
         self._iscsi.command(self._iscsi_url.lun, task, cmd.dataout, cmd.datain)
