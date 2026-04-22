@@ -258,6 +258,16 @@ sbc_opcodes = {
     "XDWRITE_10": OpCode("XDWRITE_10", 0x50, {}),
     "XDWRITEREAD_10": OpCode("XDWRITEREAD_10", 0x53, {}),
     "XPWRITE_10": OpCode("XPWRITE_10", 0x51, {}),
+    "SANITIZE": OpCode(
+        "SANITIZE", 
+        0x48, 
+        {
+            "OVERWRITE": 0x01,
+            "BLOCK_ERASE": 0x02,
+            "CRYPTOGRAPHIC_ERASE": 0x03,
+            "EXIT_FAILURE_MODE": 0x1F,
+        },
+    ),
 }
 
 ssc_opcodes = {
