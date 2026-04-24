@@ -41,6 +41,7 @@ from pyscsi.pyscsi.scsi_cdb_report_target_port_groups import ReportTargetPortGro
 from pyscsi.pyscsi.scsi_cdb_synchronize_cache10 import SynchronizeCache10
 from pyscsi.pyscsi.scsi_cdb_synchronize_cache16 import SynchronizeCache16
 from pyscsi.pyscsi.scsi_cdb_testunitready import TestUnitReady
+from pyscsi.pyscsi.scsi_cdb_unmap import Unmap
 from pyscsi.pyscsi.scsi_cdb_write10 import Write10
 from pyscsi.pyscsi.scsi_cdb_write12 import Write12
 from pyscsi.pyscsi.scsi_cdb_write16 import Write16
@@ -523,6 +524,22 @@ class SCSI(object):
         """
         opcode = self.device.opcodes.TEST_UNIT_READY
         cmd = TestUnitReady(opcode)
+        self.execute(cmd)
+        return cmd
+
+    def unmap(self, lbas, **kwargs):
+        """
+        Returns an Unmap Instance
+
+        :param lbas: a list of dicts, each with 'lba' and 'num_blocks' keys,
+                     specifying the LBA ranges to unmap
+        :param kwargs: a dict with key/value pairs
+                       anchor = 0, Anchor flag
+                       group = 0, Group Number
+        :return: an Unmap instance
+        """
+        opcode = self.device.opcodes.UNMAP
+        cmd = Unmap(opcode, lbas, **kwargs)
         self.execute(cmd)
         return cmd
 
