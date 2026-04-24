@@ -221,8 +221,8 @@ sbc_opcodes = {
     "REPORT_LUNS": OpCode("REPORT_LUNS", 0xA0, {}),
     "REQUEST_SENSE": OpCode("REQUEST_SENSE", 0x03, {}),
     "SANITIZE": OpCode(
-        "SANITIZE", 
-        0x48, 
+        "SANITIZE",
+        0x48,
         {
             "OVERWRITE": 0x01,
             "BLOCK_ERASE": 0x02,
