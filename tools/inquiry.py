@@ -118,9 +118,11 @@ def inquiry_logical_block_prov(s):
         "  Threshold=%d blocks  [%s]"
         % (
             1 << i["threshold_exponent"],
-            "NO LOGICAL BLOCK PROVISIONING SUPPORT"
-            if not i["threshold_exponent"]
-            else "exponent=%d" % (i["threshold_exponent"]),
+            (
+                "NO LOGICAL BLOCK PROVISIONING SUPPORT"
+                if not i["threshold_exponent"]
+                else "exponent=%d" % (i["threshold_exponent"])
+            ),
         )
     )
     print(

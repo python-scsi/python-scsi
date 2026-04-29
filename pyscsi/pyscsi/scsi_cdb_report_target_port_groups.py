@@ -97,9 +97,9 @@ class ReportTargetPortGroups(SCSICommand):
                 result["implicit_transition_time"] = _r["implicit_transition_time"]
                 _data = _data[4:]
         else:
-            result[
-                "format_type"
-            ] = DATA_FORMAT_TYPE.LENGTH_ONLY_HEADER_PARAMETER_DATA_FORMAT
+            result["format_type"] = (
+                DATA_FORMAT_TYPE.LENGTH_ONLY_HEADER_PARAMETER_DATA_FORMAT
+            )
 
         _tpg_descriptors = []  # Target Port Group Descriptors
         while len(_data):
