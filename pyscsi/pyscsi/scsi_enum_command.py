@@ -220,6 +220,16 @@ sbc_opcodes = {
     "REDUNDANCY_GROUP_OUT": OpCode("REDUNDANCY_GROUP_OT", 0xBB, {}),
     "REPORT_LUNS": OpCode("REPORT_LUNS", 0xA0, {}),
     "REQUEST_SENSE": OpCode("REQUEST_SENSE", 0x03, {}),
+    "SANITIZE": OpCode(
+        "SANITIZE",
+        0x48,
+        {
+            "OVERWRITE": 0x01,
+            "BLOCK_ERASE": 0x02,
+            "CRYPTOGRAPHIC_ERASE": 0x03,
+            "EXIT_FAILURE_MODE": 0x1F,
+        },
+    ),
     "SECURITY_PROTOCOL_IN": OpCode("SECURITY_PROTOCOL_IN", 0xA2, {}),
     "SECURITY_PROTOCOL_OUT": OpCode("SECURITY_PROTOCOL_OUT", 0xB5, {}),
     "SEND_DIAGNOSTIC": OpCode("SEND_DIAGNOSTIC", 0x1D, {}),
